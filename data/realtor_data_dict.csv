@@ -1,0 +1,37 @@
+Name,Label,Description
+median_listing_price,Median Listing Price,The median listing price within the specified geography during the specified month.
+median_listing_price_mm,Median Listing Price M/M,The percentage change in the median listing price from the previous month.
+median_listing_price_yy,Median Listing Price Y/Y,The percentage change in the median listing price from the same month in the previous year.
+active_listing_count,Active Listing Count,"The count of active listings within the specified geography during the specified month. The active listing count tracks the number of for sale properties on the market, excluding pending listings where a pending status is available. This is a snapshot measure of how many active listings can be expected on any given day of the specified month."
+active_listing_count_mm,Active Listing Count M/M,The percentage change in the active listing count from the previous month.
+active_listing_count_yy,Active Listing Count Y/Y,The percentage change in the active listing count from the same month in the previous year.
+days_on_market,Days on Market,The median number of days property listings spend on the market within the specified geography during the specified month. Time spent on the market is defined as the time between the initial listing of a property and either its closing date or the date it is taken off the market.
+days_on_market_mm,Days on Market M/M,The percentage change in the median days on market from the previous month.
+days_on_market_yy,Days on Market Y/Y,The percentage change in the median days on market from the same month in the previous year.
+new_listing_count,New Listing Count,The count of new listings added to the market within the specified geography. The new listing count represents a typical week’s worth of new listings in a given month. The new listing count can be multiplied by the number of weeks in a month to produce a monthly new listing count.
+new_listing_count_mm,New Listing Count M/M,The percentage change in the new listing count from the previous month.
+new_listing_count_yy,New Listing Count Y/Y,The percentage change in the new listing count from the same month in the previous year.
+price_increase_count,Price Increase Count,The count of listings which have had their price increased within the specified geography. The price increase count represents a typical week’s worth of listings which have had their price increased in a given month. The price increase count can be multiplied by the number of weeks in a month to produce a monthly price increase count.
+price_increase_count_mm,Price Increase Count M/M,The percentage change in the price increase count from the previous month.
+price_increase_count_yy,Price Increase Count Y/Y,The percentage change in the price increase count from the same month in the previous year.
+price_decrease_count,Price Decrease Count,The count of listings which have had their price reduced within the specified geography. The price decrease count represents a typical week’s worth of listings which have had their price reduced in a given month. The price decrease count can be multiplied by the number of weeks in a month to produce a monthly price decrease count.
+price_decrease_count_mm,Price Decrease Count M/M,The percentage change in the price decrease count from the previous month.
+price_decrease_count_yy,Price Decrease Count Y/Y,The percentage change in the price decrease count from the same month in the previous year.
+pending_listing_count,Pending Listing Count,"The count of pending listings within the specified geography during the specified month, if a pending definition is available for that geography. This is a snapshot measure of how many pending listings can be expected on any given day of the specified month."
+pending_listing_count_mm,Pending Listing Count M/M,The percentage change in the pending listing count from the previous month.
+pending_listing_count_yy,Pending Listing Count Y/Y,The percentage change in the pending listing count from the same month in the previous year.
+median_list_price_per_sqft,Median List Price Per Sqft,The median listing price per square foot within the specified geography during the specified month.
+median_list_price_per_sqft_mm,Median List Price Per Sqft M/M,The percentage change in the median listing price per square foot from the previous month.
+median_list_price_per_sqft_yy,Median List Price Per Sqft Y/Y,The percentage change in the median listing price per square foot from the same month in the previous year.
+median_listing_sqft,Median Listing Sqft,The median listing square feet within the specified geography during the specified month.
+median_listing_sqft_mm,Median Listing Sqft M/M,The percentage change in the median listing square feet from the previous month.
+median_listing_sqft_yy,Median Listing Sqft Y/Y,The percentage change in the median listing square feet from the same month in the previous year.
+avg_listing_price,Avg Listing Price,The average listing price within the specified geography during the specified month.
+avg_listing_price_mm,Avg Listing Price M/M,The percentage change in the average listing price from the previous month.
+avg_listing_price_yy,Avg Listing Price Y/Y,The percentage change in the average listing price from the same month in the previous year.
+total_listing_count,Total Listing Count,The total of both active listings and pending listings within the specified geography during the specified month. This is a snapshot measure of how many total listings can be expected on any given day of the specified month.
+total_listing_count_mm,Total Listing Count M/M,The percentage change in the total listing count from the previous month.
+total_listing_count_yy,Total Listing Count Y/Y,The percentage change in the total listing count from the same month in the previous year.
+pending_ratio,Pending Ratio,The ratio of the pending listing count to the active listing count within the specified geography during the specified month.
+pending_ratio_mm,Pending Ratio M/M,The change in the pending ratio from the previous month.
+pending_ratio_yy,Pending Ratio Y/Y,The change in the pending ratio from the same month in the previous year.

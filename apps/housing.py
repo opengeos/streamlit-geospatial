@@ -92,6 +92,13 @@ def select_null(gdf, col_name):
     return new_gdf
 
 
+def get_data_dict(name):
+    in_csv = os.path.join(os.getcwd(), "data/realtor_data_dict.csv")
+    df = pd.read_csv(in_csv)
+    desc = list(df[df["Name"] == name]["Description"])[0]
+    return desc
+
+
 def app():
 
     st.title("Real Estate Data and Market Trends")
@@ -119,8 +126,11 @@ def app():
     data_cols = get_data_columns(inventory_df, "county")
     selected_col = st.selectbox("", data_cols)
 
+    with st.expander("See description"):
+        st.write(get_data_dict(selected_col.strip()))
+
     county_gdf = join_attributes(county_gdf, inventory_df, "county")
-    county_gdf = select_non_null(county_gdf, "median_listing_price")
+    county_gdf = select_non_null(county_gdf, selected_col)
 
     initial_view_state = pdk.ViewState(
         latitude=40, longitude=-100, zoom=3, max_zoom=16, pitch=0, bearing=0

@@ -2,7 +2,7 @@ import streamlit as st
 from multiapp import MultiApp
 from apps import home, deck, housing
 
-# st.set_page_config(layout="wide")
+st.set_page_config(layout="wide")
 
 
 apps = MultiApp()
