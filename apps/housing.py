@@ -156,7 +156,7 @@ def app():
         if show_colormaps:
             st.write(cm.plot_colormaps(return_fig=True))
     with row2_col4:
-        show_nodata = st.checkbox("Show no data areas")
+        show_nodata = st.checkbox("Show no data areas", value=True)
 
     county_gdf = join_attributes(county_gdf, inventory_df, "county")
     county_null_gdf = select_null(county_gdf, selected_col)
