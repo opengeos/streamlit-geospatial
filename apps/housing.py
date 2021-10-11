@@ -100,8 +100,9 @@ def select_null(gdf, col_name):
 def get_data_dict(name):
     in_csv = os.path.join(os.getcwd(), "data/realtor_data_dict.csv")
     df = pd.read_csv(in_csv)
+    label = list(df[df["Name"] == name]["Label"])[0]
     desc = list(df[df["Name"] == name]["Description"])[0]
-    return desc
+    return label, desc
 
 
 def app():
@@ -114,15 +115,6 @@ def app():
     """
     )
 
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        frequency = st.radio("", ["Monthly", "Weekly"])
-    with col2:
-        st.radio("", ["Current month data", "Historical data"])
-    with col3:
-        st.radio("", ["National", "State", "Metro", "County", "Zip"], index=3)
-
     county_gdf = get_geom_data("county")
     inventory_df = get_inventory_data(
         data_links["monthly_current"]["county"], "county_fips"
@@ -130,19 +122,39 @@ def app():
 
     data_cols = get_data_columns(inventory_df, "county")
 
-    row2_col1, row2_col2, row2_col3, row2_col4 = st.columns([1.3, 1, 1, 3])
+    row1_col1, row1_col2, row1_col3, row1_col4, row1_col5 = st.columns([
+                                                                       0.6, 0.8, 0.6, 1.4, 2])
+    with row1_col1:
+        frequency = st.selectbox("Monthly/weekly data", ["Monthly", "Weekly"])
+    with row1_col2:
+        st.selectbox("Current/historical data",
+                     ["Current month data", "Historical data"])
+    with row1_col3:
+        st.selectbox("Scale", ["National", "State", "Metro",
+                     "County", "Zip"], index=3)
+    with row1_col4:
+        selected_col = st.selectbox("Attribute", data_cols)
+    with row1_col5:
+        show_desc = st.checkbox("Show data description")
+        if show_desc:
+            label, desc = get_data_dict(selected_col.strip())
+            markdown = f"""
+            **{label}**: {desc}
+            """
+            st.markdown(markdown)
+
+    row2_col1, row2_col2, row2_col3, row2_col4 = st.columns([1, 1, 2, 2])
 
     with row2_col1:
-        selected_col = st.selectbox("Select an attribute", data_cols)
-        # with st.expander("See description"):
-        #     st.write(get_data_dict(selected_col.strip()))
-
-    with row2_col2:
         palette = st.selectbox(
-            "Select a palette", cm.list_colormaps(), index=2)
-    with row2_col3:
+            "Color palette", cm.list_colormaps(), index=2)
+    with row2_col2:
         n_colors = st.slider("Number of colors", min_value=2,
                              max_value=20, value=8)
+    with row2_col3:
+        show_colormaps = st.checkbox("Preview all colormaps")
+        if show_colormaps:
+            st.write(cm.plot_colormaps(return_fig=True))
 
     county_gdf = join_attributes(county_gdf, inventory_df, "county")
     county_gdf = select_non_null(county_gdf, selected_col)
@@ -201,11 +213,11 @@ def app():
         tooltip=tooltip,
     )
 
-    col4, col5 = st.columns([6, 1])
+    row3_col1, row3_col2 = st.columns([6, 1])
 
-    with col4:
+    with row3_col1:
         st.pydeck_chart(r)
-    with col5:
+    with row3_col2:
         st.write(
             cm.create_colormap(
                 palette,
@@ -215,8 +227,13 @@ def app():
                 orientation="vertical",
                 vmin=min_value,
                 vmax=max_value,
+                font_size=10
             )
         )
-    st.dataframe(county_gdf.drop(columns=["geometry"]))
-    # st.dataframe(inventory_df)
-    # st.write(cm.plot_colormaps(return_fig=True))
+    row4_col1, row4_col2, _ = st.columns([1, 2, 3])
+    with row4_col1:
+        show_data = st.checkbox("Show data")
+    with row4_col2:
+        show_cols = st.multiselect("Select columns", data_cols)
+    if show_data:
+        st.dataframe(county_gdf[["STATEFP", "COUNTYFP", "NAME"] + show_cols])
