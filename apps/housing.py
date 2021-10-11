@@ -135,7 +135,7 @@ def app():
     with row1_col4:
         selected_col = st.selectbox("Attribute", data_cols)
     with row1_col5:
-        show_desc = st.checkbox("Show data description")
+        show_desc = st.checkbox("Show attribute description")
         if show_desc:
             label, desc = get_data_dict(selected_col.strip())
             markdown = f"""
@@ -152,11 +152,14 @@ def app():
         n_colors = st.slider("Number of colors", min_value=2,
                              max_value=20, value=8)
     with row2_col3:
-        show_colormaps = st.checkbox("Preview all colormaps")
+        show_colormaps = st.checkbox("Preview all color palettes")
         if show_colormaps:
             st.write(cm.plot_colormaps(return_fig=True))
+    with row2_col4:
+        show_nodata = st.checkbox("Show no data areas")
 
     county_gdf = join_attributes(county_gdf, inventory_df, "county")
+    county_null_gdf = select_null(county_gdf, selected_col)
     county_gdf = select_non_null(county_gdf, selected_col)
     county_gdf = county_gdf.sort_values(by=selected_col, ascending=True)
 
@@ -198,6 +201,23 @@ def app():
         line_width_min_pixels=1,
     )
 
+    geojson_null = pdk.Layer(
+        "GeoJsonLayer",
+        county_null_gdf,
+        pickable=True,
+        opacity=0.2,
+        stroked=True,
+        filled=True,
+        extruded=False,
+        wireframe=True,
+        # get_elevation="properties.ALAND/100000",
+        # get_fill_color="color",
+        get_fill_color=[200, 200, 200],
+        get_line_color=[0, 0, 0],
+        get_line_width=2,
+        line_width_min_pixels=1,
+    )
+
     # tooltip = {"text": "Name: {NAME}"}
 
     # tooltip_value = f"<b>Value:</b> {median_listing_price}""
@@ -206,8 +226,12 @@ def app():
         "style": {"backgroundColor": "steelblue", "color": "white"},
     }
 
+    layers = [geojson]
+    if show_nodata:
+        layers.append(geojson_null)
+
     r = pdk.Deck(
-        layers=[geojson],
+        layers=layers,
         initial_view_state=initial_view_state,
         map_style="light",
         tooltip=tooltip,
@@ -232,7 +256,7 @@ def app():
         )
     row4_col1, row4_col2, _ = st.columns([1, 2, 3])
     with row4_col1:
-        show_data = st.checkbox("Show data")
+        show_data = st.checkbox("Show raw data")
     with row4_col2:
         show_cols = st.multiselect("Select columns", data_cols)
     if show_data:
