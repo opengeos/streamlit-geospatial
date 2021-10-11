@@ -5,7 +5,7 @@ import geopandas as gpd
 import streamlit as st
 import leafmap.colormaps as cm
 import matplotlib.pyplot as plt
-from leafmap.common import to_hex_colors
+from leafmap.common import to_hex_colors, hex_to_rgb
 import matplotlib as mpl
 
 # Data source: https://www.realtor.com/research/data/
@@ -81,7 +81,8 @@ def join_attributes(gdf, df, category):
 
     new_gdf = None
     if category == "county":
-        new_gdf = gdf.merge(df, left_on="GEOID", right_on="county_fips", how="outer")
+        new_gdf = gdf.merge(df, left_on="GEOID",
+                            right_on="county_fips", how="outer")
 
     return new_gdf
 
@@ -128,15 +129,35 @@ def app():
     )
 
     data_cols = get_data_columns(inventory_df, "county")
-    selected_col = st.selectbox("", data_cols)
 
-    with st.expander("See description"):
-        st.write(get_data_dict(selected_col.strip()))
+    row2_col1, row2_col2, row2_col3, row2_col4 = st.columns([1.3, 1, 1, 3])
 
-    palette = st.selectbox("Select a palette", cm.list_colormaps(), index=2)
+    with row2_col1:
+        selected_col = st.selectbox("Select an attribute", data_cols)
+        # with st.expander("See description"):
+        #     st.write(get_data_dict(selected_col.strip()))
+
+    with row2_col2:
+        palette = st.selectbox(
+            "Select a palette", cm.list_colormaps(), index=2)
+    with row2_col3:
+        n_colors = st.slider("Number of colors", min_value=2,
+                             max_value=20, value=8)
 
     county_gdf = join_attributes(county_gdf, inventory_df, "county")
     county_gdf = select_non_null(county_gdf, selected_col)
+    county_gdf = county_gdf.sort_values(by=selected_col, ascending=True)
+
+    colors = cm.get_palette(palette, n_colors)
+    colors = [hex_to_rgb(c) for c in colors]
+
+    for i, ind in enumerate(county_gdf.index):
+        index = int(i / (len(county_gdf)/len(colors)))
+        if index >= len(colors):
+            index = len(colors) - 1
+        county_gdf.loc[ind, "R"] = colors[index][0]
+        county_gdf.loc[ind, "G"] = colors[index][1]
+        county_gdf.loc[ind, "B"] = colors[index][2]
 
     initial_view_state = pdk.ViewState(
         latitude=40, longitude=-100, zoom=3, max_zoom=16, pitch=0, bearing=0
@@ -144,7 +165,9 @@ def app():
 
     min_value = county_gdf[selected_col].min()
     max_value = county_gdf[selected_col].max()
-    color_exp = f"[({selected_col}-{min_value})/({max_value}-{min_value})*255, 0, 0]"
+    color = "color"
+    # color_exp = f"[({selected_col}-{min_value})/({max_value}-{min_value})*255, 0, 0]"
+    color_exp = f"[R, G, B]"
 
     geojson = pdk.Layer(
         "GeoJsonLayer",
@@ -156,6 +179,7 @@ def app():
         extruded=False,
         wireframe=True,
         # get_elevation="properties.ALAND/100000",
+        # get_fill_color="color",
         get_fill_color=color_exp,
         get_line_color=[0, 0, 0],
         get_line_width=2,
@@ -193,5 +217,6 @@ def app():
                 vmax=max_value,
             )
         )
-    st.dataframe(inventory_df)
+    st.dataframe(county_gdf.drop(columns=["geometry"]))
+    # st.dataframe(inventory_df)
     # st.write(cm.plot_colormaps(return_fig=True))
