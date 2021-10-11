@@ -3,6 +3,10 @@ import pandas as pd
 import pydeck as pdk
 import geopandas as gpd
 import streamlit as st
+import leafmap.colormaps as cm
+import matplotlib.pyplot as plt
+from leafmap.common import to_hex_colors
+import matplotlib as mpl
 
 # Data source: https://www.realtor.com/research/data/
 link_prefix = "https://econdata.s3-us-west-2.amazonaws.com/Reports/"
@@ -171,5 +175,20 @@ def app():
         tooltip=tooltip,
     )
 
-    st.pydeck_chart(r)
+    col4, col5 = st.columns([6, 1])
+
+    with col4:
+        st.pydeck_chart(r)
+    with col5:
+        st.write(
+            cm.create_colormap(
+                "gist_earth",
+                label=selected_col.replace("_", " ").title(),
+                width=0.2,
+                height=3.5,
+                orientation="vertical",
+                vmin=min_value,
+                vmax=max_value,
+            )
+        )
     st.dataframe(inventory_df)
