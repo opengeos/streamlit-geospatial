@@ -133,6 +133,8 @@ def app():
     with st.expander("See description"):
         st.write(get_data_dict(selected_col.strip()))
 
+    palette = st.selectbox("Select a palette", cm.list_colormaps(), index=2)
+
     county_gdf = join_attributes(county_gdf, inventory_df, "county")
     county_gdf = select_non_null(county_gdf, selected_col)
 
@@ -182,7 +184,7 @@ def app():
     with col5:
         st.write(
             cm.create_colormap(
-                "gist_earth",
+                palette,
                 label=selected_col.replace("_", " ").title(),
                 width=0.2,
                 height=3.5,
@@ -192,3 +194,4 @@ def app():
             )
         )
     st.dataframe(inventory_df)
+    # st.write(cm.plot_colormaps(return_fig=True))
