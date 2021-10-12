@@ -67,6 +67,16 @@ def get_inventory_data(url):
     return df
 
 
+def get_start_end_year(df):
+    start_year = int(str(df["month_date_yyyymm"].min())[:4])
+    end_year = int(str(df["month_date_yyyymm"].max())[:4])
+    return start_year, end_year
+
+
+def get_periods(df):
+    return [str(d) for d in list(set(df["month_date_yyyymm"].tolist()))]
+
+
 def get_data_columns(df, category):
     if category.lower() == "county":
         del_cols = ["month_date_yyyymm", "county_fips", "county_name"]
@@ -168,14 +178,44 @@ def app():
     with row1_col2:
         cur_hist = st.selectbox(
             "Current/historical data",
-            ["Current month data"]
-            # "Current/historical data", ["Current month data", "Historical data"]
+            ["Current month data", "Historical data"],
         )
     with row1_col3:
         scale = st.selectbox("Scale", ["National", "State", "Metro", "County"], index=3)
 
     gdf = get_geom_data(scale.lower())
-    inventory_df = get_inventory_data(data_links["monthly_current"][scale.lower()])
+    if cur_hist == "Current month data":
+        inventory_df = get_inventory_data(data_links["monthly_current"][scale.lower()])
+        selected_period = get_periods(inventory_df)[0]
+    else:
+        with row1_col2:
+            inventory_df = get_inventory_data(
+                data_links["monthly_historical"][scale.lower()]
+            )
+            start_year, end_year = get_start_end_year(inventory_df)
+            periods = get_periods(inventory_df)
+            with st.expander("Select year and month", True):
+                selected_year = st.slider(
+                    "Year",
+                    start_year,
+                    end_year,
+                    value=start_year,
+                    step=1,
+                )
+                selected_month = st.slider(
+                    "Month",
+                    min_value=1,
+                    max_value=12,
+                    value=int(periods[0][-2:]),
+                    step=1,
+                )
+            selected_period = str(selected_year) + str(selected_month).zfill(2)
+            if selected_period not in periods:
+                st.error("Data not available for selected year and month")
+                selected_period = periods[0]
+            inventory_df = inventory_df[
+                inventory_df["month_date_yyyymm"] == int(selected_period)
+            ]
 
     data_cols = get_data_columns(inventory_df, scale.lower())
 
@@ -201,7 +241,7 @@ def app():
         if show_colormaps:
             st.write(cm.plot_colormaps(return_fig=True))
     with row2_col4:
-        show_nodata = st.checkbox("Show no data areas", value=True)
+        show_nodata = st.checkbox("Show nodata areas", value=True)
 
     gdf = join_attributes(gdf, inventory_df, scale.lower())
     gdf_null = select_null(gdf, selected_col)
@@ -267,7 +307,11 @@ def app():
 
     # tooltip_value = f"<b>Value:</b> {median_listing_price}""
     tooltip = {
-        "html": "<b>Name:</b> {NAME}<br><b>Value:</b> {" + selected_col + "}",
+        "html": "<b>Name:</b> {NAME}<br><b>Value:</b> {"
+        + selected_col
+        + "}<br><b>Date:</b> "
+        + selected_period
+        + "",
         "style": {"backgroundColor": "steelblue", "color": "white"},
     }
 
