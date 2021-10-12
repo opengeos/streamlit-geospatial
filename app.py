@@ -10,7 +10,7 @@ apps = MultiApp()
 # Add all your application here
 
 apps.add_app("Real Estate", housing.app)
-apps.add_app("pydeck", deck.app)
+apps.add_app("Pyeck", deck.app)
 apps.add_app("Home", home.app)
 
 # The main app

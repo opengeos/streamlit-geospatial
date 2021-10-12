@@ -305,18 +305,27 @@ def app():
             except:
                 st.warning("No description available for selected attribute")
 
-    row2_col1, row2_col2, row2_col3, row2_col4 = st.columns([1, 1, 2, 2])
+    row2_col1, row2_col2, row2_col3, row2_col4, row2_col5, row2_col6 = st.columns(
+        [0.6, 0.68, 0.7, 0.7, 1.5, 0.8]
+    )
 
     with row2_col1:
         palette = st.selectbox("Color palette", cm.list_colormaps(), index=2)
     with row2_col2:
         n_colors = st.slider("Number of colors", min_value=2, max_value=20, value=8)
     with row2_col3:
-        show_colormaps = st.checkbox("Preview all color palettes")
-        if show_colormaps:
-            st.write(cm.plot_colormaps(return_fig=True))
-    with row2_col4:
         show_nodata = st.checkbox("Show nodata areas", value=True)
+    with row2_col4:
+        show_3d = st.checkbox("Show 3D view", value=False)
+    with row2_col5:
+        if show_3d:
+            elev_scale = st.slider(
+                "Elevation scale", min_value=1, max_value=1000000, value=1, step=10
+            )
+            with row2_col6:
+                st.info("Press Ctrl and move the left mouse button.")
+        else:
+            elev_scale = 1
 
     gdf = join_attributes(gdf, inventory_df, scale.lower())
     gdf_null = select_null(gdf, selected_col)
@@ -351,9 +360,10 @@ def app():
         opacity=0.5,
         stroked=True,
         filled=True,
-        extruded=False,
+        extruded=show_3d,
         wireframe=True,
-        # get_elevation="properties.ALAND/100000",
+        get_elevation=f"{selected_col}",
+        elevation_scale=elev_scale,
         # get_fill_color="color",
         get_fill_color=color_exp,
         get_line_color=[0, 0, 0],
@@ -418,11 +428,15 @@ def app():
                 font_size=10,
             )
         )
-    row4_col1, row4_col2, _ = st.columns([1, 2, 3])
+    row4_col1, row4_col2, row4_col3 = st.columns([1, 2, 3])
     with row4_col1:
         show_data = st.checkbox("Show raw data")
     with row4_col2:
         show_cols = st.multiselect("Select columns", data_cols)
+    with row4_col3:
+        show_colormaps = st.checkbox("Preview all color palettes")
+        if show_colormaps:
+            st.write(cm.plot_colormaps(return_fig=True))
     if show_data:
         if scale == "National":
             st.dataframe(gdf[["NAME", "GEOID"] + show_cols])

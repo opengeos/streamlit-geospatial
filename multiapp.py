@@ -74,6 +74,6 @@ class MultiApp:
         st.sidebar.info(
             """
             This app is maintained by Qiusheng Wu. You can learn more about me at
-            [wetlands.io](https://wetlands.io) or [GitHub.com](https://github.com/giswqs).
+            [wetlands.io](https://wetlands.io) | [GitHub](https://github.com/giswqs) | [Twitter](https://twitter.com/giswqs) | [YouTube](https://www.youtube.com/c/QiushengWu).
         """
         )
