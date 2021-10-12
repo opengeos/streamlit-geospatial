@@ -1,3 +1,4 @@
+import datetime
 import os
 import pathlib
 import requests
@@ -51,19 +52,66 @@ data_links = {
 }
 
 
+def get_data_columns(df, category, frequency="monthly"):
+    if frequency == "monthly":
+        if category.lower() == "county":
+            del_cols = ["month_date_yyyymm", "county_fips", "county_name"]
+        elif category.lower() == "state":
+            del_cols = ["month_date_yyyymm", "state", "state_id"]
+        elif category.lower() == "national":
+            del_cols = ["month_date_yyyymm", "country"]
+        elif category.lower() == "metro":
+            del_cols = ["month_date_yyyymm", "cbsa_code", "cbsa_title", "HouseholdRank"]
+        elif category.lower() == "zip":
+            del_cols = ["month_date_yyyymm", "postal_code", "zip_name", "flag"]
+    elif frequency == "weekly":
+        if category.lower() == "national":
+            del_cols = ["week_end_date", "geo_country"]
+        elif category.lower() == "metro":
+            del_cols = ["week_end_date", "cbsa_code", "cbsa_title", "hh_rank"]
+
+    cols = df.columns.values.tolist()
+
+    for col in cols:
+        if col.strip() in del_cols:
+            cols.remove(col)
+    if category.lower() == "metro":
+        return cols[2:]
+    else:
+        return cols[1:]
+
+
 @st.cache
 def get_inventory_data(url):
     df = pd.read_csv(url)
-    if "County" in url:
+    url = url.lower()
+    if "county" in url:
         df["county_fips"] = df["county_fips"].map(str)
         df["county_fips"] = df["county_fips"].str.zfill(5)
-    elif "State" in url:
+    elif "state" in url:
         df["STUSPS"] = df["state_id"].str.upper()
-    elif "Metro" in url:
+    elif "metro" in url:
         df["cbsa_code"] = df["cbsa_code"].map(str)
-    elif "Zip" in url:
+    elif "zip" in url:
         df["postal_code"] = df["postal_code"].map(str)
         df["postal_code"] = df["postal_code"].str.zfill(5)
+
+    if "listing_weekly_core_aggregate_by_country" in url:
+        columns = get_data_columns(df, "national", "weekly")
+        for column in columns:
+            if column != "median_days_on_market_by_day_yy":
+                df[column] = df[column].str.rstrip("%").astype(float) / 100
+    if "listing_weekly_core_aggregate_by_metro" in url:
+        columns = get_data_columns(df, "metro", "weekly")
+        for column in columns:
+            if column != "median_days_on_market_by_day_yy":
+                df[column] = df[column].str.rstrip("%").astype(float) / 100
+
+    return df
+
+
+def filter_weekly_inventory(df, week):
+    df = df[df["week_end_date"] == week]
     return df
 
 
@@ -75,28 +123,6 @@ def get_start_end_year(df):
 
 def get_periods(df):
     return [str(d) for d in list(set(df["month_date_yyyymm"].tolist()))]
-
-
-def get_data_columns(df, category):
-    if category.lower() == "county":
-        del_cols = ["month_date_yyyymm", "county_fips", "county_name"]
-    elif category.lower() == "state":
-        del_cols = ["month_date_yyyymm", "state", "state_id"]
-    elif category.lower() == "national":
-        del_cols = ["month_date_yyyymm", "country"]
-    elif category.lower() == "metro":
-        del_cols = ["month_date_yyyymm", "cbsa_code", "cbsa_title", "HouseholdRank"]
-    elif category.lower() == "zip":
-        del_cols = ["month_date_yyyymm", "postal_code", "zip_name", "flag"]
-    cols = df.columns.values.tolist()
-
-    for col in cols:
-        if col.strip() in del_cols:
-            cols.remove(col)
-    if category.lower() == "metro":
-        return cols[2:]
-    else:
-        return cols[1:]
 
 
 @st.cache
@@ -134,6 +160,8 @@ def join_attributes(gdf, df, category):
     elif category == "state":
         new_gdf = gdf.merge(df, left_on="STUSPS", right_on="STUSPS", how="outer")
     elif category == "national":
+        if "geo_country" in df.columns.values.tolist():
+            df["country"] = "United States"
         new_gdf = gdf.merge(df, left_on="NAME", right_on="country", how="outer")
     elif category == "metro":
         new_gdf = gdf.merge(df, left_on="CBSAFP", right_on="cbsa_code", how="outer")
@@ -160,6 +188,21 @@ def get_data_dict(name):
     return label, desc
 
 
+def get_weeks(df):
+    weeks = [
+        datetime.date(int(d.split("/")[2]), int(d.split("/")[0]), int(d.split("/")[1]))
+        for d in list(set(df["week_end_date"].tolist()))
+    ]
+    weeks.sort()
+    return weeks
+
+
+def get_saturday(in_date):
+    idx = (in_date.weekday() + 1) % 7
+    sat = in_date + datetime.timedelta(6 - idx)
+    return sat
+
+
 def app():
 
     st.title("Real Estate Data and Market Trends")
@@ -173,62 +216,93 @@ def app():
         [0.6, 0.8, 0.6, 1.4, 2]
     )
     with row1_col1:
-        frequency = st.selectbox("Monthly/weekly data", ["Monthly"])
-        # frequency = st.selectbox("Monthly/weekly data", ["Monthly", "Weekly"])
+        frequency = st.selectbox("Monthly/weekly data", ["Monthly", "Weekly"])
     with row1_col2:
+        types = ["Current month data", "Historical data"]
+        if frequency == "Weekly":
+            types.remove("Current month data")
         cur_hist = st.selectbox(
             "Current/historical data",
-            ["Current month data", "Historical data"],
+            types,
         )
     with row1_col3:
-        scale = st.selectbox("Scale", ["National", "State", "Metro", "County"], index=3)
+        if frequency == "Monthly":
+            scale = st.selectbox(
+                "Scale", ["National", "State", "Metro", "County"], index=3
+            )
+        else:
+            scale = st.selectbox("Scale", ["National", "Metro"], index=1)
 
     gdf = get_geom_data(scale.lower())
-    if cur_hist == "Current month data":
-        inventory_df = get_inventory_data(data_links["monthly_current"][scale.lower()])
-        selected_period = get_periods(inventory_df)[0]
-    else:
-        with row1_col2:
-            inventory_df = get_inventory_data(
-                data_links["monthly_historical"][scale.lower()]
-            )
-            start_year, end_year = get_start_end_year(inventory_df)
-            periods = get_periods(inventory_df)
-            with st.expander("Select year and month", True):
-                selected_year = st.slider(
-                    "Year",
-                    start_year,
-                    end_year,
-                    value=start_year,
-                    step=1,
-                )
-                selected_month = st.slider(
-                    "Month",
-                    min_value=1,
-                    max_value=12,
-                    value=int(periods[0][-2:]),
-                    step=1,
-                )
-            selected_period = str(selected_year) + str(selected_month).zfill(2)
-            if selected_period not in periods:
-                st.error("Data not available for selected year and month")
-                selected_period = periods[0]
-            inventory_df = inventory_df[
-                inventory_df["month_date_yyyymm"] == int(selected_period)
-            ]
 
-    data_cols = get_data_columns(inventory_df, scale.lower())
+    if frequency == "Weekly":
+        inventory_df = get_inventory_data(data_links["weekly"][scale.lower()])
+        weeks = get_weeks(inventory_df)
+        with row1_col1:
+            selected_date = st.date_input("Select a date", value=weeks[-1])
+            saturday = get_saturday(selected_date)
+            selected_period = saturday.strftime("%-m/%-d/%Y")
+            if saturday not in weeks:
+                st.error(
+                    "The selected date is not available in the data. Please select a date between {} and {}".format(
+                        weeks[0], weeks[-1]
+                    )
+                )
+                selected_period = weeks[-1].strftime("%-m/%-d/%Y")
+        inventory_df = get_inventory_data(data_links["weekly"][scale.lower()])
+        inventory_df = filter_weekly_inventory(inventory_df, selected_period)
+
+    if frequency == "Monthly":
+        if cur_hist == "Current month data":
+            inventory_df = get_inventory_data(
+                data_links["monthly_current"][scale.lower()]
+            )
+            selected_period = get_periods(inventory_df)[0]
+        else:
+            with row1_col2:
+                inventory_df = get_inventory_data(
+                    data_links["monthly_historical"][scale.lower()]
+                )
+                start_year, end_year = get_start_end_year(inventory_df)
+                periods = get_periods(inventory_df)
+                with st.expander("Select year and month", True):
+                    selected_year = st.slider(
+                        "Year",
+                        start_year,
+                        end_year,
+                        value=start_year,
+                        step=1,
+                    )
+                    selected_month = st.slider(
+                        "Month",
+                        min_value=1,
+                        max_value=12,
+                        value=int(periods[0][-2:]),
+                        step=1,
+                    )
+                selected_period = str(selected_year) + str(selected_month).zfill(2)
+                if selected_period not in periods:
+                    st.error("Data not available for selected year and month")
+                    selected_period = periods[0]
+                inventory_df = inventory_df[
+                    inventory_df["month_date_yyyymm"] == int(selected_period)
+                ]
+
+    data_cols = get_data_columns(inventory_df, scale.lower(), frequency.lower())
 
     with row1_col4:
         selected_col = st.selectbox("Attribute", data_cols)
     with row1_col5:
         show_desc = st.checkbox("Show attribute description")
         if show_desc:
-            label, desc = get_data_dict(selected_col.strip())
-            markdown = f"""
-            **{label}**: {desc}
-            """
-            st.markdown(markdown)
+            try:
+                label, desc = get_data_dict(selected_col.strip())
+                markdown = f"""
+                **{label}**: {desc}
+                """
+                st.markdown(markdown)
+            except:
+                st.warning("No description available for selected attribute")
 
     row2_col1, row2_col2, row2_col3, row2_col4 = st.columns([1, 1, 2, 2])
 
