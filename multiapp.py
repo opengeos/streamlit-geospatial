@@ -61,3 +61,19 @@ class MultiApp:
 
         st.experimental_set_query_params(**app_state)
         functions[titles.index(title)]()
+
+        st.sidebar.title("Contribute")
+        st.sidebar.info(
+            "This an open source project and you are very welcome to **contribute** your awesome "
+            "comments, questions, resources and apps as "
+            "[issues](https://github.com/giswqs/streamlit-geospatial/issues) of or "
+            "[pull requests](https://github.com/giswqs/streamlit-geospatial/pulls) "
+            "to the [source code](https://github.com/giswqs/streamlit-geospatial). "
+        )
+        st.sidebar.title("About")
+        st.sidebar.info(
+            """
+            This app is maintained by Qiusheng Wu. You can learn more about me at
+            [wetlands.io](https://wetlands.io) or [GitHub.com](https://github.com/giswqs).
+        """
+        )

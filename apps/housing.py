@@ -161,7 +161,8 @@ def join_attributes(gdf, df, category):
         new_gdf = gdf.merge(df, left_on="STUSPS", right_on="STUSPS", how="outer")
     elif category == "national":
         if "geo_country" in df.columns.values.tolist():
-            df["country"] = "United States"
+            df["country"] = None
+            df.loc[0, "country"] = "United States"
         new_gdf = gdf.merge(df, left_on="NAME", right_on="country", how="outer")
     elif category == "metro":
         new_gdf = gdf.merge(df, left_on="CBSAFP", right_on="cbsa_code", how="outer")
