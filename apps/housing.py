@@ -1,4 +1,7 @@
 import os
+import pathlib
+import requests
+import zipfile
 import pandas as pd
 import pydeck as pdk
 import geopandas as gpd
@@ -7,6 +10,14 @@ import leafmap.colormaps as cm
 import matplotlib.pyplot as plt
 from leafmap.common import to_hex_colors, hex_to_rgb
 import matplotlib as mpl
+
+
+STREAMLIT_STATIC_PATH = pathlib.Path(st.__path__[0]) / "static"
+# We create a downloads directory within the streamlit static asset directory
+# and we write output files to it
+DOWNLOADS_PATH = STREAMLIT_STATIC_PATH / "downloads"
+if not DOWNLOADS_PATH.is_dir():
+    DOWNLOADS_PATH.mkdir()
 
 # Data source: https://www.realtor.com/research/data/
 link_prefix = "https://econdata.s3-us-west-2.amazonaws.com/Reports/"
@@ -41,21 +52,40 @@ data_links = {
 
 
 @st.cache
-def get_inventory_data(url, index_col):
+def get_inventory_data(url):
     df = pd.read_csv(url)
     if "County" in url:
-        df[index_col] = df[index_col].map(str)
-        df[index_col] = df[index_col].str.zfill(5)
+        df["county_fips"] = df["county_fips"].map(str)
+        df["county_fips"] = df["county_fips"].str.zfill(5)
+    elif "State" in url:
+        df["STUSPS"] = df["state_id"].str.upper()
+    elif "Metro" in url:
+        df["cbsa_code"] = df["cbsa_code"].map(str)
+    elif "Zip" in url:
+        df["postal_code"] = df["postal_code"].map(str)
+        df["postal_code"] = df["postal_code"].str.zfill(5)
     return df
 
 
 def get_data_columns(df, category):
-    if category == "county":
+    if category.lower() == "county":
         del_cols = ["month_date_yyyymm", "county_fips", "county_name"]
-        cols = df.columns.values.tolist()
-        for col in cols:
-            if col in del_cols:
-                cols.remove(col)
+    elif category.lower() == "state":
+        del_cols = ["month_date_yyyymm", "state", "state_id"]
+    elif category.lower() == "national":
+        del_cols = ["month_date_yyyymm", "country"]
+    elif category.lower() == "metro":
+        del_cols = ["month_date_yyyymm", "cbsa_code", "cbsa_title", "HouseholdRank"]
+    elif category.lower() == "zip":
+        del_cols = ["month_date_yyyymm", "postal_code", "zip_name", "flag"]
+    cols = df.columns.values.tolist()
+
+    for col in cols:
+        if col.strip() in del_cols:
+            cols.remove(col)
+    if category.lower() == "metro":
+        return cols[2:]
+    else:
         return cols[1:]
 
 
@@ -70,10 +100,19 @@ def get_geom_data(category):
         "state": prefix + "us_states.geojson",
         "county": prefix + "us_counties.geojson",
         "metro": prefix + "us_metro_areas.geojson",
-        "zip": prefix + "us_zip_codes.geojson",
+        "zip": "https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_zcta510_500k.zip",
     }
 
-    gdf = gpd.read_file(links[category])
+    if category.lower() == "zip":
+        r = requests.get(links[category])
+        out_zip = os.path.join(DOWNLOADS_PATH, "cb_2018_us_zcta510_500k.zip")
+        with open(out_zip, "wb") as code:
+            code.write(r.content)
+        zip_ref = zipfile.ZipFile(out_zip, "r")
+        zip_ref.extractall(DOWNLOADS_PATH)
+        gdf = gpd.read_file(out_zip.replace("zip", "shp"))
+    else:
+        gdf = gpd.read_file(links[category])
     return gdf
 
 
@@ -81,9 +120,15 @@ def join_attributes(gdf, df, category):
 
     new_gdf = None
     if category == "county":
-        new_gdf = gdf.merge(df, left_on="GEOID",
-                            right_on="county_fips", how="outer")
-
+        new_gdf = gdf.merge(df, left_on="GEOID", right_on="county_fips", how="outer")
+    elif category == "state":
+        new_gdf = gdf.merge(df, left_on="STUSPS", right_on="STUSPS", how="outer")
+    elif category == "national":
+        new_gdf = gdf.merge(df, left_on="NAME", right_on="country", how="outer")
+    elif category == "metro":
+        new_gdf = gdf.merge(df, left_on="CBSAFP", right_on="cbsa_code", how="outer")
+    elif category == "zip":
+        new_gdf = gdf.merge(df, left_on="GEOID10", right_on="postal_code", how="outer")
     return new_gdf
 
 
@@ -108,30 +153,32 @@ def get_data_dict(name):
 def app():
 
     st.title("Real Estate Data and Market Trends")
-
     st.markdown(
         """
     Data source: <https://www.realtor.com/research/data>
     """
     )
 
-    county_gdf = get_geom_data("county")
-    inventory_df = get_inventory_data(
-        data_links["monthly_current"]["county"], "county_fips"
+    row1_col1, row1_col2, row1_col3, row1_col4, row1_col5 = st.columns(
+        [0.6, 0.8, 0.6, 1.4, 2]
     )
-
-    data_cols = get_data_columns(inventory_df, "county")
-
-    row1_col1, row1_col2, row1_col3, row1_col4, row1_col5 = st.columns([
-                                                                       0.6, 0.8, 0.6, 1.4, 2])
     with row1_col1:
-        frequency = st.selectbox("Monthly/weekly data", ["Monthly", "Weekly"])
+        frequency = st.selectbox("Monthly/weekly data", ["Monthly"])
+        # frequency = st.selectbox("Monthly/weekly data", ["Monthly", "Weekly"])
     with row1_col2:
-        st.selectbox("Current/historical data",
-                     ["Current month data", "Historical data"])
+        cur_hist = st.selectbox(
+            "Current/historical data",
+            ["Current month data"]
+            # "Current/historical data", ["Current month data", "Historical data"]
+        )
     with row1_col3:
-        st.selectbox("Scale", ["National", "State", "Metro",
-                     "County", "Zip"], index=3)
+        scale = st.selectbox("Scale", ["National", "State", "Metro", "County"], index=3)
+
+    gdf = get_geom_data(scale.lower())
+    inventory_df = get_inventory_data(data_links["monthly_current"][scale.lower()])
+
+    data_cols = get_data_columns(inventory_df, scale.lower())
+
     with row1_col4:
         selected_col = st.selectbox("Attribute", data_cols)
     with row1_col5:
@@ -146,11 +193,9 @@ def app():
     row2_col1, row2_col2, row2_col3, row2_col4 = st.columns([1, 1, 2, 2])
 
     with row2_col1:
-        palette = st.selectbox(
-            "Color palette", cm.list_colormaps(), index=2)
+        palette = st.selectbox("Color palette", cm.list_colormaps(), index=2)
     with row2_col2:
-        n_colors = st.slider("Number of colors", min_value=2,
-                             max_value=20, value=8)
+        n_colors = st.slider("Number of colors", min_value=2, max_value=20, value=8)
     with row2_col3:
         show_colormaps = st.checkbox("Preview all color palettes")
         if show_colormaps:
@@ -158,35 +203,35 @@ def app():
     with row2_col4:
         show_nodata = st.checkbox("Show no data areas", value=True)
 
-    county_gdf = join_attributes(county_gdf, inventory_df, "county")
-    county_null_gdf = select_null(county_gdf, selected_col)
-    county_gdf = select_non_null(county_gdf, selected_col)
-    county_gdf = county_gdf.sort_values(by=selected_col, ascending=True)
+    gdf = join_attributes(gdf, inventory_df, scale.lower())
+    gdf_null = select_null(gdf, selected_col)
+    gdf = select_non_null(gdf, selected_col)
+    gdf = gdf.sort_values(by=selected_col, ascending=True)
 
     colors = cm.get_palette(palette, n_colors)
     colors = [hex_to_rgb(c) for c in colors]
 
-    for i, ind in enumerate(county_gdf.index):
-        index = int(i / (len(county_gdf)/len(colors)))
+    for i, ind in enumerate(gdf.index):
+        index = int(i / (len(gdf) / len(colors)))
         if index >= len(colors):
             index = len(colors) - 1
-        county_gdf.loc[ind, "R"] = colors[index][0]
-        county_gdf.loc[ind, "G"] = colors[index][1]
-        county_gdf.loc[ind, "B"] = colors[index][2]
+        gdf.loc[ind, "R"] = colors[index][0]
+        gdf.loc[ind, "G"] = colors[index][1]
+        gdf.loc[ind, "B"] = colors[index][2]
 
     initial_view_state = pdk.ViewState(
         latitude=40, longitude=-100, zoom=3, max_zoom=16, pitch=0, bearing=0
     )
 
-    min_value = county_gdf[selected_col].min()
-    max_value = county_gdf[selected_col].max()
+    min_value = gdf[selected_col].min()
+    max_value = gdf[selected_col].max()
     color = "color"
     # color_exp = f"[({selected_col}-{min_value})/({max_value}-{min_value})*255, 0, 0]"
     color_exp = f"[R, G, B]"
 
     geojson = pdk.Layer(
         "GeoJsonLayer",
-        county_gdf,
+        gdf,
         pickable=True,
         opacity=0.5,
         stroked=True,
@@ -203,7 +248,7 @@ def app():
 
     geojson_null = pdk.Layer(
         "GeoJsonLayer",
-        county_null_gdf,
+        gdf_null,
         pickable=True,
         opacity=0.2,
         stroked=True,
@@ -222,7 +267,7 @@ def app():
 
     # tooltip_value = f"<b>Value:</b> {median_listing_price}""
     tooltip = {
-        "html": "<b>County:</b> {NAME}<br><b>Value:</b> {" + selected_col + "}",
+        "html": "<b>Name:</b> {NAME}<br><b>Value:</b> {" + selected_col + "}",
         "style": {"backgroundColor": "steelblue", "color": "white"},
     }
 
@@ -247,11 +292,11 @@ def app():
                 palette,
                 label=selected_col.replace("_", " ").title(),
                 width=0.2,
-                height=3.5,
+                height=3,
                 orientation="vertical",
                 vmin=min_value,
                 vmax=max_value,
-                font_size=10
+                font_size=10,
             )
         )
     row4_col1, row4_col2, _ = st.columns([1, 2, 3])
@@ -260,4 +305,13 @@ def app():
     with row4_col2:
         show_cols = st.multiselect("Select columns", data_cols)
     if show_data:
-        st.dataframe(county_gdf[["STATEFP", "COUNTYFP", "NAME"] + show_cols])
+        if scale == "National":
+            st.dataframe(gdf[["NAME", "GEOID"] + show_cols])
+        elif scale == "State":
+            st.dataframe(gdf[["NAME", "STUSPS"] + show_cols])
+        elif scale == "County":
+            st.dataframe(gdf[["NAME", "STATEFP", "COUNTYFP"] + show_cols])
+        elif scale == "Metro":
+            st.dataframe(gdf[["NAME", "CBSAFP"] + show_cols])
+        elif scale == "Zip":
+            st.dataframe(gdf[["GEOID10"] + show_cols])
