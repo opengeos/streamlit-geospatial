@@ -8,9 +8,7 @@ import pydeck as pdk
 import geopandas as gpd
 import streamlit as st
 import leafmap.colormaps as cm
-import matplotlib.pyplot as plt
-from leafmap.common import to_hex_colors, hex_to_rgb
-import matplotlib as mpl
+from leafmap.common import hex_to_rgb
 
 
 STREAMLIT_STATIC_PATH = pathlib.Path(st.__path__[0]) / "static"
@@ -208,8 +206,10 @@ def app():
 
     st.title("Real Estate Data and Market Trends")
     st.markdown(
-        """
-    Data source: <https://www.realtor.com/research/data>
+        """**Introduction:** This interactive dashboard is designed for visualizing U.S. real estate data and market trends at multiple levels (i.e., national,
+         state, county, and metro). The data sources include [Real Estate Data](https://www.realtor.com/research/data) from realtor.com and 
+         [Cartographic Boundary Files](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html) from the U.S. Census Bureau.
+         Several open-source packages are used to process the data and generate the visualizations, such as [streamlit](https://streamlit.io), [geopandas](https://geopandas.org), [leafmap](https://leafmap.org), and [pydeck](https://deckgl.readthedocs.io).
     """
     )
 

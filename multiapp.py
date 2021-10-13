@@ -64,16 +64,17 @@ class MultiApp:
 
         st.sidebar.title("Contribute")
         st.sidebar.info(
-            "This an open source project and you are very welcome to **contribute** your awesome "
+            "This is an open source project and you are very welcome to contribute your "
             "comments, questions, resources and apps as "
-            "[issues](https://github.com/giswqs/streamlit-geospatial/issues) of or "
+            "[issues](https://github.com/giswqs/streamlit-geospatial/issues) or "
             "[pull requests](https://github.com/giswqs/streamlit-geospatial/pulls) "
             "to the [source code](https://github.com/giswqs/streamlit-geospatial). "
         )
         st.sidebar.title("About")
         st.sidebar.info(
             """
-            This app is maintained by Qiusheng Wu. You can learn more about me at
+            This web [app](https://gishub.org/streamlit-geospatial) is maintained by Qiusheng Wu. You can learn more about me at
             [wetlands.io](https://wetlands.io) | [GitHub](https://github.com/giswqs) | [Twitter](https://twitter.com/giswqs) | [YouTube](https://www.youtube.com/c/QiushengWu).
+
         """
         )

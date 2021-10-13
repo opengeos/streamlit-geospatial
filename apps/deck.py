@@ -5,6 +5,7 @@ def app():
 
     import pydeck as pdk
 
+    st.title("Property values in Vancouver, Canada")
     DATA_URL = "https://raw.githubusercontent.com/visgl/deck.gl-data/master/examples/geojson/vancouver-blocks.json"
     LAND_COVER = [
         [[-123.0, 49.196], [-123.0, 49.324], [-123.306, 49.324], [-123.306, 49.196]]
