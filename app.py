@@ -12,7 +12,7 @@ apps = MultiApp()
 apps.add_app("U.S. Real Estate", housing.app)
 apps.add_app("U.S. Census Data", census.app)
 apps.add_app("Upload Vector Data", upload.app)
-apps.add_app("Pydeck", deck.app)
+apps.add_app("Pydeck Gallery", deck.app)
 apps.add_app("Home", home.app)
 
 # The main app
