@@ -110,7 +110,7 @@ def app():
 
     st.markdown("""
     
-    This app is a collection of Awesome GEE Community Datasets (https://samapriya.github.io/awesome-gee-community-datasets).
+    This app is for exploring the [Awesome GEE Community Datasets](https://samapriya.github.io/awesome-gee-community-datasets). Work in progress.
     
     """)
 
