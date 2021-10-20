@@ -19,10 +19,7 @@ def app():
 
     st.info("Click on the left sidebar menu to navigate to the different apps.")
 
-    st.header("Demos")
+    st.header("Demo")
 
     st.subheader("U.S. Real Estate Data and Market Trends")
     st.image("https://i.imgur.com/Z3dk6Tr.gif")
-
-    # st.subheader("Searching and Loading Basemaps")
-    st.image("https://i.imgur.com/0SkUhZh.gif")

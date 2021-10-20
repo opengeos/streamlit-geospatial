@@ -50,13 +50,11 @@ class MultiApp:
 
         titles = [a["title"] for a in self.apps]
         functions = [a["function"] for a in self.apps]
-        default_radio = titles.index(
-            app_state["page"]) if "page" in app_state else 0
+        default_radio = titles.index(app_state["page"]) if "page" in app_state else 0
 
         st.sidebar.title("Navigation")
 
-        title = st.sidebar.radio(
-            "Go To", titles, index=default_radio, key="radio")
+        title = st.sidebar.radio("Go To", titles, index=default_radio, key="radio")
 
         app_state["page"] = st.session_state.radio
         # st.write('after', app_state)
@@ -75,8 +73,8 @@ class MultiApp:
         st.sidebar.title("About")
         st.sidebar.info(
             """
-            This web [app](https://gishub.org/streamlit-geospatial) is maintained by [Qiusheng Wu](https://wetlands.io). You can follow me on social media:
+            This web [app](https://share.streamlit.io/giswqs/streamlit-geospatial/app.py) is maintained by [Qiusheng Wu](https://wetlands.io). You can follow me on social media:
              [GitHub](https://github.com/giswqs) | [Twitter](https://twitter.com/giswqs) | [YouTube](https://www.youtube.com/c/QiushengWu) | [LinkedIn](https://www.linkedin.com/in/qiushengwu).
-            This web app URL: <https://gishub.org/streamlit-geospatial>
+            This web app URL: <https://streamlit.gishub.org>
         """
         )
