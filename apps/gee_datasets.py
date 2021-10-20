@@ -7,6 +7,7 @@ HEIGHT = 600
 
 
 def function():
+    st.write("Not implemented yet.")
     Map = geemap.Map()
     Map.to_streamlit(WIDTH, HEIGHT)
 
@@ -126,19 +127,47 @@ def app():
             "Native Land (Indigenous Land Maps)": "function()",
         },
 
+        "Geophysical, Biological & Biogeochemical": {
+            "Geomorpho90m Geomorphometric Layers": "function()",
+        },
+
         "Land Use and Land Cover": {
             "Global Mangrove Watch": "global_mangrove_watch()",
             "Mississippi River Basin Floodplain Land Use Change (1941-2000)": "lulc_mrb_floodplain()",
 
-        }
+        },
+
+        "Hydrology": {
+            "Global Shoreline Dataset": "function()",
+        },
+
+        "Agriculture, Vegetation and Forestry": {
+            "Landfire Mosaics LF v2.0.0": "function()",
+        },
+
+        "Global Utilities, Assets and Amenities Layers": {
+            "Global Power": "function()",
+        },
+
+        "EarthEnv Biodiversity ecosystems & climate Layers": {
+            "Global Consensus Landcover": "function()",
+        },
+
+        "Weather and Climate Layers": {
+            "Global Reference Evapotranspiration Layers": "function()",
+        },
+
+        "Global Events Layers": {
+            "Global Fire Atlas (2003-2016)": "function()",
+        },
 
 
     }
 
-    row1_col1, row1_col2, _ = st.columns([1, 2, 1])
+    row1_col1, row1_col2, _ = st.columns([1.2, 1.8, 1])
 
     with row1_col1:
-        category = st.selectbox("Select a category", datasets.keys(), index=1)
+        category = st.selectbox("Select a category", datasets.keys(), index=2)
     with row1_col2:
         dataset = st.selectbox("Select a dataset", datasets[category].keys())
 
