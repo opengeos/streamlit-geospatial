@@ -1,6 +1,17 @@
 import streamlit as st
 from multiapp import MultiApp
-from apps import basemaps, heatmap, gee, gee_datasets, home, census, deck, housing, upload
+from apps import (
+    basemaps,
+    heatmap,
+    gee,
+    gee_datasets,
+    home,
+    census,
+    deck,
+    housing,
+    upload,
+    wms,
+)
 
 st.set_page_config(layout="wide")
 
@@ -16,6 +27,7 @@ apps.add_app("Upload Vector Data", upload.app)
 apps.add_app("Search Basemaps", basemaps.app)
 apps.add_app("Pydeck Gallery", deck.app)
 apps.add_app("Heatmaps", heatmap.app)
+apps.add_app("Add Web Map Service (WMS)", wms.app)
 apps.add_app("Google Earth Engine (GEE)", gee.app)
 apps.add_app("Awesome GEE Community Datasets", gee_datasets.app)
 
