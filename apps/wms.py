@@ -44,4 +44,6 @@ def app():
                         url, layers=layer, name=layer, attribution=" ", transparent=True
                     )
 
+            if "WORLDCOVER_2020_MAP" in layers:
+                m.add_legend(title="Land Cover", builtin_legend="ESA_WorldCover")
             m.to_streamlit(width, height)
