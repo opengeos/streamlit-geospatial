@@ -1,5 +1,12 @@
+import ast
 import streamlit as st
 import leafmap.foliumap as leafmap
+
+
+@st.cache
+def get_layers(url):
+    options = leafmap.get_wms_layers(url)
+    return options
 
 
 def app():
@@ -26,7 +33,7 @@ def app():
         empty = st.empty()
 
         if url:
-            options = leafmap.get_wms_layers(url)
+            options = get_layers(url)
 
             default = None
             if url == esa_landcover:
@@ -34,6 +41,14 @@ def app():
             layers = empty.multiselect(
                 "Select WMS layers to add to the map:", options, default=default
             )
+            add_legend = st.checkbox("Add a legend to the map", value=True)
+            if default == "WORLDCOVER_2020_MAP":
+                legend = str(leafmap.builtin_legends["ESA_WorldCover"])
+            else:
+                legend = ""
+            if add_legend:
+                legend_text = st.text_area(
+                    "Enter a legend as a dictionary {label: color}", value=legend, height=200)
 
         with row1_col1:
             m = leafmap.Map(center=(36.3, 0), zoom=2)
@@ -43,7 +58,8 @@ def app():
                     m.add_wms_layer(
                         url, layers=layer, name=layer, attribution=" ", transparent=True
                     )
+            if add_legend and legend_text:
+                legend_dict = ast.literal_eval(legend_text)
+                m.add_legend(legend_dict=legend_dict)
 
-            if "WORLDCOVER_2020_MAP" in layers:
-                m.add_legend(title="Land Cover", builtin_legend="ESA_WorldCover")
             m.to_streamlit(width, height)
