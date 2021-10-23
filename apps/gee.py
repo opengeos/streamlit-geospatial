@@ -7,7 +7,7 @@ def nlcd():
 
     st.header("National Land Cover Database (NLCD)")
 
-    row1_col1, row1_col2 = st.columns([2, 1])
+    row1_col1, row1_col2 = st.columns([3, 1])
     width = 950
     height = 600
 
@@ -59,7 +59,7 @@ def search_data():
     if "asset_titles" not in st.session_state:
         st.session_state["asset_titles"] = None
 
-    col1, col2 = st.columns([1, 1])
+    col1, col2 = st.columns([2, 1])
 
     dataset = None
     with col2:

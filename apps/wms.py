@@ -19,7 +19,7 @@ def app():
     """
     )
 
-    row1_col1, row1_col2, _ = st.columns([2, 1, 0.5])
+    row1_col1, row1_col2 = st.columns([3, 1.3])
     width = 800
     height = 600
     layers = None
@@ -48,7 +48,10 @@ def app():
                 legend = ""
             if add_legend:
                 legend_text = st.text_area(
-                    "Enter a legend as a dictionary {label: color}", value=legend, height=200)
+                    "Enter a legend as a dictionary {label: color}",
+                    value=legend,
+                    height=200,
+                )
 
         with row1_col1:
             m = leafmap.Map(center=(36.3, 0), zoom=2)
