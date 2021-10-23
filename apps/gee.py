@@ -63,8 +63,7 @@ def search_data():
 
     dataset = None
     with col2:
-        keyword = st.text_input(
-            "Enter a keyword to search (e.g., elevation)", "")
+        keyword = st.text_input("Enter a keyword to search (e.g., elevation)", "")
         if keyword:
             ee_assets = geemap.search_ee_data(keyword)
             asset_titles = [x["title"] for x in ee_assets]
@@ -76,8 +75,7 @@ def search_data():
             if dataset is not None:
                 with st.expander("Show dataset details", True):
                     index = asset_titles.index(dataset)
-                    html = geemap.ee_data_html(
-                        st.session_state["ee_assets"][index])
+                    html = geemap.ee_data_html(st.session_state["ee_assets"][index])
                     st.markdown(html, True)
 
                 ee_id = ee_assets[index]["ee_id_snippet"]
@@ -93,11 +91,11 @@ def search_data():
                     vis = {}
                     try:
                         if vis_params.strip() == "":
-                            st.error("Please enter visualization parameters")
+                            # st.error("Please enter visualization parameters")
+                            vis_params = "{}"
                         vis = eval(vis_params)
                         if not isinstance(vis, dict):
-                            st.error(
-                                "Visualization parameters must be a dictionary")
+                            st.error("Visualization parameters must be a dictionary")
                         try:
                             Map.addLayer(eval(ee_id), vis, layer_name)
                         except Exception as e:
@@ -115,8 +113,7 @@ def search_data():
 def app():
     st.title("Google Earth Engine Applications")
 
-    apps = [
-        "National Land Cover Database (NLCD)", "Search Earth Engine Data Catalog"]
+    apps = ["National Land Cover Database (NLCD)", "Search Earth Engine Data Catalog"]
 
     selected_app = st.selectbox("Select an app", apps)
 
