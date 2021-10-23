@@ -104,7 +104,7 @@ def get_inventory_data(url):
         for column in columns:
             if column != "median_days_on_market_by_day_yy":
                 df[column] = df[column].str.rstrip("%").astype(float) / 100
-
+        df["cbsa_code"] = df["cbsa_code"].str[:5]
     return df
 
 
@@ -188,9 +188,10 @@ def get_data_dict(name):
 
 
 def get_weeks(df):
+    seq = list(set(df[~df["week_end_date"].isnull()]["week_end_date"].tolist()))
     weeks = [
         datetime.date(int(d.split("/")[2]), int(d.split("/")[0]), int(d.split("/")[1]))
-        for d in list(set(df["week_end_date"].tolist()))
+        for d in seq
     ]
     weeks.sort()
     return weeks
