@@ -63,9 +63,15 @@ def app():
             # st.write(f"Saved to {file_path}")
 
             with row1_col1:
+                if file_path.lower().endswith(".kml"):
+                    gpd.io.file.fiona.drvsupport.supported_drivers["KML"] = "rw"
+                    gdf = gpd.read_file(file_path, driver="KML")
+                else:
+                    gdf = gpd.read_file(file_path)
+                lon = gdf.centroid.iloc[0].x
+                lat = gdf.centroid.iloc[0].y
                 if backend == "pydeck":
 
-                    gdf = gpd.read_file(file_path)
                     column_names = gdf.columns.values.tolist()
                     random_column = None
                     with container:
@@ -75,13 +81,16 @@ def app():
                                 "Select a column to apply random colors", column_names
                             )
 
-                    m = leafmap.Map()
+                    m = leafmap.Map(center=(lat, lon))
                     m.add_gdf(gdf, random_color_column=random_column)
                     st.pydeck_chart(m)
 
                 else:
-                    m = leafmap.Map(draw_export=True)
-                    m.add_vector(file_path, layer_name=layer_name)
+                    m = leafmap.Map(center=(lat, lon), draw_export=True)
+                    m.add_gdf(gdf, layer_name=layer_name)
+                    # m.add_vector(file_path, layer_name=layer_name)
+                    if backend == "folium":
+                        m.zoom_to_gdf(gdf)
                     m.to_streamlit(width=width, height=height)
 
         else:
