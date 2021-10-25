@@ -38,7 +38,7 @@ def app():
     st.markdown("""
         An interactive web app for creating timelapse of annual Landsat imagery (1984-2021) for any location around the globe. 
         The app was built using [streamlit](https://streamlit.io), [geemap](https://geemap.org), and [Google Earth Engine](https://earthengine.google.com). 
-        See a [video demo] (https://youtu.be/VVRK_-dEjR4).
+        See a [video demo](https://youtu.be/VVRK_-dEjR4).
     """)
 
     row1_col1, row1_col2 = st.columns([2, 1])
