@@ -14,7 +14,8 @@ def uploaded_file_to_gdf(data):
 
     _, file_extension = os.path.splitext(data.name)
     file_id = str(uuid.uuid4())
-    file_path = os.path.join(tempfile.gettempdir(), f"{file_id}{file_extension}")
+    file_path = os.path.join(tempfile.gettempdir(),
+                             f"{file_id}{file_extension}")
 
     with open(file_path, "wb") as file:
         file.write(data.getbuffer())
@@ -34,6 +35,12 @@ def app():
 
     st.title("Create Landsat Timelapse")
 
+    st.markdown("""
+        An interactive web app for creating timelapse of annual Landsat imagery (1984-2021) for any location around the globe. 
+        The app was built using [streamlit](https://streamlit.io), [geemap](https://geemap.org), and [Google Earth Engine](https://earthengine.google.com). 
+        See a [video demo] (https://youtu.be/VVRK_-dEjR4).
+    """)
+
     row1_col1, row1_col2 = st.columns([2, 1])
 
     with row1_col1:
@@ -41,7 +48,7 @@ def app():
         m.add_basemap("ROADMAP")
 
         data = st.file_uploader(
-            "Draw a small ROI on the map, click the Export button to save it, and then upload it here 😇👇",
+            "Draw a small ROI on the map, click the Export button to save it, and then upload it here. Customize timelapse parameters and then click the Submit button 😇👇",
             type=["geojson"],
         )
 
@@ -62,7 +69,7 @@ def app():
             gdf = gpd.GeoDataFrame(index=[0], crs=crs, geometry=[polygon_geom])
             st.session_state["roi"] = geemap.geopandas_to_ee(gdf)
             m.add_gdf(gdf, "ROI", zoom_to_layer=True)
-        m.to_streamlit(height=650)
+        m.to_streamlit(height=600)
 
     with row1_col2:
         with st.form("submit_form"):
@@ -100,9 +107,11 @@ def app():
             with st.expander("Customize timelapse"):
 
                 speed = st.slider("Frames/sec:", 1, 30, 10)
-                progress_bar_color = st.color_picker("Progress bar color:", "#0000ff")
+                progress_bar_color = st.color_picker(
+                    "Progress bar color:", "#0000ff")
                 years = st.slider(
-                    "Start and end year:", 1984, today.year, (1984, today.year - 1)
+                    "Start and end year:", 1984, today.year, (
+                        1984, today.year - 1)
                 )
                 months = st.slider("Start and end month:", 1, 12, (5, 10))
                 font_size = st.slider("Font size:", 10, 50, 30)
@@ -162,5 +171,6 @@ def app():
 
                 geemap.reduce_gif_size(out_gif)
 
-                empty_text.text("Right click the image to save it to your computer👇")
+                empty_text.text(
+                    "Right click the image to save it to your computer👇")
                 empty_image.image(out_gif)
