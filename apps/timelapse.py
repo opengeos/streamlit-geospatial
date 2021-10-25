@@ -63,7 +63,7 @@ def app():
             gdf = gpd.GeoDataFrame(index=[0], crs=crs, geometry=[polygon_geom])
             st.session_state["roi"] = geemap.geopandas_to_ee(gdf)
             m.add_gdf(gdf, "ROI", zoom_to_layer=False)
-        m.to_streamlit()
+        m.to_streamlit(height=650)
 
     with row1_col2:
         with st.form("submit_form"):
