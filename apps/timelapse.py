@@ -52,17 +52,16 @@ def app():
         else:
             polygon_geom = Polygon(
                 [
-                    [-115.471773, 35.892718],
-                    [-115.471773, 36.409454],
-                    [-114.271283, 36.409454],
-                    [-114.271283, 35.892718],
-                    [-115.471773, 35.892718],
+                    [-74.672699, -8.600032],
+                    [-74.672699, -8.254983],
+                    [-74.279938, -8.254983],
+                    [-74.279938, -8.600032],
                 ]
             )
             crs = {"init": "epsg:4326"}
             gdf = gpd.GeoDataFrame(index=[0], crs=crs, geometry=[polygon_geom])
             st.session_state["roi"] = geemap.geopandas_to_ee(gdf)
-            m.add_gdf(gdf, "ROI", zoom_to_layer=False)
+            m.add_gdf(gdf, "ROI", zoom_to_layer=True)
         m.to_streamlit(height=650)
 
     with row1_col2:
