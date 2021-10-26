@@ -2,7 +2,7 @@
 
 A multi-page streamlit app for the geospatial community.
 
-- Web app: <https://gishub.org/streamlit-geospatial>
+- Web app: <https://streamlit.gishub.org>
 - Source code: <https://github.com/giswqs/streamlit-geospatial>
 
 ## Real Estate Data and Market Trends
