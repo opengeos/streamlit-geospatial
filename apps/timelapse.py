@@ -14,7 +14,8 @@ def uploaded_file_to_gdf(data):
 
     _, file_extension = os.path.splitext(data.name)
     file_id = str(uuid.uuid4())
-    file_path = os.path.join(tempfile.gettempdir(), f"{file_id}{file_extension}")
+    file_path = os.path.join(tempfile.gettempdir(),
+                             f"{file_id}{file_extension}")
 
     with open(file_path, "wb") as file:
         file.write(data.getbuffer())
@@ -111,9 +112,11 @@ def app():
             with st.expander("Customize timelapse"):
 
                 speed = st.slider("Frames/sec:", 1, 30, 10)
-                progress_bar_color = st.color_picker("Progress bar color:", "#0000ff")
+                progress_bar_color = st.color_picker(
+                    "Progress bar color:", "#0000ff")
                 years = st.slider(
-                    "Start and end year:", 1984, today.year, (1984, today.year - 1)
+                    "Start and end year:", 1984, today.year, (
+                        1984, today.year - 1)
                 )
                 months = st.slider("Start and end month:", 1, 12, (5, 10))
                 font_size = st.slider("Font size:", 10, 50, 30)
@@ -173,5 +176,6 @@ def app():
 
                 geemap.reduce_gif_size(out_gif)
 
-                empty_text.text("Right click the image to save it to your computer👇")
+                empty_text.text(
+                    "Right click the GIF to save it to your computer👇")
                 empty_image.image(out_gif)
