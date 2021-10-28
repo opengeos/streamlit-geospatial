@@ -87,8 +87,8 @@ def app():
                     "Steps to create a timelapse: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click Submit button")
                 if collection == "Landsat TM-ETM-OLI Surface Reflectance":
                     try:
-                        lat, lon = geemap.get_current_latlon()
-                        m.set_center(lon, lat, zoom=11)
+                        # lat, lon = geemap.get_current_latlon()
+                        m.set_center(-74.5216, -8.39, zoom=11)
                     except:
                         pass
         else:
