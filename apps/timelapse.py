@@ -88,7 +88,7 @@ def app():
                 if collection == "Landsat TM-ETM-OLI Surface Reflectance":
                     try:
                         # lat, lon = geemap.get_current_latlon()
-                        m.set_center(-74.5216, -8.39, zoom=11)
+                        m.set_center(4.20, 18.63, zoom=2)
                     except:
                         pass
         else:
