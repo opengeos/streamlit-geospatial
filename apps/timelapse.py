@@ -229,7 +229,7 @@ def app():
 
         elif collection == "Geostationary Operational Environmental Satellites (GOES)":
 
-            video_empty.video("https://youtu.be/VVRK_-dEjR4")
+            video_empty.video("https://youtu.be/16fA2QORG4A")
 
             with st.form("submit_goes_form"):
 
