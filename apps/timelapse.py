@@ -65,26 +65,29 @@ def app():
             roi_options = ["Uploaded GeoJSON"] + list(goes_rois.keys())
 
         sample_roi = st.selectbox(
-            "Select a sample ROI or upload a GeoJSON file:", roi_options, index=0,
+            "Select a sample ROI or upload a GeoJSON file:",
+            roi_options,
+            index=0,
         )
 
     with row1_col1:
         m = geemap.Map(basemap="HYBRID", plugin_Draw=True, draw_export=True)
         m.add_basemap("ROADMAP")
 
-        with st.expander("See a video demo"):
+        with st.expander("Steps: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click the Submit button. Expand this tab to see a demo 👉"):
             video_empty = st.empty()
 
         data = st.file_uploader(
-            "Draw a small ROI on the map, click the Export button to save it, and then upload it here. Customize timelapse parameters and then click the Submit button 😇👇",
+            "Upload a GeoJSON file to use as an ROI. Customize timelapse parameters and then click the Submit button 😇👇",
             type=["geojson"],
         )
 
         crs = {"init": "epsg:4326"}
         if sample_roi == "Uploaded GeoJSON":
             if data is None:
-                st.info(
-                    "Steps to create a timelapse: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click Submit button")
+                # st.info(
+                #     "Steps to create a timelapse: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click Submit button"
+                # )
                 if collection == "Landsat TM-ETM-OLI Surface Reflectance":
                     try:
                         # lat, lon = geemap.get_current_latlon()
@@ -94,19 +97,29 @@ def app():
         else:
             if collection == "Landsat TM-ETM-OLI Surface Reflectance":
                 gdf = gpd.GeoDataFrame(
-                    index=[0], crs=crs, geometry=[landsat_rois[sample_roi]])
-            elif collection == "Geostationary Operational Environmental Satellites (GOES)":
+                    index=[0], crs=crs, geometry=[landsat_rois[sample_roi]]
+                )
+            elif (
+                collection
+                == "Geostationary Operational Environmental Satellites (GOES)"
+            ):
                 gdf = gpd.GeoDataFrame(
-                    index=[0], crs=crs, geometry=[goes_rois[sample_roi]["region"]])
+                    index=[0], crs=crs, geometry=[goes_rois[sample_roi]["region"]]
+                )
 
         if sample_roi != "Uploaded GeoJSON":
 
             if collection == "Landsat TM-ETM-OLI Surface Reflectance":
                 gdf = gpd.GeoDataFrame(
-                    index=[0], crs=crs, geometry=[landsat_rois[sample_roi]])
-            elif collection == "Geostationary Operational Environmental Satellites (GOES)":
+                    index=[0], crs=crs, geometry=[landsat_rois[sample_roi]]
+                )
+            elif (
+                collection
+                == "Geostationary Operational Environmental Satellites (GOES)"
+            ):
                 gdf = gpd.GeoDataFrame(
-                    index=[0], crs=crs, geometry=[goes_rois[sample_roi]["region"]])
+                    index=[0], crs=crs, geometry=[goes_rois[sample_roi]["region"]]
+                )
             st.session_state["roi"] = geemap.geopandas_to_ee(gdf)
             m.add_gdf(gdf, "ROI")
         elif data:
@@ -168,12 +181,14 @@ def app():
 
                 empty_text = st.empty()
                 empty_image = st.empty()
+                empty_fire_image = st.empty()
                 submitted = st.form_submit_button("Submit")
                 if submitted:
 
                     if sample_roi == "Uploaded GeoJSON" and data is None:
                         empty_text.warning(
-                            "Steps to create a timelapse: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click the Submit button. Alternatively, you can select a sample ROI from the dropdown list.")
+                            "Steps to create a timelapse: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click the Submit button. Alternatively, you can select a sample ROI from the dropdown list."
+                        )
                     else:
 
                         empty_text.text("Computing... Please wait...")
@@ -224,7 +239,8 @@ def app():
                         geemap.reduce_gif_size(out_gif)
 
                         empty_text.text(
-                            "Right click the GIF to save it to your computer👇")
+                            "Right click the GIF to save it to your computer👇"
+                        )
                         empty_image.image(out_gif)
 
         elif collection == "Geostationary Operational Environmental Satellites (GOES)":
@@ -252,13 +268,16 @@ def app():
                     roi_start = goes_rois[sample_roi]["start_time"]
                     roi_end = goes_rois[sample_roi]["end_time"]
                     roi_start_date = datetime.datetime.strptime(
-                        roi_start[:10], "%Y-%m-%d")
+                        roi_start[:10], "%Y-%m-%d"
+                    )
                     roi_end_date = datetime.datetime.strptime(
                         roi_end[:10], "%Y-%m-%d")
                     roi_start_time = datetime.time(
-                        int(roi_start[11:13]), int(roi_start[14:16]))
+                        int(roi_start[11:13]), int(roi_start[14:16])
+                    )
                     roi_end_time = datetime.time(
-                        int(roi_end[11:13]), int(roi_end[14:16]))
+                        int(roi_end[11:13]), int(roi_end[14:16])
+                    )
 
                 start_date = st.date_input(
                     "Select the start date:", roi_start_date)
@@ -266,14 +285,16 @@ def app():
 
                 with st.expander("Customize timelapse"):
 
+                    add_fire = st.checkbox(
+                        "Add Fire/Hotspot Characterization", False)
+
                     scan_type = st.selectbox(
                         "Select a scan type:", [
                             "Full Disk", "CONUS", "Mesoscale"]
                     )
 
                     start_time = st.time_input(
-                        "Select the start time of the start date:",
-                        roi_start_time
+                        "Select the start time of the start date:", roi_start_time
                     )
 
                     end_time = st.time_input(
@@ -300,11 +321,14 @@ def app():
                     font_color = st.color_picker("Font color:", "#ffffff")
                 empty_text = st.empty()
                 empty_image = st.empty()
+                empty_fire_text = st.empty()
+                empty_fire_image = st.empty()
                 submitted = st.form_submit_button("Submit")
                 if submitted:
                     if sample_roi == "Uploaded GeoJSON" and data is None:
                         empty_text.warning(
-                            "Steps to create a timelapse: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click the Submit button. Alternatively, you can select a sample ROI from the dropdown list.")
+                            "Steps to create a timelapse: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click the Submit button. Alternatively, you can select a sample ROI from the dropdown list."
+                        )
                     else:
                         empty_text.text("Computing... Please wait...")
 
@@ -334,6 +358,33 @@ def app():
                                 "Right click the GIF to save it to your computer👇"
                             )
                             empty_image.image(out_gif)
+
+                            if add_fire:
+                                out_fire_gif = geemap.temp_file_path(".gif")
+                                empty_fire_text.text(
+                                    "Delineating Fire Hotspot... Please wait...")
+                                geemap.goes_fire_timelapse(
+                                    out_fire_gif,
+                                    start_date=start,
+                                    end_date=end,
+                                    data=satellite,
+                                    scan=scan_type.replace(" ", "_").lower(),
+                                    region=roi,
+                                    dimensions=768,
+                                    framesPerSecond=speed,
+                                    date_format="YYYY-MM-dd HH:mm",
+                                    xy=("3%", "3%"),
+                                    text_sequence=None,
+                                    font_type="arial.ttf",
+                                    font_size=font_size,
+                                    font_color=font_color,
+                                    add_progress_bar=add_progress_bar,
+                                    progress_bar_color=progress_bar_color,
+                                    progress_bar_height=5,
+                                    loop=0,
+                                )
+                                if os.path.exists(out_fire_gif):
+                                    empty_fire_image.image(out_fire_gif)
                         else:
                             empty_text.text(
                                 "Something went wrong, either the ROI is too big or there are no data available for the specified date range. Please try a smaller ROI or different date range."
