@@ -22,9 +22,9 @@ apps = MultiApp()
 # Add all your application here
 
 apps.add_app("Home", home.app)
-apps.add_app("U.S. Real Estate", housing.app)
-apps.add_app("U.S. Census Data", census.app)
 apps.add_app("Create Timelapse", timelapse.app)
+apps.add_app("U.S. Real Estate Data", housing.app)
+apps.add_app("U.S. Census Data", census.app)
 apps.add_app("Upload Vector Data", upload.app)
 apps.add_app("Search Basemaps", basemaps.app)
 apps.add_app("Pydeck Gallery", deck.app)

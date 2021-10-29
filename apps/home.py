@@ -3,14 +3,12 @@ import leafmap.foliumap as leafmap
 
 
 def app():
-    st.title("Home")
-
-    st.header("Introduction")
+    st.title("Streamlit for Geospatial Applications")
 
     st.markdown(
         """
         This multi-page web app demonstrates various interative web apps created using [streamlit](https://streamlit.io) and open-source mapping libraries, 
-        such as [leafmap](https://leafmap.org), [pydeck](https://deckgl.readthedocs.io), and [kepler.gl](https://docs.kepler.gl/docs/keplergl-jupyter).
+        such as [leafmap](https://leafmap.org), [geemap](https://geemap.org), [pydeck](https://deckgl.readthedocs.io), and [kepler.gl](https://docs.kepler.gl/docs/keplergl-jupyter).
         This is an open-source project and you are very welcome to contribute your comments, questions, resources, and apps as [issues](https://github.com/giswqs/streamlit-geospatial/issues) or 
         [pull requests](https://github.com/giswqs/streamlit-geospatial/pulls) to the [GitHub repository](https://github.com/giswqs/streamlit-geospatial).
 
@@ -19,7 +17,18 @@ def app():
 
     st.info("Click on the left sidebar menu to navigate to the different apps.")
 
-    st.header("Demo")
+    st.subheader("Timelapse of Satellite Imagery")
+    st.markdown(
+        """
+        The following timelapse animations were created using the Timelapse web app. Click `Create Timelapse` on the left sidebar menu to create your own timelapse for any location around the globe.
+    """
+    )
 
-    st.subheader("U.S. Real Estate Data and Market Trends")
-    st.image("https://i.imgur.com/Z3dk6Tr.gif")
+    row1_col1, row1_col2 = st.columns(2)
+    with row1_col1:
+        st.image("https://i.imgur.com/NRcS93r.gif")
+        st.image("https://i.imgur.com/TwO7AGE.gif")
+
+    with row1_col2:
+        st.image("https://i.imgur.com/e0iEq3N.gif")
+        st.image("https://i.imgur.com/WlSNoGt.gif")

@@ -215,6 +215,9 @@ def app():
     """
     )
 
+    with st.expander("See a demo"):
+        st.image("https://i.imgur.com/Z3dk6Tr.gif")
+
     row1_col1, row1_col2, row1_col3, row1_col4, row1_col5 = st.columns(
         [0.6, 0.8, 0.6, 1.4, 2]
     )
