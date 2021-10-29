@@ -1,6 +1,7 @@
 import os
 import datetime
 import geopandas as gpd
+import folium
 import streamlit as st
 import geemap.foliumap as geemap
 from datetime import date
@@ -46,7 +47,23 @@ def app():
 
     row1_col1, row1_col2 = st.columns([2, 1])
 
+    with row1_col1:
+        m = geemap.Map(basemap="HYBRID", plugin_Draw=True, draw_export=True)
+        m.add_basemap("ROADMAP")
+
     with row1_col2:
+
+        keyword = st.text_input("Search for a location:", "")
+        if keyword:
+            locations = geemap.geocode(keyword)
+            if locations is not None and len(locations) > 0:
+                str_locations = [str(g)[1:-1] for g in locations]
+                location = st.selectbox("Select a location:", str_locations)
+                loc_index = str_locations.index(location)
+                selected_loc = locations[loc_index]
+                lat, lng = selected_loc.lat, selected_loc.lng
+                folium.Marker(location=[lat, lng], popup=location).add_to(m)
+                m.set_center(lng, lat, 12)
 
         collection = st.selectbox(
             "Select a satellite image collection: ",
@@ -71,8 +88,8 @@ def app():
         )
 
     with row1_col1:
-        m = geemap.Map(basemap="HYBRID", plugin_Draw=True, draw_export=True)
-        m.add_basemap("ROADMAP")
+        # m = geemap.Map(basemap="HYBRID", plugin_Draw=True, draw_export=True)
+        # m.add_basemap("ROADMAP")
 
         with st.expander("Steps: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click the Submit button. Expand this tab to see a demo 👉"):
             video_empty = st.empty()
@@ -88,7 +105,7 @@ def app():
                 # st.info(
                 #     "Steps to create a timelapse: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click Submit button"
                 # )
-                if collection == "Landsat TM-ETM-OLI Surface Reflectance":
+                if collection == "Landsat TM-ETM-OLI Surface Reflectance" and (not keyword):
                     try:
                         # lat, lon = geemap.get_current_latlon()
                         m.set_center(4.20, 18.63, zoom=2)
