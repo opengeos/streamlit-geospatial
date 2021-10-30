@@ -5,8 +5,7 @@ import folium
 import streamlit as st
 import geemap.foliumap as geemap
 from datetime import date
-from shapely.geometry import Polygon
-from .rois import goes_rois, landsat_rois
+from .rois import *
 
 
 @st.cache
@@ -17,8 +16,7 @@ def uploaded_file_to_gdf(data):
 
     _, file_extension = os.path.splitext(data.name)
     file_id = str(uuid.uuid4())
-    file_path = os.path.join(tempfile.gettempdir(),
-                             f"{file_id}{file_extension}")
+    file_path = os.path.join(tempfile.gettempdir(), f"{file_id}{file_extension}")
 
     with open(file_path, "wb") as file:
         file.write(data.getbuffer())
@@ -70,6 +68,7 @@ def app():
             [
                 "Landsat TM-ETM-OLI Surface Reflectance",
                 "Geostationary Operational Environmental Satellites (GOES)",
+                "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km",
             ],
             index=0,
         )
@@ -78,8 +77,10 @@ def app():
             roi_options = ["Uploaded GeoJSON"] + list(landsat_rois.keys())
 
         elif collection == "Geostationary Operational Environmental Satellites (GOES)":
-
             roi_options = ["Uploaded GeoJSON"] + list(goes_rois.keys())
+
+        elif collection == "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km":
+            roi_options = ["Uploaded GeoJSON"] + list(modis_rois.keys())
 
         sample_roi = st.selectbox(
             "Select a sample ROI or upload a GeoJSON file:",
@@ -91,7 +92,9 @@ def app():
         # m = geemap.Map(basemap="HYBRID", plugin_Draw=True, draw_export=True)
         # m.add_basemap("ROADMAP")
 
-        with st.expander("Steps: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click the Submit button. Expand this tab to see a demo 👉"):
+        with st.expander(
+            "Steps: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click the Submit button. Expand this tab to see a demo 👉"
+        ):
             video_empty = st.empty()
 
         data = st.file_uploader(
@@ -105,12 +108,14 @@ def app():
                 # st.info(
                 #     "Steps to create a timelapse: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click Submit button"
                 # )
-                if collection == "Landsat TM-ETM-OLI Surface Reflectance" and (not keyword):
-                    try:
-                        # lat, lon = geemap.get_current_latlon()
-                        m.set_center(4.20, 18.63, zoom=2)
-                    except:
-                        pass
+                if (
+                    collection
+                    == "Geostationary Operational Environmental Satellites (GOES)"
+                    and (not keyword)
+                ):
+                    m.set_center(-100, 40, 3)
+                else:
+                    m.set_center(4.20, 18.63, zoom=2)
         else:
             if collection == "Landsat TM-ETM-OLI Surface Reflectance":
                 gdf = gpd.GeoDataFrame(
@@ -122,6 +127,10 @@ def app():
             ):
                 gdf = gpd.GeoDataFrame(
                     index=[0], crs=crs, geometry=[goes_rois[sample_roi]["region"]]
+                )
+            elif collection == "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km":
+                gdf = gpd.GeoDataFrame(
+                    index=[0], crs=crs, geometry=[modis_rois[sample_roi]]
                 )
 
         if sample_roi != "Uploaded GeoJSON":
@@ -136,6 +145,10 @@ def app():
             ):
                 gdf = gpd.GeoDataFrame(
                     index=[0], crs=crs, geometry=[goes_rois[sample_roi]["region"]]
+                )
+            elif collection == "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km":
+                gdf = gpd.GeoDataFrame(
+                    index=[0], crs=crs, geometry=[modis_rois[sample_roi]]
                 )
             st.session_state["roi"] = geemap.geopandas_to_ee(gdf)
             m.add_gdf(gdf, "ROI")
@@ -186,8 +199,7 @@ def app():
                         "Progress bar color:", "#0000ff"
                     )
                     years = st.slider(
-                        "Start and end year:", 1984, today.year, (
-                            1984, today.year - 1)
+                        "Start and end year:", 1984, today.year, (1984, today.year)
                     )
                     months = st.slider("Start and end month:", 1, 12, (5, 10))
                     font_size = st.slider("Font size:", 10, 50, 30)
@@ -271,8 +283,7 @@ def app():
                     roi = st.session_state.get("roi")
                 out_gif = geemap.temp_file_path(".gif")
 
-                satellite = st.selectbox("Select a satellite:", [
-                                         "GOES-17", "GOES-16"])
+                satellite = st.selectbox("Select a satellite:", ["GOES-17", "GOES-16"])
                 earliest_date = datetime.date(2017, 7, 10)
                 latest_date = datetime.date.today()
 
@@ -287,8 +298,7 @@ def app():
                     roi_start_date = datetime.datetime.strptime(
                         roi_start[:10], "%Y-%m-%d"
                     )
-                    roi_end_date = datetime.datetime.strptime(
-                        roi_end[:10], "%Y-%m-%d")
+                    roi_end_date = datetime.datetime.strptime(roi_end[:10], "%Y-%m-%d")
                     roi_start_time = datetime.time(
                         int(roi_start[11:13]), int(roi_start[14:16])
                     )
@@ -296,18 +306,15 @@ def app():
                         int(roi_end[11:13]), int(roi_end[14:16])
                     )
 
-                start_date = st.date_input(
-                    "Select the start date:", roi_start_date)
+                start_date = st.date_input("Select the start date:", roi_start_date)
                 end_date = st.date_input("Select the end date:", roi_end_date)
 
                 with st.expander("Customize timelapse"):
 
-                    add_fire = st.checkbox(
-                        "Add Fire/Hotspot Characterization", False)
+                    add_fire = st.checkbox("Add Fire/Hotspot Characterization", False)
 
                     scan_type = st.selectbox(
-                        "Select a scan type:", [
-                            "Full Disk", "CONUS", "Mesoscale"]
+                        "Select a scan type:", ["Full Disk", "CONUS", "Mesoscale"]
                     )
 
                     start_time = st.time_input(
@@ -379,7 +386,8 @@ def app():
                             if add_fire:
                                 out_fire_gif = geemap.temp_file_path(".gif")
                                 empty_fire_text.text(
-                                    "Delineating Fire Hotspot... Please wait...")
+                                    "Delineating Fire Hotspot... Please wait..."
+                                )
                                 geemap.goes_fire_timelapse(
                                     out_fire_gif,
                                     start_date=start,
@@ -406,3 +414,66 @@ def app():
                             empty_text.text(
                                 "Something went wrong, either the ROI is too big or there are no data available for the specified date range. Please try a smaller ROI or different date range."
                             )
+
+        elif collection == "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km":
+
+            video_empty.video("https://youtu.be/16fA2QORG4A")
+
+            satellite = st.selectbox("Select a satellite:", ["Terra", "Aqua"])
+            band = st.selectbox("Select a band:", ["NDVI", "EVI"])
+
+            with st.form("submit_modis_form"):
+
+                roi = None
+                if st.session_state.get("roi") is not None:
+                    roi = st.session_state.get("roi")
+                out_gif = geemap.temp_file_path(".gif")
+
+                with st.expander("Customize timelapse"):
+
+                    start = st.date_input(
+                        "Select a start date:", datetime.date(2000, 2, 8)
+                    )
+                    end = st.date_input("Select an end date:", datetime.date.today())
+
+                    start_date = start.strftime("%Y-%m-%d")
+                    end_date = end.strftime("%Y-%m-%d")
+
+                    speed = st.slider("Frames per second:", 1, 30, 10)
+                    add_progress_bar = st.checkbox("Add a progress bar", True)
+                    progress_bar_color = st.color_picker(
+                        "Progress bar color:", "#0000ff"
+                    )
+                    font_size = st.slider("Font size:", 10, 50, 20)
+                    font_color = st.color_picker("Font color:", "#ffffff")
+                empty_text = st.empty()
+                empty_image = st.empty()
+
+                submitted = st.form_submit_button("Submit")
+                if submitted:
+                    if sample_roi == "Uploaded GeoJSON" and data is None:
+                        empty_text.warning(
+                            "Steps to create a timelapse: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click the Submit button. Alternatively, you can select a sample ROI from the dropdown list."
+                        )
+                    else:
+
+                        empty_text.text("Computing... Please wait...")
+
+                        print(roi.getInfo())
+                        geemap.modis_ndvi_timelapse(
+                            out_gif,
+                            satellite,
+                            band,
+                            start_date,
+                            end_date,
+                            roi,
+                            768,
+                            speed,
+                        )
+
+                        geemap.reduce_gif_size(out_gif)
+
+                        empty_text.text(
+                            "Right click the GIF to save it to your computer👇"
+                        )
+                        empty_image.image(out_gif)
