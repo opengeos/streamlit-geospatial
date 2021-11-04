@@ -485,3 +485,5 @@ def app():
                             "Right click the GIF to save it to your computer👇"
                         )
                         empty_image.image(out_gif)
+
+        st.error("This timelapse app is not working at the moment. Stay tuned!")
