@@ -16,8 +16,7 @@ def uploaded_file_to_gdf(data):
 
     _, file_extension = os.path.splitext(data.name)
     file_id = str(uuid.uuid4())
-    file_path = os.path.join(tempfile.gettempdir(),
-                             f"{file_id}{file_extension}")
+    file_path = os.path.join(tempfile.gettempdir(), f"{file_id}{file_extension}")
 
     with open(file_path, "wb") as file:
         file.write(data.getbuffer())
@@ -200,8 +199,7 @@ def app():
                         "Progress bar color:", "#0000ff"
                     )
                     years = st.slider(
-                        "Start and end year:", 1984, today.year, (
-                            1984, today.year)
+                        "Start and end year:", 1984, today.year, (1984, today.year)
                     )
                     months = st.slider("Start and end month:", 1, 12, (5, 10))
                     font_size = st.slider("Font size:", 10, 50, 30)
@@ -285,8 +283,7 @@ def app():
                     roi = st.session_state.get("roi")
                 out_gif = geemap.temp_file_path(".gif")
 
-                satellite = st.selectbox("Select a satellite:", [
-                                         "GOES-17", "GOES-16"])
+                satellite = st.selectbox("Select a satellite:", ["GOES-17", "GOES-16"])
                 earliest_date = datetime.date(2017, 7, 10)
                 latest_date = datetime.date.today()
 
@@ -301,8 +298,7 @@ def app():
                     roi_start_date = datetime.datetime.strptime(
                         roi_start[:10], "%Y-%m-%d"
                     )
-                    roi_end_date = datetime.datetime.strptime(
-                        roi_end[:10], "%Y-%m-%d")
+                    roi_end_date = datetime.datetime.strptime(roi_end[:10], "%Y-%m-%d")
                     roi_start_time = datetime.time(
                         int(roi_start[11:13]), int(roi_start[14:16])
                     )
@@ -310,18 +306,15 @@ def app():
                         int(roi_end[11:13]), int(roi_end[14:16])
                     )
 
-                start_date = st.date_input(
-                    "Select the start date:", roi_start_date)
+                start_date = st.date_input("Select the start date:", roi_start_date)
                 end_date = st.date_input("Select the end date:", roi_end_date)
 
                 with st.expander("Customize timelapse"):
 
-                    add_fire = st.checkbox(
-                        "Add Fire/Hotspot Characterization", False)
+                    add_fire = st.checkbox("Add Fire/Hotspot Characterization", False)
 
                     scan_type = st.selectbox(
-                        "Select a scan type:", [
-                            "Full Disk", "CONUS", "Mesoscale"]
+                        "Select a scan type:", ["Full Disk", "CONUS", "Mesoscale"]
                     )
 
                     start_time = st.time_input(
@@ -441,8 +434,7 @@ def app():
                     start = st.date_input(
                         "Select a start date:", datetime.date(2000, 2, 8)
                     )
-                    end = st.date_input(
-                        "Select an end date:", datetime.date.today())
+                    end = st.date_input("Select an end date:", datetime.date.today())
 
                     start_date = start.strftime("%Y-%m-%d")
                     end_date = end.strftime("%Y-%m-%d")
@@ -486,7 +478,7 @@ def app():
                         )
                         empty_image.image(out_gif)
 
-        st.error("This timelapse app is not working at the moment. See the GEE Develop Forum. Stay tuned!")
-        st.markdown("""
-            See the [GEE Develop Forum](https://groups.google.com/g/google-earth-engine-developers/c/jhMWdmdFoVY) for more details.
-        """)
+        # st.error("This timelapse app is not working at the moment. See the GEE Develop Forum. Stay tuned!")
+        # st.markdown("""
+        #     See the [GEE Develop Forum](https://groups.google.com/g/google-earth-engine-developers/c/jhMWdmdFoVY) for more details.
+        # """)
