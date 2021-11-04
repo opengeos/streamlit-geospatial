@@ -486,4 +486,7 @@ def app():
                         )
                         empty_image.image(out_gif)
 
-        st.error("This timelapse app is not working at the moment. Stay tuned!")
+        st.error("This timelapse app is not working at the moment. See the GEE Develop Forum. Stay tuned!")
+        st.markdown("""
+            See the [GEE Develop Forum](https://groups.google.com/g/google-earth-engine-developers/c/jhMWdmdFoVY) for more details.
+        """)
