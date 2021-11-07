@@ -1,3 +1,4 @@
+import ee
 import os
 import datetime
 import geopandas as gpd
@@ -150,11 +151,11 @@ def app():
                 gdf = gpd.GeoDataFrame(
                     index=[0], crs=crs, geometry=[modis_rois[sample_roi]]
                 )
-            st.session_state["roi"] = geemap.geopandas_to_ee(gdf)
+            st.session_state["roi"] = geemap.geopandas_to_ee(gdf, geodesic=False)
             m.add_gdf(gdf, "ROI")
         elif data:
             gdf = uploaded_file_to_gdf(data)
-            st.session_state["roi"] = geemap.geopandas_to_ee(gdf)
+            st.session_state["roi"] = geemap.geopandas_to_ee(gdf, geodesic=False)
             m.add_gdf(gdf, "ROI")
 
         m.to_streamlit(height=600)
@@ -422,6 +423,49 @@ def app():
             satellite = st.selectbox("Select a satellite:", ["Terra", "Aqua"])
             band = st.selectbox("Select a band:", ["NDVI", "EVI"])
 
+            add_outline = st.checkbox(
+                "Overlay an administrative boundary on timelapse", False
+            )
+
+            if add_outline:
+
+                with st.expander("Customize administrative boundary", True):
+
+                    overlay_options = {
+                        "User-defined": None,
+                        "Countries": "countries",
+                        "US States": "us_states",
+                        "China Administrative Boundary Level 0": "chn_admin_level0",
+                        "China Administrative Boundary Level 1": "chn_admin_level1",
+                        "China Administrative Boundary Level 2": "chn_admin_level2",
+                    }
+
+                    overlay = st.selectbox(
+                        "Select an administrative boundary:",
+                        list(overlay_options.keys()),
+                        index=1,
+                    )
+
+                    overlay_data = overlay_options[overlay]
+
+                    if overlay_data is None:
+                        asset_id = st.text_input(
+                            "Specify an ee.FeatureCollection asset id:",
+                            "USDOS/LSIB_SIMPLE/2017",
+                        )
+                        overlay_data = ee.FeatureCollection(asset_id)
+
+                    overlay_color = st.color_picker(
+                        "Select a color for the administrative boundary:", "#000000"
+                    )
+                    overlay_width = st.slider(
+                        "Select a line width for the administrative boundary:", 1, 10, 1
+                    )
+            else:
+                overlay_data = None
+                overlay_color = None
+                overlay_width = None
+
             with st.form("submit_modis_form"):
 
                 roi = None
@@ -469,6 +513,9 @@ def app():
                             roi,
                             768,
                             speed,
+                            overlay_data=overlay_data,
+                            overlay_color=overlay_color,
+                            overlay_width=overlay_width,
                         )
 
                         geemap.reduce_gif_size(out_gif)
