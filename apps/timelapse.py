@@ -229,7 +229,7 @@ def app():
                         end_date = str(months[1]).zfill(2) + "-30"
                         bands = RGB.split("/")
 
-                        out_gif = geemap.landsat_ts_gif(
+                        out_gif = geemap.landsat_timelapse(
                             roi=roi,
                             out_gif=out_gif,
                             start_year=start_year,
