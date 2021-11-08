@@ -35,7 +35,7 @@ def app():
 
     today = date.today()
 
-    st.title("Create Landsat/GOES/MODIS Timelapse")
+    st.title("Create Timelapse")
 
     st.markdown(
         """
@@ -68,13 +68,17 @@ def app():
             "Select a satellite image collection: ",
             [
                 "Landsat TM-ETM-OLI Surface Reflectance",
+                "Sentinel-2 MSI Surface Reflectance",
                 "Geostationary Operational Environmental Satellites (GOES)",
                 "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km",
             ],
             index=0,
         )
 
-        if collection == "Landsat TM-ETM-OLI Surface Reflectance":
+        if collection in [
+            "Landsat TM-ETM-OLI Surface Reflectance",
+            "Sentinel-2 MSI Surface Reflectance",
+        ]:
             roi_options = ["Uploaded GeoJSON"] + list(landsat_rois.keys())
 
         elif collection == "Geostationary Operational Environmental Satellites (GOES)":
@@ -89,9 +93,58 @@ def app():
             index=0,
         )
 
+        add_outline = st.checkbox(
+            "Overlay an administrative boundary on timelapse", False
+        )
+
+        if add_outline:
+
+            with st.expander("Customize administrative boundary", True):
+
+                overlay_options = {
+                    "User-defined": None,
+                    "Continents": "continents",
+                    "Countries": "countries",
+                    "US States": "us_states",
+                    "China Administrative Boundary Level 0": "chn_admin_level0",
+                    "China Administrative Boundary Level 1": "chn_admin_level1",
+                    "China Administrative Boundary Level 2": "chn_admin_level2",
+                }
+
+                overlay = st.selectbox(
+                    "Select an administrative boundary:",
+                    list(overlay_options.keys()),
+                    index=2,
+                )
+
+                overlay_data = overlay_options[overlay]
+
+                if overlay_data is None:
+                    overlay_data = st.text_input(
+                        "Enter an HTTP URL to a GeoJSON file or an ee.FeatureCollection asset id:",
+                        "https://raw.githubusercontent.com/giswqs/geemap/master/examples/data/countries.geojson",
+                    )
+
+                overlay_color = st.color_picker(
+                    "Select a color for the administrative boundary:", "#000000"
+                )
+                overlay_width = st.slider(
+                    "Select a line width for the administrative boundary:", 1, 20, 1
+                )
+                overlay_opacity = st.slider(
+                    "Select an opacity for the administrative boundary:",
+                    0.0,
+                    1.0,
+                    1.0,
+                    0.05,
+                )
+        else:
+            overlay_data = None
+            overlay_color = "black"
+            overlay_width = 1
+            overlay_opacity = 1
+
     with row1_col1:
-        # m = geemap.Map(basemap="HYBRID", plugin_Draw=True, draw_export=True)
-        # m.add_basemap("ROADMAP")
 
         with st.expander(
             "Steps: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click the Submit button. Expand this tab to see a demo 👉"
@@ -118,7 +171,10 @@ def app():
                 else:
                     m.set_center(4.20, 18.63, zoom=2)
         else:
-            if collection == "Landsat TM-ETM-OLI Surface Reflectance":
+            if collection in [
+                "Landsat TM-ETM-OLI Surface Reflectance",
+                "Sentinel-2 MSI Surface Reflectance",
+            ]:
                 gdf = gpd.GeoDataFrame(
                     index=[0], crs=crs, geometry=[landsat_rois[sample_roi]]
                 )
@@ -136,7 +192,10 @@ def app():
 
         if sample_roi != "Uploaded GeoJSON":
 
-            if collection == "Landsat TM-ETM-OLI Surface Reflectance":
+            if collection in [
+                "Landsat TM-ETM-OLI Surface Reflectance",
+                "Sentinel-2 MSI Surface Reflectance",
+            ]:
                 gdf = gpd.GeoDataFrame(
                     index=[0], crs=crs, geometry=[landsat_rois[sample_roi]]
                 )
@@ -162,8 +221,19 @@ def app():
 
     with row1_col2:
 
-        if collection == "Landsat TM-ETM-OLI Surface Reflectance":
+        if collection in [
+            "Landsat TM-ETM-OLI Surface Reflectance",
+            "Sentinel-2 MSI Surface Reflectance",
+        ]:
 
+            if collection == "Landsat TM-ETM-OLI Surface Reflectance":
+                sensor_start_year = 1984
+                timelapse_title = "Landsat Timelapse"
+                timelapse_speed = 10
+            elif collection == "Sentinel-2 MSI Surface Reflectance":
+                sensor_start_year = 2015
+                timelapse_title = "Sentinel-2 Timelapse"
+                timelapse_speed = 5
             video_empty.video("https://youtu.be/VVRK_-dEjR4")
 
             with st.form("submit_landsat_form"):
@@ -174,7 +244,7 @@ def app():
                 out_gif = geemap.temp_file_path(".gif")
 
                 title = st.text_input(
-                    "Enter a title to show on the timelapse: ", "Landsat Timelapse"
+                    "Enter a title to show on the timelapse: ", timelapse_title
                 )
                 RGB = st.selectbox(
                     "Select an RGB band combination:",
@@ -195,12 +265,15 @@ def app():
 
                 with st.expander("Customize timelapse"):
 
-                    speed = st.slider("Frames per second:", 1, 30, 10)
+                    speed = st.slider("Frames per second:", 1, 30, timelapse_speed)
                     progress_bar_color = st.color_picker(
                         "Progress bar color:", "#0000ff"
                     )
                     years = st.slider(
-                        "Start and end year:", 1984, today.year, (1984, today.year)
+                        "Start and end year:",
+                        sensor_start_year,
+                        today.year,
+                        (sensor_start_year, today.year),
                     )
                     months = st.slider("Start and end month:", 1, 12, (5, 10))
                     font_size = st.slider("Font size:", 10, 50, 30)
@@ -228,6 +301,7 @@ def app():
                         start_date = str(months[0]).zfill(2) + "-01"
                         end_date = str(months[1]).zfill(2) + "-30"
                         bands = RGB.split("/")
+                        print(overlay_color)
 
                         out_gif = geemap.landsat_timelapse(
                             roi=roi,
@@ -238,6 +312,10 @@ def app():
                             end_date=end_date,
                             bands=bands,
                             apply_fmask=apply_fmask,
+                            overlay_data=overlay_data,
+                            overlay_color=overlay_color,
+                            overlay_width=overlay_width,
+                            overlay_opacity=overlay_opacity,
                         )
 
                         geemap.add_text_to_gif(
@@ -376,6 +454,10 @@ def app():
                             progress_bar_color=progress_bar_color,
                             progress_bar_height=5,
                             loop=0,
+                            overlay_data=overlay_data,
+                            overlay_color=overlay_color,
+                            overlay_width=overlay_width,
+                            overlay_opacity=overlay_opacity,
                         )
 
                         if os.path.exists(out_gif):
@@ -422,49 +504,6 @@ def app():
 
             satellite = st.selectbox("Select a satellite:", ["Terra", "Aqua"])
             band = st.selectbox("Select a band:", ["NDVI", "EVI"])
-
-            add_outline = st.checkbox(
-                "Overlay an administrative boundary on timelapse", False
-            )
-
-            if add_outline:
-
-                with st.expander("Customize administrative boundary", True):
-
-                    overlay_options = {
-                        "User-defined": None,
-                        "Countries": "countries",
-                        "US States": "us_states",
-                        "China Administrative Boundary Level 0": "chn_admin_level0",
-                        "China Administrative Boundary Level 1": "chn_admin_level1",
-                        "China Administrative Boundary Level 2": "chn_admin_level2",
-                    }
-
-                    overlay = st.selectbox(
-                        "Select an administrative boundary:",
-                        list(overlay_options.keys()),
-                        index=1,
-                    )
-
-                    overlay_data = overlay_options[overlay]
-
-                    if overlay_data is None:
-                        asset_id = st.text_input(
-                            "Specify an ee.FeatureCollection asset id:",
-                            "USDOS/LSIB_SIMPLE/2017",
-                        )
-                        overlay_data = ee.FeatureCollection(asset_id)
-
-                    overlay_color = st.color_picker(
-                        "Select a color for the administrative boundary:", "#000000"
-                    )
-                    overlay_width = st.slider(
-                        "Select a line width for the administrative boundary:", 1, 10, 1
-                    )
-            else:
-                overlay_data = None
-                overlay_color = None
-                overlay_width = None
 
             with st.form("submit_modis_form"):
 
@@ -516,6 +555,7 @@ def app():
                             overlay_data=overlay_data,
                             overlay_color=overlay_color,
                             overlay_width=overlay_width,
+                            overlay_opacity=overlay_opacity,
                         )
 
                         geemap.reduce_gif_size(out_gif)
