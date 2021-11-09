@@ -46,6 +46,9 @@ def app():
 
     row1_col1, row1_col2 = st.columns([2, 1])
 
+    if st.session_state.get("zoom_level") is None:
+        st.session_state["zoom_level"] = 4
+
     with row1_col1:
         m = geemap.Map(basemap="HYBRID", plugin_Draw=True, draw_export=True)
         m.add_basemap("ROADMAP")
@@ -63,6 +66,7 @@ def app():
                 lat, lng = selected_loc.lat, selected_loc.lng
                 folium.Marker(location=[lat, lng], popup=location).add_to(m)
                 m.set_center(lng, lat, 12)
+                st.session_state["zoom_level"] = 12
 
         collection = st.selectbox(
             "Select a satellite image collection: ",
@@ -168,8 +172,8 @@ def app():
                     and (not keyword)
                 ):
                     m.set_center(-100, 40, 3)
-                else:
-                    m.set_center(4.20, 18.63, zoom=2)
+                # else:
+                #     m.set_center(4.20, 18.63, zoom=2)
         else:
             if collection in [
                 "Landsat TM-ETM-OLI Surface Reflectance",
