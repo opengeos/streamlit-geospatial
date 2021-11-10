@@ -285,6 +285,11 @@ def app():
                     apply_fmask = st.checkbox(
                         "Apply fmask (remove clouds, shadows, snow)", True
                     )
+                    title_font = st.selectbox(
+                        "Select the font type for the title:",
+                        ["arial.ttf", "alibaba.otf"],
+                        index=0,
+                    )
 
                 empty_text = st.empty()
                 empty_image = st.empty()
@@ -341,6 +346,7 @@ def app():
                             xy=("2%", "90%"),
                             text_sequence=title,
                             font_size=font_size,
+                            font_type=title_font,
                             font_color=font_color,
                             duration=int(1000 / speed),
                             add_progress_bar=True,
