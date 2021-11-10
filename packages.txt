@@ -1,6 +1,3 @@
 ffmpeg
 gifsicle
 fonts-noto
-ttf-droid
-ttf-wqy-zenhei 
-ttf-wqy-microhei
