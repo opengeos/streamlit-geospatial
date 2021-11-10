@@ -1,2 +1,6 @@
 ffmpeg
 gifsicle
+language-pack-zh*
+chinese*
+tf-wqy-zenhei 
+ttf-wqy-microhei
