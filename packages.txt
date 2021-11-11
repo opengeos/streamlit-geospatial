@@ -1,3 +1,2 @@
 ffmpeg
 gifsicle
-fonts-noto

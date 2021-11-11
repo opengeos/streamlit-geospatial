@@ -552,7 +552,6 @@ def app():
 
                         empty_text.text("Computing... Please wait...")
 
-                        print(roi.getInfo())
                         geemap.modis_ndvi_timelapse(
                             out_gif,
                             satellite,
