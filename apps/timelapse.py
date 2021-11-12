@@ -693,7 +693,7 @@ def app():
                     )
                     reducer = st.selectbox(
                         "Select a reducer for aggregating data:",
-                        ["mean", "median", "min", "max", "sum", "variance", "stdDev"],
+                        ["median", "mean", "min", "max", "sum", "variance", "stdDev"],
                         index=0,
                     )
                     data_format = st.selectbox(
