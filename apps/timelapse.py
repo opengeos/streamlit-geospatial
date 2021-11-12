@@ -4,6 +4,7 @@ import datetime
 import geopandas as gpd
 import folium
 import streamlit as st
+import geemap.colormaps as cm
 import geemap.foliumap as geemap
 from datetime import date
 from .rois import *
@@ -49,6 +50,11 @@ def app():
     if st.session_state.get("zoom_level") is None:
         st.session_state["zoom_level"] = 4
 
+    st.session_state["ee_asset_id"] = None
+    st.session_state["bands"] = None
+    st.session_state["palette"] = None
+    st.session_state["vis_params"] = None
+
     with row1_col1:
         m = geemap.Map(basemap="HYBRID", plugin_Draw=True, draw_export=True)
         m.add_basemap("ROADMAP")
@@ -71,12 +77,13 @@ def app():
         collection = st.selectbox(
             "Select a satellite image collection: ",
             [
+                "Any Earth Engine ImageCollection",
                 "Landsat TM-ETM-OLI Surface Reflectance",
                 "Sentinel-2 MSI Surface Reflectance",
                 "Geostationary Operational Environmental Satellites (GOES)",
                 "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km",
             ],
-            index=0,
+            index=1,
         )
 
         if collection in [
@@ -90,6 +97,98 @@ def app():
 
         elif collection == "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km":
             roi_options = ["Uploaded GeoJSON"] + list(modis_rois.keys())
+        else:
+            roi_options = ["Uploaded GeoJSON"]
+
+        if collection == "Any Earth Engine ImageCollection":
+            keyword = st.text_input("Enter a keyword to search (e.g., MODIS):", "")
+            if keyword:
+
+                assets = geemap.search_ee_data(keyword)
+                ee_assets = []
+                for asset in assets:
+                    if asset["ee_id_snippet"].startswith("ee.ImageCollection"):
+                        ee_assets.append(asset)
+
+                asset_titles = [x["title"] for x in ee_assets]
+                dataset = st.selectbox("Select a dataset:", asset_titles)
+                if len(ee_assets) > 0:
+                    st.session_state["ee_assets"] = ee_assets
+                    st.session_state["asset_titles"] = asset_titles
+                    index = asset_titles.index(dataset)
+                    ee_id = ee_assets[index]["id"]
+                else:
+                    ee_id = ""
+
+                if dataset is not None:
+                    with st.expander("Show dataset details", False):
+                        index = asset_titles.index(dataset)
+                        html = geemap.ee_data_html(st.session_state["ee_assets"][index])
+                        st.markdown(html, True)
+            else:
+                ee_id = ""
+
+            asset_id = st.text_input("Enter an ee.ImageCollection asset ID:", ee_id)
+
+            if asset_id:
+                with st.expander("Customize band combination and color palette", True):
+                    try:
+                        col = ee.ImageCollection.load(asset_id)
+                        size = col.size().getInfo()
+                        st.session_state["ee_asset_id"] = asset_id
+                    except:
+                        st.error("Invalid Earth Engine asset ID.")
+                        st.session_state["ee_asset_id"] = None
+                        return
+
+                    img_bands = col.first().bandNames().getInfo()
+                    if len(img_bands) >= 3:
+                        default_bands = img_bands[:3][::-1]
+                    else:
+                        default_bands = img_bands[:]
+                    bands = st.multiselect(
+                        "Select one or three bands (RGB):", img_bands, default_bands
+                    )
+                    st.session_state["bands"] = bands
+
+                    if len(bands) == 1:
+                        palette_options = st.selectbox(
+                            "Color palette",
+                            cm.list_colormaps(),
+                            index=2,
+                        )
+                        palette_values = cm.get_palette(palette_options, 15)
+                        palette = st.text_area(
+                            "Enter a custom palette:",
+                            palette_values,
+                        )
+                        st.write(
+                            cm.plot_colormap(cmap=palette_options, return_fig=True)
+                        )
+                        st.session_state["palette"] = eval(palette)
+
+                    if bands:
+                        vis_params = st.text_area(
+                            "Enter visualization parameters",
+                            "{'bands': ["
+                            + ", ".join([f"'{band}'" for band in bands])
+                            + "]}",
+                        )
+                    else:
+                        vis_params = st.text_area(
+                            "Enter visualization parameters",
+                            "{}",
+                        )
+                    try:
+                        st.session_state["vis_params"] = eval(vis_params)
+                        st.session_state["vis_params"]["palette"] = st.session_state[
+                            "palette"
+                        ]
+                    except Exception as e:
+                        st.session_state["vis_params"] = None
+                        st.error(
+                            f"Invalid visualization parameters. It must be a dictionary."
+                        )
 
         sample_roi = st.selectbox(
             "Select a sample ROI or upload a GeoJSON file:",
@@ -233,7 +332,7 @@ def app():
             if collection == "Landsat TM-ETM-OLI Surface Reflectance":
                 sensor_start_year = 1984
                 timelapse_title = "Landsat Timelapse"
-                timelapse_speed = 10
+                timelapse_speed = 5
             elif collection == "Sentinel-2 MSI Surface Reflectance":
                 sensor_start_year = 2015
                 timelapse_title = "Sentinel-2 Timelapse"
@@ -285,7 +384,7 @@ def app():
                     apply_fmask = st.checkbox(
                         "Apply fmask (remove clouds, shadows, snow)", True
                     )
-                    title_font = st.selectbox(
+                    font_type = st.selectbox(
                         "Select the font type for the title:",
                         ["arial.ttf", "alibaba.otf"],
                         index=0,
@@ -310,7 +409,6 @@ def app():
                         start_date = str(months[0]).zfill(2) + "-01"
                         end_date = str(months[1]).zfill(2) + "-30"
                         bands = RGB.split("/")
-                        print(overlay_color)
 
                         out_gif = geemap.landsat_timelapse(
                             roi=roi,
@@ -346,7 +444,7 @@ def app():
                             xy=("2%", "90%"),
                             text_sequence=title,
                             font_size=font_size,
-                            font_type=title_font,
+                            font_type=font_type,
                             font_color=font_color,
                             duration=int(1000 / speed),
                             add_progress_bar=True,
@@ -425,7 +523,7 @@ def app():
                         + end_time.strftime("%H:%M:%S")
                     )
 
-                    speed = st.slider("Frames per second:", 1, 30, 10)
+                    speed = st.slider("Frames per second:", 1, 30, 5)
                     add_progress_bar = st.checkbox("Add a progress bar", True)
                     progress_bar_color = st.color_picker(
                         "Progress bar color:", "#0000ff"
@@ -532,7 +630,7 @@ def app():
                     start_date = start.strftime("%Y-%m-%d")
                     end_date = end.strftime("%Y-%m-%d")
 
-                    speed = st.slider("Frames per second:", 1, 30, 10)
+                    speed = st.slider("Frames per second:", 1, 30, 5)
                     add_progress_bar = st.checkbox("Add a progress bar", True)
                     progress_bar_color = st.color_picker(
                         "Progress bar color:", "#0000ff"
@@ -574,7 +672,116 @@ def app():
                         )
                         empty_image.image(out_gif)
 
-        # st.error("This timelapse app is not working at the moment. See the GEE Develop Forum. Stay tuned!")
-        # st.markdown("""
-        #     See the [GEE Develop Forum](https://groups.google.com/g/google-earth-engine-developers/c/jhMWdmdFoVY) for more details.
-        # """)
+        elif collection == "Any Earth Engine ImageCollection":
+
+            with st.form("submit_ts_form"):
+                with st.expander("Customize timelapse"):
+
+                    title = st.text_input(
+                        "Enter a title to show on the timelapse: ", "Timelapse"
+                    )
+                    start_date = st.date_input(
+                        "Select the start date:", datetime.date(2020, 1, 1)
+                    )
+                    end_date = st.date_input(
+                        "Select the end date:", datetime.date.today()
+                    )
+                    frequency = st.selectbox(
+                        "Select a temporal frequency:",
+                        ["year", "quarter", "month", "day", "hour", "minute", "second"],
+                        index=0,
+                    )
+                    reducer = st.selectbox(
+                        "Select a reducer for aggregating data:",
+                        ["mean", "median", "min", "max", "sum", "variance", "stdDev"],
+                        index=0,
+                    )
+                    data_format = st.selectbox(
+                        "Select a date format to show on the timelapse:",
+                        [
+                            "YYYY-MM-dd",
+                            "YYYY",
+                            "YYMM-MM",
+                            "YYYY-MM-dd HH:mm",
+                            "YYYY-MM-dd HH:mm:ss",
+                            "HH:mm",
+                            "HH:mm:ss",
+                            "w",
+                            "M",
+                            "d",
+                            "D",
+                        ],
+                        index=0,
+                    )
+
+                    speed = st.slider("Frames per second:", 1, 30, 5)
+                    add_progress_bar = st.checkbox("Add a progress bar", True)
+                    progress_bar_color = st.color_picker(
+                        "Progress bar color:", "#0000ff"
+                    )
+                    font_size = st.slider("Font size:", 10, 50, 30)
+                    font_color = st.color_picker("Font color:", "#ffffff")
+                    font_type = st.selectbox(
+                        "Select the font type for the title:",
+                        ["arial.ttf", "alibaba.otf"],
+                        index=0,
+                    )
+
+                empty_text = st.empty()
+                empty_image = st.empty()
+                empty_fire_image = st.empty()
+
+                roi = None
+                if st.session_state.get("roi") is not None:
+                    roi = st.session_state.get("roi")
+                out_gif = geemap.temp_file_path(".gif")
+
+                submitted = st.form_submit_button("Submit_timelapse")
+                if submitted:
+
+                    if sample_roi == "Uploaded GeoJSON" and data is None:
+                        empty_text.warning(
+                            "Steps to create a timelapse: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click the Submit button. Alternatively, you can select a sample ROI from the dropdown list."
+                        )
+                    else:
+
+                        empty_text.text("Computing... Please wait...")
+                        geemap.create_timelapse(
+                            st.session_state.get("ee_asset_id"),
+                            start_date=start_date.strftime("%Y-%m-%d"),
+                            end_date=end_date.strftime("%Y-%m-%d"),
+                            region=roi,
+                            frequency=frequency,
+                            reducer=reducer,
+                            date_format=data_format,
+                            out_gif=out_gif,
+                            bands=st.session_state.get("bands"),
+                            palette=st.session_state.get("palette"),
+                            vis_params=st.session_state.get("vis_params"),
+                            dimensions=768,
+                            frames_per_second=speed,
+                            crs="EPSG:3857",
+                            overlay_data=overlay_data,
+                            overlay_color=overlay_color,
+                            overlay_width=overlay_width,
+                            overlay_opacity=overlay_opacity,
+                            title=title,
+                            title_xy=("2%", "90%"),
+                            add_text=True,
+                            text_xy=("2%", "2%"),
+                            text_sequence=None,
+                            font_type=font_type,
+                            font_size=font_size,
+                            font_color=font_color,
+                            add_progress_bar=add_progress_bar,
+                            progress_bar_color=progress_bar_color,
+                            progress_bar_height=5,
+                            loop=0,
+                        )
+
+                        geemap.reduce_gif_size(out_gif)
+
+                        empty_text.text(
+                            "Right click the GIF to save it to your computer👇"
+                        )
+                        empty_image.image(out_gif)
