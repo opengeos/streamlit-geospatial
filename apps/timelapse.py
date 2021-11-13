@@ -923,9 +923,15 @@ def app():
                             loop=0,
                         )
 
-                        geemap.reduce_gif_size(out_gif)
+                        if os.path.exists(out_gif):
 
-                        empty_text.text(
-                            "Right click the GIF to save it to your computer👇"
-                        )
-                        empty_image.image(out_gif)
+                            geemap.reduce_gif_size(out_gif)
+
+                            empty_text.text(
+                                "Right click the GIF to save it to your computer👇"
+                            )
+                            empty_image.image(out_gif)
+                        else:
+                            st.error(
+                                "Something went wrong. You probably requested too much data. Try reducing the ROI or timespan."
+                            )
