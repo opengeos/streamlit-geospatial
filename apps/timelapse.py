@@ -82,6 +82,7 @@ def app():
                 "Sentinel-2 MSI Surface Reflectance",
                 "Geostationary Operational Environmental Satellites (GOES)",
                 "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km",
+                "MODIS Gap filled Land Surface Temperature Daily",
             ],
             index=1,
         )
@@ -95,7 +96,10 @@ def app():
         elif collection == "Geostationary Operational Environmental Satellites (GOES)":
             roi_options = ["Uploaded GeoJSON"] + list(goes_rois.keys())
 
-        elif collection == "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km":
+        elif collection in [
+            "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km",
+            "MODIS Gap filled Land Surface Temperature Daily",
+        ]:
             roi_options = ["Uploaded GeoJSON"] + list(modis_rois.keys())
         else:
             roi_options = ["Uploaded GeoJSON"]
@@ -125,6 +129,8 @@ def app():
                         index = asset_titles.index(dataset)
                         html = geemap.ee_data_html(st.session_state["ee_assets"][index])
                         st.markdown(html, True)
+            # elif collection == "MODIS Gap filled Land Surface Temperature Daily":
+            #     ee_id = ""
             else:
                 ee_id = ""
 
@@ -189,6 +195,38 @@ def app():
                         st.error(
                             f"Invalid visualization parameters. It must be a dictionary."
                         )
+
+        elif collection == "MODIS Gap filled Land Surface Temperature Daily":
+            with st.expander("Show dataset details", False):
+                st.markdown(
+                    """
+                See the [Awesome GEE Community Datasets](https://samapriya.github.io/awesome-gee-community-datasets/projects/daily_lst/).
+                """
+                )
+
+            MODIS_options = ["Daytime (1:30 pm)", "Nightime (1:30 am)"]
+            MODIS_option = st.selectbox("Select a MODIS dataset:", MODIS_options)
+            if MODIS_option == "Daytime (1:30 pm)":
+                st.session_state[
+                    "ee_asset_id"
+                ] = "projects/sat-io/open-datasets/gap-filled-lst/gf_day_1km"
+            else:
+                st.session_state[
+                    "ee_asset_id"
+                ] = "projects/sat-io/open-datasets/gap-filled-lst/gf_night_1km"
+
+            palette_options = st.selectbox(
+                "Color palette",
+                cm.list_colormaps(),
+                index=90,
+            )
+            palette_values = cm.get_palette(palette_options, 15)
+            palette = st.text_area(
+                "Enter a custom palette:",
+                palette_values,
+            )
+            st.write(cm.plot_colormap(cmap=palette_options, return_fig=True))
+            st.session_state["palette"] = eval(palette)
 
         sample_roi = st.selectbox(
             "Select a sample ROI or upload a GeoJSON file:",
@@ -309,7 +347,10 @@ def app():
                 gdf = gpd.GeoDataFrame(
                     index=[0], crs=crs, geometry=[goes_rois[sample_roi]["region"]]
                 )
-            elif collection == "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km":
+            elif collection in [
+                "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km",
+                "MODIS Gap filled Land Surface Temperature Daily",
+            ]:
                 gdf = gpd.GeoDataFrame(
                     index=[0], crs=crs, geometry=[modis_rois[sample_roi]]
                 )
@@ -758,6 +799,109 @@ def app():
                             bands=st.session_state.get("bands"),
                             palette=st.session_state.get("palette"),
                             vis_params=st.session_state.get("vis_params"),
+                            dimensions=768,
+                            frames_per_second=speed,
+                            crs="EPSG:3857",
+                            overlay_data=overlay_data,
+                            overlay_color=overlay_color,
+                            overlay_width=overlay_width,
+                            overlay_opacity=overlay_opacity,
+                            title=title,
+                            title_xy=("2%", "90%"),
+                            add_text=True,
+                            text_xy=("2%", "2%"),
+                            text_sequence=None,
+                            font_type=font_type,
+                            font_size=font_size,
+                            font_color=font_color,
+                            add_progress_bar=add_progress_bar,
+                            progress_bar_color=progress_bar_color,
+                            progress_bar_height=5,
+                            loop=0,
+                        )
+
+                        geemap.reduce_gif_size(out_gif)
+
+                        empty_text.text(
+                            "Right click the GIF to save it to your computer👇"
+                        )
+                        empty_image.image(out_gif)
+
+        elif collection == "MODIS Gap filled Land Surface Temperature Daily":
+
+            with st.form("submit_ts_form"):
+                with st.expander("Customize timelapse"):
+
+                    title = st.text_input(
+                        "Enter a title to show on the timelapse: ",
+                        "Land Surface Temperature",
+                    )
+                    start_date = st.date_input(
+                        "Select the start date:", datetime.date(2018, 1, 1)
+                    )
+                    end_date = st.date_input(
+                        "Select the end date:", datetime.date(2020, 12, 31)
+                    )
+                    frequency = st.selectbox(
+                        "Select a temporal frequency:",
+                        ["year", "quarter", "month", "week", "day"],
+                        index=2,
+                    )
+                    reducer = st.selectbox(
+                        "Select a reducer for aggregating data:",
+                        ["median", "mean", "min", "max", "sum", "variance", "stdDev"],
+                        index=0,
+                    )
+                    # data_format = st.selectbox(
+                    #     "Select a date format to show on the timelapse:",
+                    #     list(feq_dict.keys()),
+                    #     index=list(feq_dict.keys()).index(frequency),
+                    # )
+
+                    speed = st.slider("Frames per second:", 1, 30, 5)
+                    add_progress_bar = st.checkbox("Add a progress bar", True)
+                    progress_bar_color = st.color_picker(
+                        "Progress bar color:", "#0000ff"
+                    )
+                    font_size = st.slider("Font size:", 10, 50, 30)
+                    font_color = st.color_picker("Font color:", "#ffffff")
+                    font_type = st.selectbox(
+                        "Select the font type for the title:",
+                        ["arial.ttf", "alibaba.otf"],
+                        index=0,
+                    )
+
+                empty_text = st.empty()
+                empty_image = st.empty()
+                empty_fire_image = st.empty()
+
+                roi = None
+                if st.session_state.get("roi") is not None:
+                    roi = st.session_state.get("roi")
+                out_gif = geemap.temp_file_path(".gif")
+
+                submitted = st.form_submit_button("Submit_timelapse")
+                if submitted:
+
+                    if sample_roi == "Uploaded GeoJSON" and data is None:
+                        empty_text.warning(
+                            "Steps to create a timelapse: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click the Submit button. Alternatively, you can select a sample ROI from the dropdown list."
+                        )
+                    else:
+
+                        empty_text.text("Computing... Please wait...")
+                        geemap.create_timelapse(
+                            st.session_state.get("ee_asset_id"),
+                            start_date=start_date.strftime("%Y-%m-%d"),
+                            end_date=end_date.strftime("%Y-%m-%d"),
+                            region=roi,
+                            frequency=frequency,
+                            reducer=reducer,
+                            date_format=None,
+                            out_gif=out_gif,
+                            bands=None,
+                            palette=st.session_state.get("palette"),
+                            vis_params=None,
                             dimensions=768,
                             frames_per_second=speed,
                             crs="EPSG:3857",
