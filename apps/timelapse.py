@@ -247,9 +247,7 @@ def app():
                     "Continents": "continents",
                     "Countries": "countries",
                     "US States": "us_states",
-                    "China Administrative Boundary Level 0": "chn_admin_level0",
-                    "China Administrative Boundary Level 1": "chn_admin_level1",
-                    "China Administrative Boundary Level 2": "chn_admin_level2",
+                    "China": "china",
                 }
 
                 overlay = st.selectbox(
