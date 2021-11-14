@@ -204,7 +204,7 @@ def app():
                 """
                 )
 
-            MODIS_options = ["Daytime (1:30 pm)", "Nightime (1:30 am)"]
+            MODIS_options = ["Daytime (1:30 pm)", "Nighttime (1:30 am)"]
             MODIS_option = st.selectbox("Select a MODIS dataset:", MODIS_options)
             if MODIS_option == "Daytime (1:30 pm)":
                 st.session_state[
@@ -405,6 +405,12 @@ def app():
                     index=9,
                 )
 
+                frequency = st.selectbox(
+                    "Select a temporal frequency:",
+                    ["year", "quarter", "month"],
+                    index=0,
+                )
+
                 with st.expander("Customize timelapse"):
 
                     speed = st.slider("Frames per second:", 1, 30, timelapse_speed)
@@ -449,54 +455,76 @@ def app():
                         end_date = str(months[1]).zfill(2) + "-30"
                         bands = RGB.split("/")
 
-                        out_gif = geemap.landsat_timelapse(
-                            roi=roi,
-                            out_gif=out_gif,
-                            start_year=start_year,
-                            end_year=end_year,
-                            start_date=start_date,
-                            end_date=end_date,
-                            bands=bands,
-                            apply_fmask=apply_fmask,
-                            overlay_data=overlay_data,
-                            overlay_color=overlay_color,
-                            overlay_width=overlay_width,
-                            overlay_opacity=overlay_opacity,
-                        )
+                        if collection == "Landsat TM-ETM-OLI Surface Reflectance":
+                            out_gif = geemap.landsat_timelapse(
+                                roi=roi,
+                                out_gif=out_gif,
+                                start_year=start_year,
+                                end_year=end_year,
+                                start_date=start_date,
+                                end_date=end_date,
+                                bands=bands,
+                                apply_fmask=apply_fmask,
+                                overlay_data=overlay_data,
+                                overlay_color=overlay_color,
+                                overlay_width=overlay_width,
+                                overlay_opacity=overlay_opacity,
+                                frequency=frequency,
+                                date_format=None,
+                                title=title,
+                                title_xy=("2%", "90%"),
+                                add_text=True,
+                                text_xy=("2%", "2%"),
+                                text_sequence=None,
+                                font_type=font_type,
+                                font_size=font_size,
+                                font_color=font_color,
+                                add_progress_bar=True,
+                                progress_bar_color=progress_bar_color,
+                                progress_bar_height=5,
+                                loop=0,
+                            )
+                        elif collection == "Sentinel-2 MSI Surface Reflectance":
+                            out_gif = geemap.sentinel2_timelapse(
+                                roi=roi,
+                                out_gif=out_gif,
+                                start_year=start_year,
+                                end_year=end_year,
+                                start_date=start_date,
+                                end_date=end_date,
+                                bands=bands,
+                                apply_fmask=apply_fmask,
+                                overlay_data=overlay_data,
+                                overlay_color=overlay_color,
+                                overlay_width=overlay_width,
+                                overlay_opacity=overlay_opacity,
+                                frequency=frequency,
+                                date_format=None,
+                                title=title,
+                                title_xy=("2%", "90%"),
+                                add_text=True,
+                                text_xy=("2%", "2%"),
+                                text_sequence=None,
+                                font_type=font_type,
+                                font_size=font_size,
+                                font_color=font_color,
+                                add_progress_bar=True,
+                                progress_bar_color=progress_bar_color,
+                                progress_bar_height=5,
+                                loop=0,
+                            )
 
-                        geemap.add_text_to_gif(
-                            out_gif,
-                            out_gif,
-                            xy=("2%", "2%"),
-                            text_sequence=start_year,
-                            font_size=font_size,
-                            font_color=font_color,
-                            duration=int(1000 / speed),
-                            add_progress_bar=True,
-                            progress_bar_color=progress_bar_color,
-                            progress_bar_height=5,
-                        )
+                        if os.path.exists(out_gif):
+                            geemap.reduce_gif_size(out_gif)
 
-                        geemap.add_text_to_gif(
-                            out_gif,
-                            out_gif,
-                            xy=("2%", "90%"),
-                            text_sequence=title,
-                            font_size=font_size,
-                            font_type=font_type,
-                            font_color=font_color,
-                            duration=int(1000 / speed),
-                            add_progress_bar=True,
-                            progress_bar_color=progress_bar_color,
-                            progress_bar_height=5,
-                        )
-
-                        geemap.reduce_gif_size(out_gif)
-
-                        empty_text.text(
-                            "Right click the GIF to save it to your computer👇"
-                        )
-                        empty_image.image(out_gif)
+                            empty_text.text(
+                                "Right click the GIF to save it to your computer👇"
+                            )
+                            empty_image.image(out_gif)
+                        else:
+                            empty_text.error(
+                                "You probably requested too much data. Try reducing the ROI or timespan."
+                            )
 
         elif collection == "Geostationary Operational Environmental Satellites (GOES)":
 
