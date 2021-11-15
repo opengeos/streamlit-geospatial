@@ -414,6 +414,9 @@ def app():
                 with st.expander("Customize timelapse"):
 
                     speed = st.slider("Frames per second:", 1, 30, timelapse_speed)
+                    dimensions = st.slider(
+                        "Maximum dimensions (Width*Height) in pixels", 768, 2000, 768
+                    )
                     progress_bar_color = st.color_picker(
                         "Progress bar color:", "#0000ff"
                     )
@@ -423,7 +426,7 @@ def app():
                         today.year,
                         (sensor_start_year, today.year),
                     )
-                    months = st.slider("Start and end month:", 1, 12, (5, 10))
+                    months = st.slider("Start and end month:", 1, 12, (1, 12))
                     font_size = st.slider("Font size:", 10, 50, 30)
                     font_color = st.color_picker("Font color:", "#ffffff")
                     apply_fmask = st.checkbox(
@@ -434,10 +437,12 @@ def app():
                         ["arial.ttf", "alibaba.otf"],
                         index=0,
                     )
+                    mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
                 empty_image = st.empty()
                 empty_fire_image = st.empty()
+                empty_video = st.container()
                 submitted = st.form_submit_button("Submit")
                 if submitted:
 
@@ -465,6 +470,8 @@ def app():
                                 end_date=end_date,
                                 bands=bands,
                                 apply_fmask=apply_fmask,
+                                frames_per_second=speed,
+                                dimensions=dimensions,
                                 overlay_data=overlay_data,
                                 overlay_color=overlay_color,
                                 overlay_width=overlay_width,
@@ -483,6 +490,7 @@ def app():
                                 progress_bar_color=progress_bar_color,
                                 progress_bar_height=5,
                                 loop=0,
+                                mp4=mp4,
                             )
                         elif collection == "Sentinel-2 MSI Surface Reflectance":
                             out_gif = geemap.sentinel2_timelapse(
@@ -494,6 +502,8 @@ def app():
                                 end_date=end_date,
                                 bands=bands,
                                 apply_fmask=apply_fmask,
+                                frames_per_second=speed,
+                                dimensions=dimensions,
                                 overlay_data=overlay_data,
                                 overlay_color=overlay_color,
                                 overlay_width=overlay_width,
@@ -512,18 +522,27 @@ def app():
                                 progress_bar_color=progress_bar_color,
                                 progress_bar_height=5,
                                 loop=0,
+                                mp4=mp4,
                             )
 
-                        if os.path.exists(out_gif):
-                            geemap.reduce_gif_size(out_gif)
+                        if out_gif is not None and os.path.exists(out_gif):
 
                             empty_text.text(
                                 "Right click the GIF to save it to your computer👇"
                             )
                             empty_image.image(out_gif)
+
+                            out_mp4 = out_gif.replace(".gif", ".mp4")
+                            if mp4 and os.path.exists(out_mp4):
+                                with empty_video:
+                                    st.text(
+                                        "Right click the MP4 to save it to your computer👇"
+                                    )
+                                    st.video(out_gif.replace(".gif", ".mp4"))
+
                         else:
                             empty_text.error(
-                                "You probably requested too much data. Try reducing the ROI or timespan."
+                                "Something went wrong. You probably requested too much data. Try reducing the ROI or timespan."
                             )
 
         elif collection == "Geostationary Operational Environmental Satellites (GOES)":
@@ -597,10 +616,14 @@ def app():
                     )
                     font_size = st.slider("Font size:", 10, 50, 20)
                     font_color = st.color_picker("Font color:", "#ffffff")
+                    mp4 = st.checkbox("Save timelapse as MP4", True)
+
                 empty_text = st.empty()
                 empty_image = st.empty()
+                empty_video = st.container()
                 empty_fire_text = st.empty()
                 empty_fire_image = st.empty()
+
                 submitted = st.form_submit_button("Submit")
                 if submitted:
                     if sample_roi == "Uploaded GeoJSON" and data is None:
@@ -633,13 +656,22 @@ def app():
                             overlay_color=overlay_color,
                             overlay_width=overlay_width,
                             overlay_opacity=overlay_opacity,
+                            mp4=mp4,
                         )
 
-                        if os.path.exists(out_gif):
+                        if out_gif is not None and os.path.exists(out_gif):
                             empty_text.text(
                                 "Right click the GIF to save it to your computer👇"
                             )
                             empty_image.image(out_gif)
+
+                            out_mp4 = out_gif.replace(".gif", ".mp4")
+                            if mp4 and os.path.exists(out_mp4):
+                                with empty_video:
+                                    st.text(
+                                        "Right click the MP4 to save it to your computer👇"
+                                    )
+                                    st.video(out_gif.replace(".gif", ".mp4"))
 
                             if add_fire:
                                 out_fire_gif = geemap.temp_file_path(".gif")
@@ -704,8 +736,17 @@ def app():
                     )
                     font_size = st.slider("Font size:", 10, 50, 20)
                     font_color = st.color_picker("Font color:", "#ffffff")
+
+                    font_type = st.selectbox(
+                        "Select the font type for the title:",
+                        ["arial.ttf", "alibaba.otf"],
+                        index=0,
+                    )
+                    mp4 = st.checkbox("Save timelapse as MP4", True)
+
                 empty_text = st.empty()
                 empty_image = st.empty()
+                empty_video = st.container()
 
                 submitted = st.form_submit_button("Submit")
                 if submitted:
@@ -730,6 +771,7 @@ def app():
                             overlay_color=overlay_color,
                             overlay_width=overlay_width,
                             overlay_opacity=overlay_opacity,
+                            mp4=mp4,
                         )
 
                         geemap.reduce_gif_size(out_gif)
@@ -738,6 +780,14 @@ def app():
                             "Right click the GIF to save it to your computer👇"
                         )
                         empty_image.image(out_gif)
+
+                        out_mp4 = out_gif.replace(".gif", ".mp4")
+                        if mp4 and os.path.exists(out_mp4):
+                            with empty_video:
+                                st.text(
+                                    "Right click the MP4 to save it to your computer👇"
+                                )
+                                st.video(out_gif.replace(".gif", ".mp4"))
 
         elif collection == "Any Earth Engine ImageCollection":
 
@@ -793,9 +843,11 @@ def app():
                         ["arial.ttf", "alibaba.otf"],
                         index=0,
                     )
+                    mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
                 empty_image = st.empty()
+                empty_video = st.container()
                 empty_fire_image = st.empty()
 
                 roi = None
@@ -844,14 +896,21 @@ def app():
                             progress_bar_color=progress_bar_color,
                             progress_bar_height=5,
                             loop=0,
+                            mp4=mp4,
                         )
-
-                        geemap.reduce_gif_size(out_gif)
 
                         empty_text.text(
                             "Right click the GIF to save it to your computer👇"
                         )
                         empty_image.image(out_gif)
+
+                        out_mp4 = out_gif.replace(".gif", ".mp4")
+                        if mp4 and os.path.exists(out_mp4):
+                            with empty_video:
+                                st.text(
+                                    "Right click the MP4 to save it to your computer👇"
+                                )
+                                st.video(out_gif.replace(".gif", ".mp4"))
 
         elif collection == "MODIS Gap filled Land Surface Temperature Daily":
 
@@ -878,11 +937,6 @@ def app():
                         ["median", "mean", "min", "max", "sum", "variance", "stdDev"],
                         index=0,
                     )
-                    # data_format = st.selectbox(
-                    #     "Select a date format to show on the timelapse:",
-                    #     list(feq_dict.keys()),
-                    #     index=list(feq_dict.keys()).index(frequency),
-                    # )
 
                     speed = st.slider("Frames per second:", 1, 30, 5)
                     add_progress_bar = st.checkbox("Add a progress bar", True)
@@ -896,10 +950,11 @@ def app():
                         ["arial.ttf", "alibaba.otf"],
                         index=0,
                     )
+                    mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
                 empty_image = st.empty()
-                empty_fire_image = st.empty()
+                empty_video = st.container()
 
                 roi = None
                 if st.session_state.get("roi") is not None:
@@ -916,7 +971,7 @@ def app():
                     else:
 
                         empty_text.text("Computing... Please wait...")
-                        geemap.create_timelapse(
+                        out_gif = geemap.create_timelapse(
                             st.session_state.get("ee_asset_id"),
                             start_date=start_date.strftime("%Y-%m-%d"),
                             end_date=end_date.strftime("%Y-%m-%d"),
@@ -947,9 +1002,10 @@ def app():
                             progress_bar_color=progress_bar_color,
                             progress_bar_height=5,
                             loop=0,
+                            mp4=mp4,
                         )
 
-                        if os.path.exists(out_gif):
+                        if out_gif is not None and os.path.exists(out_gif):
 
                             geemap.reduce_gif_size(out_gif)
 
@@ -957,6 +1013,15 @@ def app():
                                 "Right click the GIF to save it to your computer👇"
                             )
                             empty_image.image(out_gif)
+
+                            out_mp4 = out_gif.replace(".gif", ".mp4")
+                            if mp4 and os.path.exists(out_mp4):
+                                with empty_video:
+                                    st.text(
+                                        "Right click the MP4 to save it to your computer👇"
+                                    )
+                                    st.video(out_gif.replace(".gif", ".mp4"))
+
                         else:
                             st.error(
                                 "Something went wrong. You probably requested too much data. Try reducing the ROI or timespan."
