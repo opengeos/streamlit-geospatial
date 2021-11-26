@@ -401,6 +401,8 @@ def app():
                         "NIR/SWIR1/Blue",
                         "SWIR2/NIR/Green",
                         "SWIR1/NIR/Red",
+                        "SWIR2/NIR/SWIR1",
+                        "SWIR1/NIR/SWIR2",
                     ],
                     index=9,
                 )
