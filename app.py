@@ -4,6 +4,7 @@ from apps import (
     basemaps,
     census,
     deck,
+    device_loc,
     gee,
     gee_datasets,
     heatmap,
@@ -32,6 +33,7 @@ apps.add_app("Heatmaps", heatmap.app)
 apps.add_app("Add Web Map Service (WMS)", wms.app)
 apps.add_app("Google Earth Engine (GEE)", gee.app)
 apps.add_app("Awesome GEE Community Datasets", gee_datasets.app)
+apps.add_app("Get Device Location", device_loc.app)
 
 # The main app
 apps.run()
