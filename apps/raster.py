@@ -59,7 +59,7 @@ def app():
 
         submit = st.button("Submit")
 
-    m = leafmap.Map()
+    m = leafmap.Map(latlon_control=False)
 
     if submit:
         if data or url:
