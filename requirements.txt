@@ -1,6 +1,6 @@
 geopandas
 keplergl
-localtileserver
+# localtileserver
 palettable
 streamlit
 streamlit-folium
