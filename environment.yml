@@ -2,7 +2,7 @@ name: geo
 channels:
   - conda-forge
 dependencies:
-  - gdal
+  - gdal=3.2.2
   - pip
   - pip:
       - geopandas
