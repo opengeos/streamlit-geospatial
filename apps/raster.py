@@ -63,11 +63,14 @@ def app():
 
     if submit:
         if data or url:
-            if data:
-                file_path = leafmap.save_data(data)
-                m.add_local_tile(file_path, palette=palette)
-            elif url:
-                m.add_remote_tile(url, palette=palette)
+            try:
+                if data:
+                    file_path = leafmap.save_data(data)
+                    m.add_local_tile(file_path, palette=palette)
+                elif url:
+                    m.add_remote_tile(url, palette=palette)
+            except Exception as e:
+                st.error("Something well wrong. ")
 
     with row1_col1:
         m.to_streamlit()
