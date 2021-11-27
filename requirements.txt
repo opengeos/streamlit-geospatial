@@ -1,3 +1,4 @@
+--find-links=https://girder.github.io/large_image_wheels --no-cache GDAL
 geopandas
 keplergl
 palettable
@@ -9,3 +10,4 @@ streamlit-keplergl
 streamlit-bokeh-events
 git+git://github.com/giswqs/leafmap
 git+git://github.com/giswqs/geemap
+
