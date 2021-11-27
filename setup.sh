@@ -4,7 +4,7 @@ sudo apt-get install gdal-bin
 sudo apt-get install libgdal-dev
 export CPLUS_INCLUDE_PATH=/usr/include/gdal
 export C_INCLUDE_PATH=/usr/include/gdal
-pip install GDAL
+pip install GDAL localtileserver
 
 mkdir -p ~/.streamlit/
 echo "\
