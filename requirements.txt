@@ -2,6 +2,7 @@ geopandas
 keplergl
 palettable
 pygdal==3.2.2.10
+localtileserver
 streamlit
 streamlit-folium
 streamlit-keplergl
