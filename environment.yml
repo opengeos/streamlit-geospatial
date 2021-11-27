@@ -3,11 +3,11 @@ channels:
   - conda-forge
 dependencies:
   - gdal
-  - geopandas
-  - keplergl
-  - streamlit
   - pip
   - pip:
+      - geopandas
+      - keplergl
+      - streamlit
       - localtileserver
       - palettable
       - streamlit-folium
