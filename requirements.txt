@@ -1,5 +1,6 @@
 geopandas
 keplergl
+palettable
 streamlit
 streamlit-folium
 streamlit-keplergl
