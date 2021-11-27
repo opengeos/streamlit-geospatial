@@ -1,6 +1,7 @@
 geopandas
 keplergl
 palettable
+pygdal==3.2.2
 streamlit
 streamlit-folium
 streamlit-keplergl
