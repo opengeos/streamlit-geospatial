@@ -1,2 +1,5 @@
 ffmpeg
 gifsicle
+python3-dev
+gdal-bin
+libgdal-dev
