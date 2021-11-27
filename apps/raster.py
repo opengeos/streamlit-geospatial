@@ -66,9 +66,9 @@ def app():
             try:
                 if data:
                     file_path = leafmap.save_data(data)
-                    m.add_local_tile(file_path, palette=palette)
+                    m.add_local_tile(file_path, palette=palette, debug=True)
                 elif url:
-                    m.add_remote_tile(url, palette=palette)
+                    m.add_remote_tile(url, palette=palette, debug=True)
             except Exception as e:
                 with row1_col2:
                     st.error("Work in progress. Try it again later.")
