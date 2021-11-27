@@ -70,7 +70,8 @@ def app():
                 elif url:
                     m.add_remote_tile(url, palette=palette)
             except Exception as e:
-                st.error("Something well wrong. ")
+                with row1_col2:
+                    st.error("Work in progress. Try it again later.")
 
     with row1_col1:
         m.to_streamlit()
