@@ -1,5 +1,9 @@
 ffmpeg
 gifsicle
+build-essential
+gcc 
+gcc-c++ 
+kernel-devel
 python3-dev
 gdal-bin
 libgdal-dev
