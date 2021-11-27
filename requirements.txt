@@ -1,8 +1,8 @@
---find-links=https://girder.github.io/large_image_wheels --no-cache GDAL
+--find-links=https://girder.github.io/large_image_wheels GDAL
 geopandas
 keplergl
 palettable
-pygdal==3.2.2.10
+# pygdal==3.2.2.10
 localtileserver
 streamlit
 streamlit-folium
