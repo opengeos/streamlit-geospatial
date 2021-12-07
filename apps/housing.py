@@ -121,7 +121,6 @@ def get_start_end_year(df):
 
 
 def get_periods(df):
-    print(df.columns)
     return [str(d) for d in list(set(df["month_date_yyyymm"].tolist()))]
 
 
