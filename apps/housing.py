@@ -19,7 +19,8 @@ if not DOWNLOADS_PATH.is_dir():
     DOWNLOADS_PATH.mkdir()
 
 # Data source: https://www.realtor.com/research/data/
-link_prefix = "https://econdata.s3-us-west-2.amazonaws.com/Reports/"
+# link_prefix = "https://econdata.s3-us-west-2.amazonaws.com/Reports/"
+link_prefix = "https://raw.githubusercontent.com/giswqs/data/main/housing/"
 
 data_links = {
     "weekly": {
@@ -120,6 +121,7 @@ def get_start_end_year(df):
 
 
 def get_periods(df):
+    print(df.columns)
     return [str(d) for d in list(set(df["month_date_yyyymm"].tolist()))]
 
 
@@ -314,8 +316,9 @@ def app():
         [0.6, 0.68, 0.7, 0.7, 1.5, 0.8]
     )
 
+    palettes = cm.list_colormaps()
     with row2_col1:
-        palette = st.selectbox("Color palette", cm.list_colormaps(), index=2)
+        palette = st.selectbox("Color palette", palettes, index=palettes.index("Blues"))
     with row2_col2:
         n_colors = st.slider("Number of colors", min_value=2, max_value=20, value=8)
     with row2_col3:
