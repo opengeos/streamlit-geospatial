@@ -6,6 +6,7 @@ import folium
 import streamlit as st
 from bokeh.models.widgets import Button
 from bokeh.models import CustomJS
+from folium import plugins
 from streamlit_bokeh_events import streamlit_bokeh_events
 import geemap.colormaps as cm
 import geemap.foliumap as geemap
@@ -59,41 +60,43 @@ def app():
     st.session_state["vis_params"] = None
 
     with row1_col1:
-        m = geemap.Map(basemap="HYBRID", plugin_Draw=True, draw_export=True)
+        m = geemap.Map(
+            basemap="HYBRID", plugin_Draw=True, draw_export=True, locate_control=True
+        )
         m.add_basemap("ROADMAP")
 
     with row1_col2:
 
-        loc_button = Button(label="Get Device Location", max_width=150)
-        loc_button.js_on_event(
-            "button_click",
-            CustomJS(
-                code="""
-            navigator.geolocation.getCurrentPosition(
-                (loc) => {
-                    document.dispatchEvent(new CustomEvent("GET_LOCATION", {detail: {lat: loc.coords.latitude, lon: loc.coords.longitude}}))
-                }
-            )
-            """
-            ),
-        )
-        result = streamlit_bokeh_events(
-            loc_button,
-            events="GET_LOCATION",
-            key="get_location",
-            refresh_on_update=False,
-            override_height=75,
-            debounce_time=0,
-        )
+        # loc_button = Button(label="Get Device Location", max_width=150)
+        # loc_button.js_on_event(
+        #     "button_click",
+        #     CustomJS(
+        #         code="""
+        #     navigator.geolocation.getCurrentPosition(
+        #         (loc) => {
+        #             document.dispatchEvent(new CustomEvent("GET_LOCATION", {detail: {lat: loc.coords.latitude, lon: loc.coords.longitude}}))
+        #         }
+        #     )
+        #     """
+        #     ),
+        # )
+        # result = streamlit_bokeh_events(
+        #     loc_button,
+        #     events="GET_LOCATION",
+        #     key="get_location",
+        #     refresh_on_update=False,
+        #     override_height=75,
+        #     debounce_time=0,
+        # )
 
-        if result:
-            if "GET_LOCATION" in result:
-                loc = result.get("GET_LOCATION")
-                lat = loc.get("lat")
-                lon = loc.get("lon")
-                popup = f"lat, lon: {lat}, {lon}"
-                m.add_marker(location=(lat, lon), popup=popup)
-                m.set_center(lon, lat, 16)
+        # if result:
+        #     if "GET_LOCATION" in result:
+        #         loc = result.get("GET_LOCATION")
+        #         lat = loc.get("lat")
+        #         lon = loc.get("lon")
+        #         popup = f"lat, lon: {lat}, {lon}"
+        #         m.add_marker(location=(lat, lon), popup=popup)
+        #         m.set_center(lon, lat, 16)
 
         keyword = st.text_input("Search for a location:", "")
         if keyword:
