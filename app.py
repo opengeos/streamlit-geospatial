@@ -3,6 +3,7 @@ from multiapp import MultiApp
 from apps import (
     basemaps,
     census,
+    cesium,
     deck,
     device_loc,
     gee,
@@ -35,7 +36,8 @@ apps.add_app("Heatmaps", heatmap.app)
 apps.add_app("Add Web Map Service (WMS)", wms.app)
 apps.add_app("Google Earth Engine (GEE)", gee.app)
 apps.add_app("Awesome GEE Community Datasets", gee_datasets.app)
-apps.add_app("Get Device Location", device_loc.app)
+apps.add_app("Geolocation", device_loc.app)
+apps.add_app("Cesium 3D Map", cesium.app)
 
 # The main app
 apps.run()
