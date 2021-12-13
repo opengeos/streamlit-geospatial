@@ -15,6 +15,7 @@ from apps import (
     timelapse,
     vector,
     wms,
+    xy,
 )
 
 st.set_page_config(layout="wide")
@@ -33,6 +34,7 @@ apps.add_app("Visualize Vector Data", vector.app)
 apps.add_app("Search Basemaps", basemaps.app)
 apps.add_app("Pydeck Gallery", deck.app)
 apps.add_app("Heatmaps", heatmap.app)
+apps.add_app("Add Points from XY", xy.app)
 apps.add_app("Add Web Map Service (WMS)", wms.app)
 apps.add_app("Google Earth Engine (GEE)", gee.app)
 apps.add_app("Awesome GEE Community Datasets", gee_datasets.app)
