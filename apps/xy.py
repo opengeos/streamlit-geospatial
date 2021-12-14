@@ -17,7 +17,9 @@ def app():
             df = pd.read_csv(url)
 
             columns = df.columns.values.tolist()
-            row1_col1, row1_col2, row1_col3 = st.columns([1, 1, 2])
+            row1_col1, row1_col2, row1_col3, row1_col4, row1_col5 = st.columns(
+                [1, 1, 3, 1, 1]
+            )
 
             lon_index = 0
             lat_index = 0
@@ -37,7 +39,25 @@ def app():
             with row1_col3:
                 popups = st.multiselect("Select popup columns", columns, columns)
 
-            m.add_points_from_xy(df, x, y, popups)
+            with row1_col4:
+                heatmap = st.checkbox("Add heatmap")
+
+            if heatmap:
+                with row1_col5:
+                    if "pop_max" in columns:
+                        index = columns.index("pop_max")
+                    else:
+                        index = 0
+                    heatmap_col = st.selectbox("Select heatmap column", columns, index)
+                    try:
+                        m.add_heatmap(df, y, x, heatmap_col)
+                    except:
+                        st.error("Please select a numeric column")
+
+            try:
+                m.add_points_from_xy(df, x, y, popups)
+            except:
+                st.error("Please select a numeric column")
 
         except Exception as e:
             st.error(e)
