@@ -4,10 +4,6 @@ import datetime
 import geopandas as gpd
 import folium
 import streamlit as st
-from bokeh.models.widgets import Button
-from bokeh.models import CustomJS
-from folium import plugins
-from streamlit_bokeh_events import streamlit_bokeh_events
 import geemap.colormaps as cm
 import geemap.foliumap as geemap
 from datetime import date
@@ -67,37 +63,6 @@ def app():
 
     with row1_col2:
 
-        # loc_button = Button(label="Get Device Location", max_width=150)
-        # loc_button.js_on_event(
-        #     "button_click",
-        #     CustomJS(
-        #         code="""
-        #     navigator.geolocation.getCurrentPosition(
-        #         (loc) => {
-        #             document.dispatchEvent(new CustomEvent("GET_LOCATION", {detail: {lat: loc.coords.latitude, lon: loc.coords.longitude}}))
-        #         }
-        #     )
-        #     """
-        #     ),
-        # )
-        # result = streamlit_bokeh_events(
-        #     loc_button,
-        #     events="GET_LOCATION",
-        #     key="get_location",
-        #     refresh_on_update=False,
-        #     override_height=75,
-        #     debounce_time=0,
-        # )
-
-        # if result:
-        #     if "GET_LOCATION" in result:
-        #         loc = result.get("GET_LOCATION")
-        #         lat = loc.get("lat")
-        #         lon = loc.get("lon")
-        #         popup = f"lat, lon: {lat}, {lon}"
-        #         m.add_marker(location=(lat, lon), popup=popup)
-        #         m.set_center(lon, lat, 16)
-
         keyword = st.text_input("Search for a location:", "")
         if keyword:
             locations = geemap.geocode(keyword)
@@ -120,6 +85,7 @@ def app():
                 "Geostationary Operational Environmental Satellites (GOES)",
                 "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km",
                 "MODIS Gap filled Land Surface Temperature Daily",
+                "USDA National Agriculture Imagery Program (NAIP)",
             ],
             index=1,
         )
@@ -340,7 +306,10 @@ def app():
                 # )
                 if (
                     collection
-                    == "Geostationary Operational Environmental Satellites (GOES)"
+                    in [
+                        "Geostationary Operational Environmental Satellites (GOES)",
+                        "USDA National Agriculture Imagery Program (NAIP)",
+                    ]
                     and (not keyword)
                 ):
                     m.set_center(-100, 40, 3)
@@ -1080,4 +1049,113 @@ def app():
                         else:
                             st.error(
                                 "Something went wrong. You probably requested too much data. Try reducing the ROI or timespan."
+                            )
+
+        elif collection == "USDA National Agriculture Imagery Program (NAIP)":
+
+            with st.form("submit_naip_form"):
+                with st.expander("Customize timelapse"):
+
+                    title = st.text_input(
+                        "Enter a title to show on the timelapse: ", "NAIP Timelapse"
+                    )
+
+                    years = st.slider(
+                        "Start and end year:",
+                        2003,
+                        today.year,
+                        (2003, today.year),
+                    )
+
+                    bands = st.selectbox(
+                        "Select a band combination:", ["N/R/G", "R/G/B"], index=0
+                    )
+
+                    speed = st.slider("Frames per second:", 1, 30, 3)
+                    add_progress_bar = st.checkbox("Add a progress bar", True)
+                    progress_bar_color = st.color_picker(
+                        "Progress bar color:", "#0000ff"
+                    )
+                    font_size = st.slider("Font size:", 10, 50, 30)
+                    font_color = st.color_picker("Font color:", "#ffffff")
+                    font_type = st.selectbox(
+                        "Select the font type for the title:",
+                        ["arial.ttf", "alibaba.otf"],
+                        index=0,
+                    )
+                    mp4 = st.checkbox("Save timelapse as MP4", True)
+
+                empty_text = st.empty()
+                empty_image = st.empty()
+                empty_video = st.container()
+                empty_fire_image = st.empty()
+
+                roi = None
+                if st.session_state.get("roi") is not None:
+                    roi = st.session_state.get("roi")
+                out_gif = geemap.temp_file_path(".gif")
+
+                submitted = st.form_submit_button("Submit_timelapse")
+                if submitted:
+
+                    if sample_roi == "Uploaded GeoJSON" and data is None:
+                        empty_text.warning(
+                            "Steps to create a timelapse: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click the Submit button. Alternatively, you can select a sample ROI from the dropdown list."
+                        )
+                    else:
+
+                        empty_text.text("Computing... Please wait...")
+                        try:
+                            geemap.naip_timelapse(
+                                roi,
+                                years[0],
+                                years[1],
+                                out_gif,
+                                bands=bands.split("/"),
+                                palette=st.session_state.get("palette"),
+                                vis_params=None,
+                                dimensions=768,
+                                frames_per_second=speed,
+                                crs="EPSG:3857",
+                                overlay_data=overlay_data,
+                                overlay_color=overlay_color,
+                                overlay_width=overlay_width,
+                                overlay_opacity=overlay_opacity,
+                                title=title,
+                                title_xy=("2%", "90%"),
+                                add_text=True,
+                                text_xy=("2%", "2%"),
+                                text_sequence=None,
+                                font_type=font_type,
+                                font_size=font_size,
+                                font_color=font_color,
+                                add_progress_bar=add_progress_bar,
+                                progress_bar_color=progress_bar_color,
+                                progress_bar_height=5,
+                                loop=0,
+                                mp4=mp4,
+                            )
+                        except:
+                            empty_text.error(
+                                "Something went wrong. You either requested too much data or the ROI is outside the U.S."
+                            )
+
+                        if out_gif is not None and os.path.exists(out_gif):
+
+                            empty_text.text(
+                                "Right click the GIF to save it to your computer👇"
+                            )
+                            empty_image.image(out_gif)
+
+                            out_mp4 = out_gif.replace(".gif", ".mp4")
+                            if mp4 and os.path.exists(out_mp4):
+                                with empty_video:
+                                    st.text(
+                                        "Right click the MP4 to save it to your computer👇"
+                                    )
+                                    st.video(out_gif.replace(".gif", ".mp4"))
+
+                        else:
+                            st.error(
+                                "Something went wrong. You either requested too much data or the ROI is outside the U.S."
                             )
