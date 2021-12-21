@@ -869,7 +869,7 @@ def app():
                     roi = st.session_state.get("roi")
                 out_gif = geemap.temp_file_path(".gif")
 
-                submitted = st.form_submit_button("Submit_timelapse")
+                submitted = st.form_submit_button("Submit")
                 if submitted:
 
                     if sample_roi == "Uploaded GeoJSON" and data is None:
@@ -980,7 +980,7 @@ def app():
                     roi = st.session_state.get("roi")
                 out_gif = geemap.temp_file_path(".gif")
 
-                submitted = st.form_submit_button("Submit_timelapse")
+                submitted = st.form_submit_button("Submit")
                 if submitted:
 
                     if sample_roi == "Uploaded GeoJSON" and data is None:
@@ -1095,7 +1095,7 @@ def app():
                     roi = st.session_state.get("roi")
                 out_gif = geemap.temp_file_path(".gif")
 
-                submitted = st.form_submit_button("Submit_timelapse")
+                submitted = st.form_submit_button("Submit")
                 if submitted:
 
                     if sample_roi == "Uploaded GeoJSON" and data is None:
