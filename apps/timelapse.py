@@ -57,7 +57,11 @@ def app():
 
     with row1_col1:
         m = geemap.Map(
-            basemap="HYBRID", plugin_Draw=True, draw_export=True, locate_control=True
+            basemap="HYBRID",
+            plugin_Draw=True,
+            draw_export=True,
+            locate_control=True,
+            plugin_LatLngPopup=False,
         )
         m.add_basemap("ROADMAP")
 
