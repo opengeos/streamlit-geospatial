@@ -85,6 +85,7 @@ def app():
                 "Geostationary Operational Environmental Satellites (GOES)",
                 "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km",
                 "MODIS Gap filled Land Surface Temperature Daily",
+                "MODIS Ocean Color SMI",
                 "USDA National Agriculture Imagery Program (NAIP)",
             ],
             index=1,
@@ -104,6 +105,8 @@ def app():
             "MODIS Gap filled Land Surface Temperature Daily",
         ]:
             roi_options = ["Uploaded GeoJSON"] + list(modis_rois.keys())
+        elif collection == "MODIS Ocean Color SMI":
+            roi_options = ["Uploaded GeoJSON"] + list(ocean_rois.keys())
         else:
             roi_options = ["Uploaded GeoJSON"]
 
@@ -143,7 +146,6 @@ def app():
                 with st.expander("Customize band combination and color palette", True):
                     try:
                         col = ee.ImageCollection.load(asset_id)
-                        size = col.size().getInfo()
                         st.session_state["ee_asset_id"] = asset_id
                     except:
                         st.error("Invalid Earth Engine asset ID.")
@@ -222,6 +224,64 @@ def app():
                 "Color palette",
                 cm.list_colormaps(),
                 index=90,
+            )
+            palette_values = cm.get_palette(palette_options, 15)
+            palette = st.text_area(
+                "Enter a custom palette:",
+                palette_values,
+            )
+            st.write(cm.plot_colormap(cmap=palette_options, return_fig=True))
+            st.session_state["palette"] = eval(palette)
+        elif collection == "MODIS Ocean Color SMI":
+            with st.expander("Show dataset details", False):
+                st.markdown(
+                    """
+                See the [Earth Engine Data Catalog](https://developers.google.com/earth-engine/datasets/catalog/NASA_OCEANDATA_MODIS-Aqua_L3SMI).
+                """
+                )
+
+            MODIS_options = ["Aqua", "Terra"]
+            MODIS_option = st.selectbox("Select a satellite:", MODIS_options)
+            st.session_state["ee_asset_id"] = MODIS_option
+            # if MODIS_option == "Daytime (1:30 pm)":
+            #     st.session_state[
+            #         "ee_asset_id"
+            #     ] = "projects/sat-io/open-datasets/gap-filled-lst/gf_day_1km"
+            # else:
+            #     st.session_state[
+            #         "ee_asset_id"
+            #     ] = "projects/sat-io/open-datasets/gap-filled-lst/gf_night_1km"
+
+            band_dict = {
+                "Chlorophyll a concentration": "chlor_a",
+                "Normalized fluorescence line height": "nflh",
+                "Particulate organic carbon": "poc",
+                "Sea surface temperature": "sst",
+                "Remote sensing reflectance at band 412nm": "Rrs_412",
+                "Remote sensing reflectance at band 443nm": "Rrs_443",
+                "Remote sensing reflectance at band 469nm": "Rrs_469",
+                "Remote sensing reflectance at band 488nm": "Rrs_488",
+                "Remote sensing reflectance at band 531nm": "Rrs_531",
+                "Remote sensing reflectance at band 547nm": "Rrs_547",
+                "Remote sensing reflectance at band 555nm": "Rrs_555",
+                "Remote sensing reflectance at band 645nm": "Rrs_645",
+                "Remote sensing reflectance at band 667nm": "Rrs_667",
+                "Remote sensing reflectance at band 678nm": "Rrs_678",
+            }
+
+            band_options = list(band_dict.keys())
+            band = st.selectbox(
+                "Select a band",
+                band_options,
+                band_options.index("Sea surface temperature"),
+            )
+            st.session_state["band"] = band_dict[band]
+
+            colors = cm.list_colormaps()
+            palette_options = st.selectbox(
+                "Color palette",
+                colors,
+                index=colors.index("coolwarm"),
             )
             palette_values = cm.get_palette(palette_options, 15)
             palette = st.text_area(
@@ -358,8 +418,13 @@ def app():
                 gdf = gpd.GeoDataFrame(
                     index=[0], crs=crs, geometry=[modis_rois[sample_roi]]
                 )
+            elif collection == "MODIS Ocean Color SMI":
+                gdf = gpd.GeoDataFrame(
+                    index=[0], crs=crs, geometry=[ocean_rois[sample_roi]]
+                )
             st.session_state["roi"] = geemap.geopandas_to_ee(gdf, geodesic=False)
             m.add_gdf(gdf, "ROI")
+
         elif data:
             gdf = uploaded_file_to_gdf(data)
             st.session_state["roi"] = geemap.geopandas_to_ee(gdf, geodesic=False)
@@ -931,14 +996,17 @@ def app():
                                 )
                                 st.video(out_gif.replace(".gif", ".mp4"))
 
-        elif collection == "MODIS Gap filled Land Surface Temperature Daily":
+        elif collection in [
+            "MODIS Gap filled Land Surface Temperature Daily",
+            "MODIS Ocean Color SMI",
+        ]:
 
             with st.form("submit_ts_form"):
                 with st.expander("Customize timelapse"):
 
                     title = st.text_input(
                         "Enter a title to show on the timelapse: ",
-                        "Land Surface Temperature",
+                        "Surface Temperature",
                     )
                     start_date = st.date_input(
                         "Select the start date:", datetime.date(2018, 1, 1)
@@ -991,39 +1059,77 @@ def app():
 
                         empty_text.text("Computing... Please wait...")
                         try:
-                            out_gif = geemap.create_timelapse(
-                                st.session_state.get("ee_asset_id"),
-                                start_date=start_date.strftime("%Y-%m-%d"),
-                                end_date=end_date.strftime("%Y-%m-%d"),
-                                region=roi,
-                                frequency=frequency,
-                                reducer=reducer,
-                                date_format=None,
-                                out_gif=out_gif,
-                                bands=None,
-                                palette=st.session_state.get("palette"),
-                                vis_params=None,
-                                dimensions=768,
-                                frames_per_second=speed,
-                                crs="EPSG:3857",
-                                overlay_data=overlay_data,
-                                overlay_color=overlay_color,
-                                overlay_width=overlay_width,
-                                overlay_opacity=overlay_opacity,
-                                title=title,
-                                title_xy=("2%", "90%"),
-                                add_text=True,
-                                text_xy=("2%", "2%"),
-                                text_sequence=None,
-                                font_type=font_type,
-                                font_size=font_size,
-                                font_color=font_color,
-                                add_progress_bar=add_progress_bar,
-                                progress_bar_color=progress_bar_color,
-                                progress_bar_height=5,
-                                loop=0,
-                                mp4=mp4,
-                            )
+                            if (
+                                collection
+                                == "MODIS Gap filled Land Surface Temperature Daily"
+                            ):
+                                out_gif = geemap.create_timelapse(
+                                    st.session_state.get("ee_asset_id"),
+                                    start_date=start_date.strftime("%Y-%m-%d"),
+                                    end_date=end_date.strftime("%Y-%m-%d"),
+                                    region=roi,
+                                    bands=None,
+                                    frequency=frequency,
+                                    reducer=reducer,
+                                    date_format=None,
+                                    out_gif=out_gif,
+                                    palette=st.session_state.get("palette"),
+                                    vis_params=None,
+                                    dimensions=768,
+                                    frames_per_second=speed,
+                                    crs="EPSG:3857",
+                                    overlay_data=overlay_data,
+                                    overlay_color=overlay_color,
+                                    overlay_width=overlay_width,
+                                    overlay_opacity=overlay_opacity,
+                                    title=title,
+                                    title_xy=("2%", "90%"),
+                                    add_text=True,
+                                    text_xy=("2%", "2%"),
+                                    text_sequence=None,
+                                    font_type=font_type,
+                                    font_size=font_size,
+                                    font_color=font_color,
+                                    add_progress_bar=add_progress_bar,
+                                    progress_bar_color=progress_bar_color,
+                                    progress_bar_height=5,
+                                    loop=0,
+                                    mp4=mp4,
+                                )
+                            elif collection == "MODIS Ocean Color SMI":
+                                out_gif = geemap.modis_ocean_color_timelapse(
+                                    st.session_state.get("ee_asset_id"),
+                                    start_date=start_date.strftime("%Y-%m-%d"),
+                                    end_date=end_date.strftime("%Y-%m-%d"),
+                                    region=roi,
+                                    bands=None,
+                                    frequency=frequency,
+                                    reducer=reducer,
+                                    date_format=None,
+                                    out_gif=out_gif,
+                                    palette=st.session_state.get("palette"),
+                                    vis_params=None,
+                                    dimensions=768,
+                                    frames_per_second=speed,
+                                    crs="EPSG:3857",
+                                    overlay_data=overlay_data,
+                                    overlay_color=overlay_color,
+                                    overlay_width=overlay_width,
+                                    overlay_opacity=overlay_opacity,
+                                    title=title,
+                                    title_xy=("2%", "90%"),
+                                    add_text=True,
+                                    text_xy=("2%", "2%"),
+                                    text_sequence=None,
+                                    font_type=font_type,
+                                    font_size=font_size,
+                                    font_color=font_color,
+                                    add_progress_bar=add_progress_bar,
+                                    progress_bar_color=progress_bar_color,
+                                    progress_bar_height=5,
+                                    loop=0,
+                                    mp4=mp4,
+                                )
                         except:
                             empty_text.error(
                                 "Something went wrong. You probably requested too much data. Try reducing the ROI or timespan."
