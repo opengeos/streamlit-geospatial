@@ -1041,6 +1041,11 @@ def app():
                         ["arial.ttf", "alibaba.otf"],
                         index=0,
                     )
+                    add_colorbar = st.checkbox("Add a colorbar", True)
+                    colorbar_label = st.text_input(
+                        "Enter the colorbar label:", "Surface Temperature (°C)"
+                    )
+
                     mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
@@ -1097,6 +1102,8 @@ def app():
                                     add_progress_bar=add_progress_bar,
                                     progress_bar_color=progress_bar_color,
                                     progress_bar_height=5,
+                                    add_colorbar=add_colorbar,
+                                    colorbar_label=colorbar_label,
                                     loop=0,
                                     mp4=mp4,
                                 )
@@ -1106,7 +1113,7 @@ def app():
                                     start_date=start_date.strftime("%Y-%m-%d"),
                                     end_date=end_date.strftime("%Y-%m-%d"),
                                     region=roi,
-                                    bands=None,
+                                    bands=st.session_state["band"],
                                     frequency=frequency,
                                     reducer=reducer,
                                     date_format=None,
@@ -1131,6 +1138,8 @@ def app():
                                     add_progress_bar=add_progress_bar,
                                     progress_bar_color=progress_bar_color,
                                     progress_bar_height=5,
+                                    add_colorbar=add_colorbar,
+                                    colorbar_label=colorbar_label,
                                     loop=0,
                                     mp4=mp4,
                                 )
