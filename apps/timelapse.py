@@ -1029,6 +1029,12 @@ def app():
                         index=0,
                     )
 
+                    vis_params = st.text_area(
+                        "Enter visualization parameters",
+                        "",
+                        help="Enter a string in the format of a dictionary, such as '{'min': 23, 'max': 32}'"
+                    )
+
                     speed = st.slider("Frames per second:", 1, 30, 5)
                     add_progress_bar = st.checkbox("Add a progress bar", True)
                     progress_bar_color = st.color_picker(
@@ -1119,7 +1125,7 @@ def app():
                                     date_format=None,
                                     out_gif=out_gif,
                                     palette=st.session_state.get("palette"),
-                                    vis_params=None,
+                                    vis_params=eval(vis_params),
                                     dimensions=768,
                                     frames_per_second=speed,
                                     crs="EPSG:3857",
