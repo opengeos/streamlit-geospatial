@@ -359,7 +359,7 @@ def app():
 
         data = st.file_uploader(
             "Upload a GeoJSON file to use as an ROI. Customize timelapse parameters and then click the Submit button 😇👇",
-            type=["geojson"],
+            type=["geojson", "kml", "zip"],
         )
 
         crs = "epsg:4326"
