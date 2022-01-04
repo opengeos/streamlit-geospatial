@@ -362,7 +362,7 @@ def app():
             type=["geojson"],
         )
 
-        crs = {"init": "epsg:4326"}
+        crs = "epsg:4326"
         if sample_roi == "Uploaded GeoJSON":
             if data is None:
                 # st.info(
@@ -1114,6 +1114,12 @@ def app():
                                     mp4=mp4,
                                 )
                             elif collection == "MODIS Ocean Color SMI":
+                                if vis_params.startswith("{") and vis_params.endswith(
+                                    "}"
+                                ):
+                                    vis_params = eval(vis_params)
+                                else:
+                                    vis_params = None
                                 out_gif = geemap.modis_ocean_color_timelapse(
                                     st.session_state.get("ee_asset_id"),
                                     start_date=start_date.strftime("%Y-%m-%d"),
@@ -1125,7 +1131,7 @@ def app():
                                     date_format=None,
                                     out_gif=out_gif,
                                     palette=st.session_state.get("palette"),
-                                    vis_params=eval(vis_params),
+                                    vis_params=vis_params,
                                     dimensions=768,
                                     frames_per_second=speed,
                                     crs="EPSG:3857",
