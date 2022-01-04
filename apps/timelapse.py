@@ -501,7 +501,7 @@ def app():
                         "Start and end year:",
                         sensor_start_year,
                         today.year,
-                        (sensor_start_year, today.year),
+                        (sensor_start_year, today.year - 1),
                     )
                     months = st.slider("Start and end month:", 1, 12, (1, 12))
                     font_size = st.slider("Font size:", 10, 50, 30)
@@ -1032,7 +1032,7 @@ def app():
                     vis_params = st.text_area(
                         "Enter visualization parameters",
                         "",
-                        help="Enter a string in the format of a dictionary, such as '{'min': 23, 'max': 32}'"
+                        help="Enter a string in the format of a dictionary, such as '{'min': 23, 'max': 32}'",
                     )
 
                     speed = st.slider("Frames per second:", 1, 30, 5)
@@ -1189,7 +1189,7 @@ def app():
                         "Start and end year:",
                         2003,
                         today.year,
-                        (2003, today.year),
+                        (2003, today.year - 1),
                     )
 
                     bands = st.selectbox(
