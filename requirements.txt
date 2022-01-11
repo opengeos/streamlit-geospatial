@@ -7,8 +7,8 @@ streamlit
 streamlit-folium
 streamlit-keplergl
 streamlit-bokeh-events
-leafmap
-geemap
-# git+git://github.com/giswqs/leafmap
-# git+git://github.com/giswqs/geemap
+# leafmap
+# geemap
+git+https://github.com/giswqs/leafmap
+git+https://github.com/giswqs/geemap
 
