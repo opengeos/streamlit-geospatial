@@ -13,8 +13,7 @@ def save_uploaded_file(file_content, file_name):
 
     _, file_extension = os.path.splitext(file_name)
     file_id = str(uuid.uuid4())
-    file_path = os.path.join(tempfile.gettempdir(),
-                             f"{file_id}{file_extension}")
+    file_path = os.path.join(tempfile.gettempdir(), f"{file_id}{file_extension}")
 
     with open(file_path, "wb") as file:
         file.write(file_content.getbuffer())
@@ -61,7 +60,6 @@ def app():
             elif url:
                 file_path = url
                 layer_name = url.split("/")[-1].split(".")[0]
-            # st.write(f"Saved to {file_path}")
 
             with row1_col1:
                 if file_path.lower().endswith(".kml"):
@@ -69,8 +67,7 @@ def app():
                     gdf = gpd.read_file(file_path, driver="KML")
                 else:
                     gdf = gpd.read_file(file_path)
-                lon = gdf.centroid.iloc[0].x
-                lat = gdf.centroid.iloc[0].y
+                lon, lat = leafmap.gdf_centroid(gdf)
                 if backend == "pydeck":
 
                     column_names = gdf.columns.values.tolist()
