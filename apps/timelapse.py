@@ -514,6 +514,7 @@ def app():
                         ["arial.ttf", "alibaba.otf"],
                         index=0,
                     )
+                    fading = st.slider("Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0)
                     mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
@@ -569,6 +570,7 @@ def app():
                                     progress_bar_height=5,
                                     loop=0,
                                     mp4=mp4,
+                                    fading=fading,
                                 )
                             elif collection == "Sentinel-2 MSI Surface Reflectance":
                                 out_gif = geemap.sentinel2_timelapse(
@@ -601,6 +603,7 @@ def app():
                                     progress_bar_height=5,
                                     loop=0,
                                     mp4=mp4,
+                                    fading=fading,
                                 )
                         except:
                             empty_text.error(
@@ -699,6 +702,7 @@ def app():
                     )
                     font_size = st.slider("Font size:", 10, 50, 20)
                     font_color = st.color_picker("Font color:", "#ffffff")
+                    fading = st.slider("Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0)
                     mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
@@ -740,6 +744,7 @@ def app():
                             overlay_width=overlay_width,
                             overlay_opacity=overlay_opacity,
                             mp4=mp4,
+                            fading=fading,
                         )
 
                         if out_gif is not None and os.path.exists(out_gif):
@@ -825,6 +830,7 @@ def app():
                         ["arial.ttf", "alibaba.otf"],
                         index=0,
                     )
+                    fading = st.slider("Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0)
                     mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
@@ -855,6 +861,7 @@ def app():
                             overlay_width=overlay_width,
                             overlay_opacity=overlay_opacity,
                             mp4=mp4,
+                            fading=fading,
                         )
 
                         geemap.reduce_gif_size(out_gif)
@@ -926,6 +933,7 @@ def app():
                         ["arial.ttf", "alibaba.otf"],
                         index=0,
                     )
+                    fading = st.slider("Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0)
                     mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
@@ -981,6 +989,7 @@ def app():
                                 progress_bar_height=5,
                                 loop=0,
                                 mp4=mp4,
+                                fading=fading,
                             )
                         except:
                             empty_text.error(
@@ -1051,7 +1060,7 @@ def app():
                     colorbar_label = st.text_input(
                         "Enter the colorbar label:", "Surface Temperature (°C)"
                     )
-
+                    fading = st.slider("Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0)
                     mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
@@ -1112,6 +1121,7 @@ def app():
                                     colorbar_label=colorbar_label,
                                     loop=0,
                                     mp4=mp4,
+                                    fading=fading,
                                 )
                             elif collection == "MODIS Ocean Color SMI":
                                 if vis_params.startswith("{") and vis_params.endswith(
@@ -1154,6 +1164,7 @@ def app():
                                     colorbar_label=colorbar_label,
                                     loop=0,
                                     mp4=mp4,
+                                    fading=fading,
                                 )
                         except:
                             empty_text.error(
@@ -1214,6 +1225,7 @@ def app():
                         ["arial.ttf", "alibaba.otf"],
                         index=0,
                     )
+                    fading = st.slider("Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0)
                     mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
@@ -1265,6 +1277,7 @@ def app():
                                 progress_bar_height=5,
                                 loop=0,
                                 mp4=mp4,
+                                fading=fading,
                             )
                         except:
                             empty_text.error(
