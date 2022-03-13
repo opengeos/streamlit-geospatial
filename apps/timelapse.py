@@ -501,7 +501,7 @@ def app():
                         "Start and end year:",
                         sensor_start_year,
                         today.year,
-                        (sensor_start_year, today.year - 1),
+                        (sensor_start_year, today.year),
                     )
                     months = st.slider("Start and end month:", 1, 12, (1, 12))
                     font_size = st.slider("Font size:", 10, 50, 30)
@@ -514,7 +514,9 @@ def app():
                         ["arial.ttf", "alibaba.otf"],
                         index=0,
                     )
-                    fading = st.slider("Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0)
+                    fading = st.slider(
+                        "Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0
+                    )
                     mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
@@ -702,7 +704,9 @@ def app():
                     )
                     font_size = st.slider("Font size:", 10, 50, 20)
                     font_color = st.color_picker("Font color:", "#ffffff")
-                    fading = st.slider("Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0)
+                    fading = st.slider(
+                        "Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0
+                    )
                     mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
@@ -830,7 +834,9 @@ def app():
                         ["arial.ttf", "alibaba.otf"],
                         index=0,
                     )
-                    fading = st.slider("Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0)
+                    fading = st.slider(
+                        "Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0
+                    )
                     mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
@@ -933,7 +939,9 @@ def app():
                         ["arial.ttf", "alibaba.otf"],
                         index=0,
                     )
-                    fading = st.slider("Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0)
+                    fading = st.slider(
+                        "Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0
+                    )
                     mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
@@ -1060,7 +1068,9 @@ def app():
                     colorbar_label = st.text_input(
                         "Enter the colorbar label:", "Surface Temperature (°C)"
                     )
-                    fading = st.slider("Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0)
+                    fading = st.slider(
+                        "Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0
+                    )
                     mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
@@ -1206,7 +1216,7 @@ def app():
                         "Start and end year:",
                         2003,
                         today.year,
-                        (2003, today.year - 1),
+                        (2003, today.year),
                     )
 
                     bands = st.selectbox(
@@ -1225,7 +1235,9 @@ def app():
                         ["arial.ttf", "alibaba.otf"],
                         index=0,
                     )
-                    fading = st.slider("Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0)
+                    fading = st.slider(
+                        "Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0
+                    )
                     mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()

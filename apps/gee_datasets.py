@@ -16,14 +16,15 @@ def lulc_mrb_floodplain():
 
     Map = geemap.Map()
 
-    State_boundaries = ee.FeatureCollection(
-        'users/giswqs/MRB/State_Boundaries')
-    State_style = State_boundaries.style(**
-                                         {'color': '808080', 'width': 1, 'fillColor': '00000000'})
+    State_boundaries = ee.FeatureCollection('users/giswqs/MRB/State_Boundaries')
+    State_style = State_boundaries.style(
+        **{'color': '808080', 'width': 1, 'fillColor': '00000000'}
+    )
 
     MRB_boundary = ee.FeatureCollection('users/giswqs/MRB/MRB_Boundary')
-    MRB_style = MRB_boundary.style(**
-                                   {'color': '000000', 'width': 2, 'fillColor': '00000000'})
+    MRB_style = MRB_boundary.style(
+        **{'color': '000000', 'width': 2, 'fillColor': '00000000'}
+    )
 
     floodplain = ee.Image('users/giswqs/MRB/USGS_Floodplain')
 
@@ -69,38 +70,51 @@ def lulc_mrb_floodplain():
 
 
 def global_mangrove_watch():
-    """https://samapriya.github.io/awesome-gee-community-datasets/projects/mangrove/
-    """
+    """https://samapriya.github.io/awesome-gee-community-datasets/projects/mangrove/"""
     Map = geemap.Map()
-    gmw2007 = ee.FeatureCollection(
-        "projects/sat-io/open-datasets/GMW/GMW_2007_v2")
-    gmw2008 = ee.FeatureCollection(
-        "projects/sat-io/open-datasets/GMW/GMW_2008_v2")
-    gmw2009 = ee.FeatureCollection(
-        "projects/sat-io/open-datasets/GMW/GMW_2009_v2")
-    gmw2010 = ee.FeatureCollection(
-        "projects/sat-io/open-datasets/GMW/GMW_2010_v2")
-    gmw2015 = ee.FeatureCollection(
-        "projects/sat-io/open-datasets/GMW/GMW_2015_v2")
-    gmw2016 = ee.FeatureCollection(
-        "projects/sat-io/open-datasets/GMW/GMW_2016_v2")
-    gmw1996 = ee.FeatureCollection(
-        "projects/sat-io/open-datasets/GMW/GMW_1996_v2")
+    gmw2007 = ee.FeatureCollection("projects/sat-io/open-datasets/GMW/GMW_2007_v2")
+    gmw2008 = ee.FeatureCollection("projects/sat-io/open-datasets/GMW/GMW_2008_v2")
+    gmw2009 = ee.FeatureCollection("projects/sat-io/open-datasets/GMW/GMW_2009_v2")
+    gmw2010 = ee.FeatureCollection("projects/sat-io/open-datasets/GMW/GMW_2010_v2")
+    gmw2015 = ee.FeatureCollection("projects/sat-io/open-datasets/GMW/GMW_2015_v2")
+    gmw2016 = ee.FeatureCollection("projects/sat-io/open-datasets/GMW/GMW_2016_v2")
+    gmw1996 = ee.FeatureCollection("projects/sat-io/open-datasets/GMW/GMW_1996_v2")
 
-    Map.addLayer(ee.Image().paint(gmw1996, 0, 3), {
-                 "palette": ["228B22"]}, 'Global Mangrove Watch 1996')
-    Map.addLayer(ee.Image().paint(gmw2007, 0, 3), {
-                 "palette": ["228B22"]}, 'Global Mangrove Watch 2007')
-    Map.addLayer(ee.Image().paint(gmw2008, 0, 3), {
-                 "palette": ["228B22"]}, 'Global Mangrove Watch 2008')
-    Map.addLayer(ee.Image().paint(gmw2009, 0, 3), {
-                 "palette": ["228B22"]}, 'Global Mangrove Watch 2009')
-    Map.addLayer(ee.Image().paint(gmw2010, 0, 3), {
-                 "palette": ["228B22"]}, 'Global Mangrove Watch 2010')
-    Map.addLayer(ee.Image().paint(gmw2015, 0, 3), {
-                 "palette": ["228B22"]}, 'Global Mangrove Watch 2015')
-    Map.addLayer(ee.Image().paint(gmw2016, 0, 3), {
-                 "palette": ["228B22"]}, 'Global Mangrove Watch 2015')
+    Map.addLayer(
+        ee.Image().paint(gmw1996, 0, 3),
+        {"palette": ["228B22"]},
+        'Global Mangrove Watch 1996',
+    )
+    Map.addLayer(
+        ee.Image().paint(gmw2007, 0, 3),
+        {"palette": ["228B22"]},
+        'Global Mangrove Watch 2007',
+    )
+    Map.addLayer(
+        ee.Image().paint(gmw2008, 0, 3),
+        {"palette": ["228B22"]},
+        'Global Mangrove Watch 2008',
+    )
+    Map.addLayer(
+        ee.Image().paint(gmw2009, 0, 3),
+        {"palette": ["228B22"]},
+        'Global Mangrove Watch 2009',
+    )
+    Map.addLayer(
+        ee.Image().paint(gmw2010, 0, 3),
+        {"palette": ["228B22"]},
+        'Global Mangrove Watch 2010',
+    )
+    Map.addLayer(
+        ee.Image().paint(gmw2015, 0, 3),
+        {"palette": ["228B22"]},
+        'Global Mangrove Watch 2015',
+    )
+    Map.addLayer(
+        ee.Image().paint(gmw2016, 0, 3),
+        {"palette": ["228B22"]},
+        'Global Mangrove Watch 2015',
+    )
 
     Map.to_streamlit(WIDTH, HEIGHT)
 
@@ -109,11 +123,13 @@ def app():
 
     st.title("Awesome GEE Community Datasets")
 
-    st.markdown("""
+    st.markdown(
+        """
     
     This app is for exploring the [Awesome GEE Community Datasets](https://samapriya.github.io/awesome-gee-community-datasets). Work in progress.
     
-    """)
+    """
+    )
 
     datasets = {
         "Population & Socioeconomic": {
@@ -126,42 +142,31 @@ def app():
             "Social Connectedness Index (SCI)": "function()",
             "Native Land (Indigenous Land Maps)": "function()",
         },
-
         "Geophysical, Biological & Biogeochemical": {
             "Geomorpho90m Geomorphometric Layers": "function()",
         },
-
         "Land Use and Land Cover": {
             "Global Mangrove Watch": "global_mangrove_watch()",
             "Mississippi River Basin Floodplain Land Use Change (1941-2000)": "lulc_mrb_floodplain()",
-
         },
-
         "Hydrology": {
             "Global Shoreline Dataset": "function()",
         },
-
         "Agriculture, Vegetation and Forestry": {
             "Landfire Mosaics LF v2.0.0": "function()",
         },
-
         "Global Utilities, Assets and Amenities Layers": {
             "Global Power": "function()",
         },
-
         "EarthEnv Biodiversity ecosystems & climate Layers": {
             "Global Consensus Landcover": "function()",
         },
-
         "Weather and Climate Layers": {
             "Global Reference Evapotranspiration Layers": "function()",
         },
-
         "Global Events Layers": {
             "Global Fire Atlas (2003-2016)": "function()",
         },
-
-
     }
 
     row1_col1, row1_col2, _ = st.columns([1.2, 1.8, 1])
