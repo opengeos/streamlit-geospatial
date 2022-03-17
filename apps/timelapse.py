@@ -59,7 +59,7 @@ def app():
         m = geemap.Map(
             basemap="HYBRID",
             plugin_Draw=True,
-            draw_export=True,
+            Draw_export=True,
             locate_control=True,
             plugin_LatLngPopup=False,
         )
