@@ -3,6 +3,8 @@ geopandas
 keplergl
 palettable
 localtileserver
+owslib
+plotly
 streamlit
 streamlit-folium
 streamlit-keplergl

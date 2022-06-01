@@ -8,7 +8,7 @@ def app():
     m = leafmap.Map(basemap="street", height=650)
     m.add_mapbox_layer(style="streets")
 
-    basemaps = list(leafmap.plotly_basemaps.keys())
+    basemaps = list(leafmap.basemaps.keys())
     basemap = st.selectbox(
         "Select a basemap", basemaps, basemaps.index("Stamen.Terrain")
     )
