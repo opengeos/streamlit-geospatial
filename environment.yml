@@ -1,0 +1,18 @@
+name: geo-env
+channels:
+    - conda-forge
+dependencies:
+    - cartopy
+    - geopandas
+    - keplergl
+    - palettable
+    - localtileserver
+    - owslib
+    - plotly
+    - streamlit
+    - streamlit-folium
+    - streamlit-keplergl
+    - streamlit-bokeh-events
+    - tropycal
+    - geemap
+    - leafmap
