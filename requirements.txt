@@ -1,5 +1,5 @@
 --find-links=https://girder.github.io/large_image_wheels GDAL
-pip>=8.0
+pyproj>=8.0
 cartopy
 geopandas
 keplergl
