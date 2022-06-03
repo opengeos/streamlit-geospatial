@@ -6,4 +6,5 @@ gdal-bin
 libgdal-dev
 libproj-dev
 libgeos-dev
-proj-bin  
+proj-bin
+python-cartopy  
