@@ -2,7 +2,7 @@ name: geo-env
 channels:
     - conda-forge
 dependencies:
-    - gdal=3.4.3
+    # - gdal=3.4.3
     - cartopy
     - pip
     - pip:
