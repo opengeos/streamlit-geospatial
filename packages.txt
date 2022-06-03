@@ -7,4 +7,3 @@ libgdal-dev
 libproj-dev
 libgeos-dev
 proj-bin
-python-cartopy  
