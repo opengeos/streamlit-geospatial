@@ -1,49 +1,50 @@
 import streamlit as st
-from multiapp import MultiApp
-from apps import (
-    basemaps,
-    census,
-    cesium,
-    deck,
-    device_loc,
-    gee,
-    gee_datasets,
-    heatmap,
-    home,
-    housing,
-    # hurricane,
-    plotly_maps,
-    raster,
-    timelapse,
-    vector,
-    wms,
-    xy,
-)
+import leafmap.foliumap as leafmap
 
 st.set_page_config(layout="wide")
 
+st.sidebar.title("About")
+st.sidebar.info(
+    """
+    Web App URL: <https://geospatial.streamlitapp.com>
+    GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
+    """
+)
 
-apps = MultiApp()
+st.sidebar.title("Contact")
+st.sidebar.info(
+    """
+    Qiusheng Wu: <https://wetlands.io>
+    [GitHub](https://github.com/giswqs) | [Twitter](https://twitter.com/giswqs) | [YouTube](https://www.youtube.com/c/QiushengWu) | [LinkedIn](https://www.linkedin.com/in/qiushengwu)
+    """
+)
 
-# Add all your application here
+st.title("Streamlit for Geospatial Applications")
 
-apps.add_app("Home", home.app)
-apps.add_app("Create Timelapse", timelapse.app)
-# apps.add_app("Hurricane Mapping", hurricane.app)
-apps.add_app("U.S. Real Estate Data", housing.app)
-apps.add_app("U.S. Census Data", census.app)
-apps.add_app("Visualize Raster Data", raster.app)
-apps.add_app("Visualize Vector Data", vector.app)
-apps.add_app("Search Basemaps", basemaps.app)
-apps.add_app("Pydeck Gallery", deck.app)
-apps.add_app("Heatmaps", heatmap.app)
-apps.add_app("Add Points from XY", xy.app)
-apps.add_app("Add Web Map Service (WMS)", wms.app)
-apps.add_app("Google Earth Engine (GEE)", gee.app)
-apps.add_app("Awesome GEE Community Datasets", gee_datasets.app)
-apps.add_app("Geolocation", device_loc.app)
-apps.add_app("Cesium 3D Map", cesium.app)
-apps.add_app("Plotly", plotly_maps.app)
+st.markdown(
+    """
+    This multi-page web app demonstrates various interactive web apps created using [streamlit](https://streamlit.io) and open-source mapping libraries, 
+    such as [leafmap](https://leafmap.org), [geemap](https://geemap.org), [pydeck](https://deckgl.readthedocs.io), and [kepler.gl](https://docs.kepler.gl/docs/keplergl-jupyter).
+    This is an open-source project and you are very welcome to contribute your comments, questions, resources, and apps as [issues](https://github.com/giswqs/streamlit-geospatial/issues) or 
+    [pull requests](https://github.com/giswqs/streamlit-geospatial/pulls) to the [GitHub repository](https://github.com/giswqs/streamlit-geospatial).
 
-# The main app
-apps.run()
+    """
+)
+
+st.info("Click on the left sidebar menu to navigate to the different apps.")
+
+st.subheader("Timelapse of Satellite Imagery")
+st.markdown(
+    """
+    The following timelapse animations were created using the Timelapse web app. Click `Timelapse` on the left sidebar menu to create your own timelapse for any location around the globe.
+"""
+)
+
+row1_col1, row1_col2 = st.columns(2)
+with row1_col1:
+    st.image("https://github.com/giswqs/data/raw/main/timelapse/spain.gif")
+    st.image("https://github.com/giswqs/data/raw/main/timelapse/las_vegas.gif")
+
+with row1_col2:
+    st.image("https://github.com/giswqs/data/raw/main/timelapse/goes.gif")
+    st.image("https://github.com/giswqs/data/raw/main/timelapse/fire.gif")
