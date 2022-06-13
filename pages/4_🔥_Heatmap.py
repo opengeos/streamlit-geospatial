@@ -3,15 +3,21 @@ import leafmap.foliumap as leafmap
 
 st.set_page_config(layout="wide")
 
-markdown = """
-Web App URL: <https://template.streamlitapp.com>
-GitHub Repository: <https://github.com/giswqs/streamlit-multipage-template>
-"""
-
 st.sidebar.title("About")
-st.sidebar.info(markdown)
-logo = "https://i.imgur.com/UbOXYAU.png"
-st.sidebar.image(logo)
+st.sidebar.info(
+    """
+    Web App URL: <https://geospatial.streamlitapp.com>
+    GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
+    """
+)
+
+st.sidebar.title("Contact")
+st.sidebar.info(
+    """
+    Qiusheng Wu: <https://wetlands.io>
+    [GitHub](https://github.com/giswqs) | [Twitter](https://twitter.com/giswqs) | [YouTube](https://www.youtube.com/c/QiushengWu) | [LinkedIn](https://www.linkedin.com/in/qiushengwu)
+    """
+)
 
 st.title("Heatmap")
 
