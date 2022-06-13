@@ -3,8 +3,9 @@ import tropycal.tracks as tracks
 
 
 @st.cache
-def read_data(basin='north_atlantic',source='hurdat',include_btk=False):
-    return tracks.TrackDataset(basin=basin,source=source,include_btk=include_btk)
+def read_data(basin='north_atlantic', source='hurdat', include_btk=False):
+    return tracks.TrackDataset(basin=basin, source=source, include_btk=include_btk)
+
 
 def app():
 
@@ -23,14 +24,16 @@ def app():
             if st.session_state.get('hurricane') is None:
                 st.session_state['hurricane'] = read_data()
 
-            years = st.slider('Select a year', min_value=1950, max_value=2022, value=(2000, 2010))
+            years = st.slider(
+                'Select a year', min_value=1950, max_value=2022, value=(2000, 2010)
+            )
             storms = st.session_state['hurricane'].filter_storms(year_range=years)
             selected = st.selectbox('Select a storm', storms)
             storm = st.session_state['hurricane'].get_storm(selected)
             ax = storm.plot()
             fig = ax.get_figure()
-            empty.pyplot(fig) 
-        else:           
+            empty.pyplot(fig)
+        else:
 
             name = st.text_input("Or enter a storm Name", "michael")
             if name:
@@ -40,12 +43,10 @@ def app():
                 years = basin.search_name(name)
                 if len(years) > 0:
                     year = st.selectbox("Select a year", years)
-                    storm = basin.get_storm((name,year))
+                    storm = basin.get_storm((name, year))
                     ax = storm.plot()
                     fig = ax.get_figure()
                     empty.pyplot(fig)
                 else:
                     empty.text("No storms found")
                     st.write("No storms found")
-
-    
