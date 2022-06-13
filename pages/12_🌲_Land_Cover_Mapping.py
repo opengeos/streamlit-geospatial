@@ -26,6 +26,9 @@ st.title("Comparing Global Land Cover Maps")
 col1, col2 = st.columns([4, 1])
 
 Map = geemap.Map()
+Map.add_basemap("ESA WorldCover 2020 S2 FCC")
+Map.add_basemap("ESA WorldCover 2020 S2 TCC")
+Map.add_basemap("HYBRID")
 
 esa = ee.ImageCollection("ESA/WorldCover/v100").first()
 esa_vis = {"bands": ["Map"]}
