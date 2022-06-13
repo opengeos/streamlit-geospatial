@@ -1,5 +1,6 @@
 import os
 import leafmap.foliumap as leafmap
+import leafmap.colormaps as cm
 import streamlit as st
 import palettable
 
@@ -32,67 +33,77 @@ def load_cog_list():
 
 @st.cache
 def get_palettes():
-    palettes = dir(palettable.matplotlib)[:-16]
-    return ["matplotlib." + p for p in palettes]
+    return list(cm.palettes.keys())
+    # palettes = dir(palettable.matplotlib)[:-16]
+    # return ["matplotlib." + p for p in palettes]
 
 
-def app():
-
-    st.title("Visualize Raster Datasets")
-    st.markdown(
-        """
-    An interactive web app for visualizing local raster datasets and Cloud Optimized GeoTIFF ([COG](https://www.cogeo.org)). The app was built using [streamlit](https://streamlit.io), [leafmap](https://leafmap.org), and [localtileserver](https://github.com/banesullivan/localtileserver).
-
-
+st.title("Visualize Raster Datasets")
+st.markdown(
     """
+An interactive web app for visualizing local raster datasets and Cloud Optimized GeoTIFF ([COG](https://www.cogeo.org)). The app was built using [streamlit](https://streamlit.io), [leafmap](https://leafmap.org), and [localtileserver](https://github.com/banesullivan/localtileserver).
+
+
+"""
+)
+
+row1_col1, row1_col2 = st.columns([2, 1])
+
+with row1_col1:
+    cog_list = load_cog_list()
+    cog = st.selectbox("Select a sample Cloud Opitmized GeoTIFF (COG)", cog_list)
+
+with row1_col2:
+    empty = st.empty()
+
+    url = empty.text_input(
+        "Enter a HTTP URL to a Cloud Optimized GeoTIFF (COG)",
+        cog,
     )
 
-    row1_col1, row1_col2 = st.columns([2, 1])
-
-    with row1_col1:
-        cog_list = load_cog_list()
-        cog = st.selectbox("Select a sample Cloud Opitmized GeoTIFF (COG)", cog_list)
-
-    with row1_col2:
-        empty = st.empty()
-
-        url = empty.text_input(
-            "Enter a HTTP URL to a Cloud Optimized GeoTIFF (COG)",
-            cog,
-        )
-
-        data = st.file_uploader("Upload a raster dataset", type=["tif", "img"])
-
-        if data:
-            url = empty.text_input(
-                "Enter a URL to a Cloud Optimized GeoTIFF (COG)",
-                "",
-            )
-
-        add_palette = st.checkbox("Add a color palette")
-        if add_palette:
-            palette = st.selectbox("Select a color palette", get_palettes())
+    if url:
+        try:
+            options = leafmap.cog_bands(url)
+        except Exception as e:
+            st.error(e)
+        if len(options) > 3:
+            default = options[:3]
         else:
-            palette = None
+            default = options[0]
+        bands = st.multiselect("Select bands to display", options, default=options)
 
-        submit = st.button("Submit")
+        if len(bands) == 1 or len(bands) == 3:
+            pass
+        else:
+            st.error("Please select one or three bands")
 
-    m = leafmap.Map(latlon_control=False)
+    add_params = st.checkbox("Add visualization parameters")
+    if add_params:
+        vis_params = st.text_area("Enter visualization parameters", "{}")
+    else:
+        vis_params = {}
 
-    if submit:
-        if data or url:
-            try:
-                if data:
-                    file_path = leafmap.save_data(data)
-                    m.add_local_tile(file_path, palette=palette, debug=True)
-                elif url:
-                    m.add_remote_tile(url, palette=palette, debug=True)
-            except Exception as e:
-                with row1_col2:
-                    st.error("Work in progress. Try it again later.")
+    if len(vis_params) > 0:
+        try:
+            vis_params = eval(vis_params)
+        except Exception as e:
+            st.error(
+                f"Invalid visualization parameters. It should be a dictionary. Error: {e}"
+            )
+            vis_params = {}
 
-    with row1_col1:
-        m.to_streamlit()
+    submit = st.button("Submit")
 
+m = leafmap.Map(latlon_control=False)
 
-app()
+if submit:
+    if url:
+        try:
+            m.add_cog_layer(url, bands=bands, **vis_params)
+        except Exception as e:
+            with row1_col2:
+                st.error(e)
+                st.error("Work in progress. Try it again later.")
+
+with row1_col1:
+    m.to_streamlit()
