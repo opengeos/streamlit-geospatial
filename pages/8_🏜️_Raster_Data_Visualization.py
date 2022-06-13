@@ -2,7 +2,6 @@ import os
 import leafmap.foliumap as leafmap
 import leafmap.colormaps as cm
 import streamlit as st
-import palettable
 
 st.set_page_config(layout="wide")
 
