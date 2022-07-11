@@ -374,7 +374,7 @@ def app():
         max_zoom=16,
         pitch=0,
         bearing=0,
-        height=700,
+        height=900,
         width=None,
     )
 

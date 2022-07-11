@@ -422,12 +422,12 @@ def app():
                 gdf = gpd.GeoDataFrame(
                     index=[0], crs=crs, geometry=[ocean_rois[sample_roi]]
                 )
-            st.session_state["roi"] = geemap.geopandas_to_ee(gdf, geodesic=False)
+            st.session_state["roi"] = geemap.gdf_to_ee(gdf, geodesic=False)
             m.add_gdf(gdf, "ROI")
 
         elif data:
             gdf = uploaded_file_to_gdf(data)
-            st.session_state["roi"] = geemap.geopandas_to_ee(gdf, geodesic=False)
+            st.session_state["roi"] = geemap.gdf_to_ee(gdf, geodesic=False)
             m.add_gdf(gdf, "ROI")
 
         m.to_streamlit(height=600)
