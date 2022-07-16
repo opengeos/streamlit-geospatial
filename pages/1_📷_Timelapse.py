@@ -623,11 +623,11 @@ def app():
             gdf = uploaded_file_to_gdf(data)
             try:
                 st.session_state["roi"] = geemap.gdf_to_ee(gdf, geodesic=False)
+                m.add_gdf(gdf, "ROI")
             except Exception as e:
                 st.error(e)
                 st.error("Please draw another ROI and try again.")
                 return
-            m.add_gdf(gdf, "ROI")
 
         m.to_streamlit(height=600)
 
