@@ -4,8 +4,6 @@ Ordnance Survey - Six Inch Scotland, 1843-1882 - 1:10,560	https://mapseries-tile
 War Office, Great Britain 1:25,000. GSGS 3906, 1940-43	https://mapseries-tilesets.s3.amazonaws.com/gsgs3906/{z}/{x}/{y}.png
 Roy - Roy Highlands, 1747-1752 - 1:36000	https://mapseries-tilesets.s3.amazonaws.com/roy/highlands/{z}/{x}/{y}.png
 Roy - Roy Lowlands, 1752-1755 - 1:36000	https://mapseries-tilesets.s3.amazonaws.com/roy/lowlands/{z}/{x}/{y}.png
-Great Britain - OS 1:25,000, 1937-61	https://nls-0.tileserver.com/fpsUZbIoj0Oa/{z}/{x}/{y}.jpg
-Great Britain - OS One Inch 7th series, 1955-61	https://nls-0.tileserver.com/fpsUZbc4ftb2/{z}/{x}/{y}.jpg
 Great Britain - OS 1:10,560, 1949-1970	https://mapseries-tilesets.s3.amazonaws.com/os/britain10knatgrid/{z}/{x}/{y}.png
 Great Britain - Bartholomew Half Inch, 1897-1907	https://mapseries-tilesets.s3.amazonaws.com/bartholomew_great_britain/{z}/{x}/{y}.png
 OS 25 inch, 1892-1914 - Scotland South 	https://mapseries-tilesets.s3.amazonaws.com/25_inch/scotland_1/{z}/{x}/{y}.png

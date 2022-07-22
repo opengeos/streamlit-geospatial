@@ -65,7 +65,7 @@ with st.expander("Acknowledgements"):
 - The Roy Maps are owned by the British Library.
 - The Great Britain – OS maps 1:25,000, 1937-61 and One Inch 7th series, 1955-61 are hosted by MapTiler.
 
-If you wish you use these layers within a website, or for a commercial or public purpose, please view the National Library of Scotland Historic Maps Subscription API or contact them at maps@nls.uk.
+If you wish you use these layers within a website, or for a commercial or public purpose, please view the [National Library of Scotland Historic Maps Subscription API](https://maps.nls.uk/projects/subscription-api/) or contact them at maps@nls.uk.
     """
     st.markdown(markdown, unsafe_allow_html=True)
 
