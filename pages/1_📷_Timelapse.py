@@ -198,7 +198,6 @@ ocean_rois = {
     ),
 }
 
-
 @st.cache
 def uploaded_file_to_gdf(data):
     import tempfile
@@ -275,7 +274,7 @@ def app():
                 "Any Earth Engine ImageCollection",
                 "Landsat TM-ETM-OLI Surface Reflectance",
                 "Sentinel-2 MSI Surface Reflectance",
-                "Sentinel-1 SAR Ground Range Deteceted",
+                "Sentinel-1 SAR Ground Range Detected",
                 "Geostationary Operational Environmental Satellites (GOES)",
                 "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km",
                 "MODIS Gap filled Land Surface Temperature Daily",
@@ -285,18 +284,18 @@ def app():
             index=1,
         )
 
-        roi_default = {"Landsat TM-ETM-OLI Surface Reflectance": list(landsat_rois.keys()),
-            "Sentinel-2 MSI Surface Reflectance": list(landsat_rois.keys()),
-            "Sentinel-1 SAR Ground Range Deteceted": list(landsat_rois.keys()),
-            "Geostationary Operational Environmental Satellites (GOES)": list(goes_rois.keys()),
-            "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km":list(modis_rois.keys()),
-            "MODIS Gap filled Land Surface Temperature Daily":list(modis_rois.keys()),
-            "MODIS Ocean Color SMI":list(ocean_rois.keys()) 
+        roi_default = {"Landsat TM-ETM-OLI Surface Reflectance": landsat_rois,
+            "Sentinel-2 MSI Surface Reflectance": landsat_rois,
+            "Sentinel-1 SAR Ground Range Detected": landsat_rois,
+            "Geostationary Operational Environmental Satellites (GOES)": goes_rois,
+            "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km": modis_rois,
+            "MODIS Gap filled Land Surface Temperature Daily": modis_rois,
+            "MODIS Ocean Color SMI": ocean_rois 
         }
 
         from collections import defaultdict            
-        roi_default = defaultdict(None, roi_default)
-        roi_options = ["Uploaded GeoJSON"] + roi_default[collection]
+        roi_default = defaultdict({}, roi_default)
+        roi_options = ["Uploaded GeoJSON"] + list(roi_default[collection].keys())
 
         if collection == "Any Earth Engine ImageCollection":
             keyword = st.text_input("Enter a keyword to search (e.g., MODIS):", "")
@@ -547,7 +546,6 @@ def app():
         )
 
         crs = "epsg:4326"
-        
         if sample_roi == "Uploaded GeoJSON":
             if data is None:
                 # st.info(
@@ -564,7 +562,7 @@ def app():
             if collection in [
                 "Landsat TM-ETM-OLI Surface Reflectance",
                 "Sentinel-2 MSI Surface Reflectance",
-                "Sentinel-1 SAR Ground Range Deteceted",
+                "Sentinel-1 SAR Ground Range Detected",
             ]:
                 gdf = gpd.GeoDataFrame(
                     index=[0], crs=crs, geometry=[landsat_rois[sample_roi]]
@@ -586,7 +584,7 @@ def app():
             if collection in [
                 "Landsat TM-ETM-OLI Surface Reflectance",
                 "Sentinel-2 MSI Surface Reflectance",
-                "Sentinel-1 SAR Ground Range Deteceted",
+                "Sentinel-1 SAR Ground Range Detected",
             ]:
                 gdf = gpd.GeoDataFrame(
                     index=[0], crs=crs, geometry=[landsat_rois[sample_roi]]
@@ -624,12 +622,12 @@ def app():
         if collection in [
             "Landsat TM-ETM-OLI Surface Reflectance",
             "Sentinel-2 MSI Surface Reflectance",
-            "Sentinel-1 SAR Ground Range Deteceted",
+            "Sentinel-1 SAR Ground Range Detected",
         ]:
 
             presents = {"Landsat TM-ETM-OLI Surface Reflectance": (1984, "Landsat Timelapse", 5),
                         "Sentinel-2 MSI Surface Reflectance": (2015, "Sentinel-2 Timelapse", 5),
-                        "Sentinel-1 SAR Ground Range Deteceted": (2015, "Sentinel-1 Timelapse", 5),
+                        "Sentinel-1 SAR Ground Range Detected": (2015, "Sentinel-1 Timelapse", 5),
 
             }
 
@@ -694,11 +692,10 @@ def app():
                     font_size = st.slider("Font size:", 10, 50, 30)
                     font_color = st.color_picker("Font color:", "#ffffff")
 
-                    if collection != "Sentinel-1 SAR Ground Range Deteceted":
+                    if collection != "Sentinel-1 SAR Ground Range Detected":
                         apply_fmask = st.checkbox(
                             "Apply fmask (remove clouds, shadows, snow)", True
-                    )
-                    
+                        )
                     font_type = st.selectbox(
                         "Select the font type for the title:",
                         ["arial.ttf", "alibaba.otf"],
@@ -762,7 +759,7 @@ def app():
 
                         function = {"Landsat TM-ETM-OLI Surface Reflectance": geemap.landsat_timelapse,
                                     "Sentinel-2 MSI Surface Reflectance": geemap.sentinel2_timelapse,
-                                    "Sentinel-1 SAR Ground Range Deteceted": geemap.sentinel1_timelapse}
+                                    "Sentinel-1 SAR Ground Range Detected": geemap.sentinel1_timelapse}
 
                         try:
                             out_gif = function[collection](**_kwargs)
