@@ -106,7 +106,7 @@ def app():
         }
 
         from collections import defaultdict            
-        roi_default = defaultdict({}, roi_default)
+        roi_default = defaultdict(dict, roi_default)
         roi_options = ["Uploaded GeoJSON"] + list(roi_default[collection].keys())
 
         if collection == "Any Earth Engine ImageCollection":
