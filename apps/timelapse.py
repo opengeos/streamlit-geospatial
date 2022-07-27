@@ -6,6 +6,7 @@ import folium
 import streamlit as st
 import geemap.colormaps as cm
 import geemap.foliumap as geemap
+import geemap.timelapse as timelapse
 from datetime import date
 from .rois import *
 
@@ -570,9 +571,9 @@ def app():
                                     'mp4':mp4,
                                     'fading':fading}
 
-                        function = {"Landsat TM-ETM-OLI Surface Reflectance": geemap.landsat_timelapse,
-                                    "Sentinel-2 MSI Surface Reflectance": geemap.sentinel2_timelapse,
-                                    "Sentinel-1 SAR Ground Range Detected": geemap.sentinel1_timelapse}
+                        function = {"Landsat TM-ETM-OLI Surface Reflectance": timelapse.landsat_timelapse,
+                                    "Sentinel-2 MSI Surface Reflectance": timelapse.sentinel2_timelapse,
+                                    "Sentinel-1 SAR Ground Range Detected": timelapse.sentinel1_timelapse}
 
                         try:
                             out_gif = function[collection](**_kwargs)
