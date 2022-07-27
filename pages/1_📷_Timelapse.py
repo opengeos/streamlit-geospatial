@@ -692,6 +692,7 @@ def app():
                     font_size = st.slider("Font size:", 10, 50, 30)
                     font_color = st.color_picker("Font color:", "#ffffff")
 
+                    apply_fmask = ''
                     if collection != "Sentinel-1 SAR Ground Range Detected":
                         apply_fmask = st.checkbox(
                             "Apply fmask (remove clouds, shadows, snow)", True
