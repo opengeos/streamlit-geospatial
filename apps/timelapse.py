@@ -86,6 +86,7 @@ def app():
                 "Any Earth Engine ImageCollection",
                 "Landsat TM-ETM-OLI Surface Reflectance",
                 "Sentinel-2 MSI Surface Reflectance",
+                "Sentinel-1 SAR Ground Range Deteceted",
                 "Geostationary Operational Environmental Satellites (GOES)",
                 "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km",
                 "MODIS Gap filled Land Surface Temperature Daily",
@@ -95,24 +96,18 @@ def app():
             index=1,
         )
 
-        if collection in [
-            "Landsat TM-ETM-OLI Surface Reflectance",
-            "Sentinel-2 MSI Surface Reflectance",
-        ]:
-            roi_options = ["Uploaded GeoJSON"] + list(landsat_rois.keys())
+        roi_default = {"Landsat TM-ETM-OLI Surface Reflectance": list(landsat_rois.keys()),
+            "Sentinel-2 MSI Surface Reflectance": list(landsat_rois.keys()),
+            "Sentinel-1 SAR Ground Range Deteceted": list(landsat_rois.keys()),
+            "Geostationary Operational Environmental Satellites (GOES)": list(goes_rois.keys()),
+            "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km":list(modis_rois.keys()),
+            "MODIS Gap filled Land Surface Temperature Daily":list(modis_rois.keys()),
+            "MODIS Ocean Color SMI":list(ocean_rois.keys()) 
+        }
 
-        elif collection == "Geostationary Operational Environmental Satellites (GOES)":
-            roi_options = ["Uploaded GeoJSON"] + list(goes_rois.keys())
-
-        elif collection in [
-            "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km",
-            "MODIS Gap filled Land Surface Temperature Daily",
-        ]:
-            roi_options = ["Uploaded GeoJSON"] + list(modis_rois.keys())
-        elif collection == "MODIS Ocean Color SMI":
-            roi_options = ["Uploaded GeoJSON"] + list(ocean_rois.keys())
-        else:
-            roi_options = ["Uploaded GeoJSON"]
+        from collections import defaultdict            
+        roi_default = defaultdict(None, roi_default)
+        roi_options = ["Uploaded GeoJSON"] + roi_default[collection]
 
         if collection == "Any Earth Engine ImageCollection":
             keyword = st.text_input("Enter a keyword to search (e.g., MODIS):", "")
@@ -379,6 +374,7 @@ def app():
             if collection in [
                 "Landsat TM-ETM-OLI Surface Reflectance",
                 "Sentinel-2 MSI Surface Reflectance",
+                "Sentinel-1 SAR Ground Range Deteceted",
             ]:
                 gdf = gpd.GeoDataFrame(
                     index=[0], crs=crs, geometry=[landsat_rois[sample_roi]]
@@ -400,6 +396,7 @@ def app():
             if collection in [
                 "Landsat TM-ETM-OLI Surface Reflectance",
                 "Sentinel-2 MSI Surface Reflectance",
+                "Sentinel-1 SAR Ground Range Deteceted",
             ]:
                 gdf = gpd.GeoDataFrame(
                     index=[0], crs=crs, geometry=[landsat_rois[sample_roi]]
@@ -437,16 +434,17 @@ def app():
         if collection in [
             "Landsat TM-ETM-OLI Surface Reflectance",
             "Sentinel-2 MSI Surface Reflectance",
+            "Sentinel-1 SAR Ground Range Deteceted",
         ]:
 
-            if collection == "Landsat TM-ETM-OLI Surface Reflectance":
-                sensor_start_year = 1984
-                timelapse_title = "Landsat Timelapse"
-                timelapse_speed = 5
-            elif collection == "Sentinel-2 MSI Surface Reflectance":
-                sensor_start_year = 2015
-                timelapse_title = "Sentinel-2 Timelapse"
-                timelapse_speed = 5
+            presents = {"Landsat TM-ETM-OLI Surface Reflectance": (1984, "Landsat Timelapse", 5),
+                        "Sentinel-2 MSI Surface Reflectance": (2015, "Sentinel-2 Timelapse", 5),
+                        "Sentinel-1 SAR Ground Range Deteceted": (2015, "Sentinel-1 Timelapse", 5),
+
+            }
+
+            sensor_start_year, timelapse_title, timelapse_speed = presents[collection]
+
             video_empty.video("https://youtu.be/VVRK_-dEjR4")
 
             with st.form("submit_landsat_form"):
@@ -459,24 +457,27 @@ def app():
                 title = st.text_input(
                     "Enter a title to show on the timelapse: ", timelapse_title
                 )
-                RGB = st.selectbox(
-                    "Select an RGB band combination:",
-                    [
-                        "Red/Green/Blue",
-                        "NIR/Red/Green",
-                        "SWIR2/SWIR1/NIR",
-                        "NIR/SWIR1/Red",
-                        "SWIR2/NIR/Red",
-                        "SWIR2/SWIR1/Red",
-                        "SWIR1/NIR/Blue",
-                        "NIR/SWIR1/Blue",
-                        "SWIR2/NIR/Green",
-                        "SWIR1/NIR/Red",
-                        "SWIR2/NIR/SWIR1",
-                        "SWIR1/NIR/SWIR2",
-                    ],
-                    index=9,
-                )
+
+                RGB = ''
+                if collection != "Sentinel-1 SAR Ground Range Deteceted":
+                    RGB = st.selectbox(
+                        "Select an RGB band combination:",
+                        [
+                            "Red/Green/Blue",
+                            "NIR/Red/Green",
+                            "SWIR2/SWIR1/NIR",
+                            "NIR/SWIR1/Red",
+                            "SWIR2/NIR/Red",
+                            "SWIR2/SWIR1/Red",
+                            "SWIR1/NIR/Blue",
+                            "NIR/SWIR1/Blue",
+                            "SWIR2/NIR/Green",
+                            "SWIR1/NIR/Red",
+                            "SWIR2/NIR/SWIR1",
+                            "SWIR1/NIR/SWIR2",
+                        ],
+                        index=9,
+                    )
 
                 frequency = st.selectbox(
                     "Select a temporal frequency:",
@@ -502,9 +503,11 @@ def app():
                     months = st.slider("Start and end month:", 1, 12, (1, 12))
                     font_size = st.slider("Font size:", 10, 50, 30)
                     font_color = st.color_picker("Font color:", "#ffffff")
-                    apply_fmask = st.checkbox(
-                        "Apply fmask (remove clouds, shadows, snow)", True
-                    )
+
+                    if collection != "Sentinel-1 SAR Ground Range Deteceted":
+                        apply_fmask = st.checkbox(
+                            "Apply fmask (remove clouds, shadows, snow)", True
+                        )
                     font_type = st.selectbox(
                         "Select the font type for the title:",
                         ["arial.ttf", "alibaba.otf"],
@@ -534,78 +537,51 @@ def app():
                         end_year = years[1]
                         start_date = str(months[0]).zfill(2) + "-01"
                         end_date = str(months[1]).zfill(2) + "-30"
-                        bands = RGB.split("/")
+
+                        _kwargs = {'roi':roi,
+                                    'out_gif':out_gif,
+                                    'start_year':start_year,
+                                    'end_year':end_year,
+                                    'start_date':start_date,
+                                    'end_date':end_date,
+                                    'bands':RGB.split("/"),
+                                    'apply_fmask':apply_fmask,
+                                    'frames_per_second':speed,
+                                    'dimensions':dimensions,
+                                    'overlay_data':overlay_data,
+                                    'overlay_color':overlay_color,
+                                    'overlay_width':overlay_width,
+                                    'overlay_opacity':overlay_opacity,
+                                    'frequency':frequency,
+                                    'date_format':None,
+                                    'title':title,
+                                    'title_xy':("2%", "90%"),
+                                    'add_text':True,
+                                    'text_xy':("2%", "2%"),
+                                    'text_sequence':None,
+                                    'font_type':font_type,
+                                    'font_size':font_size,
+                                    'font_color':font_color,
+                                    'add_progress_bar':True,
+                                    'progress_bar_color':progress_bar_color,
+                                    'progress_bar_height':5,
+                                    'loop':0,
+                                    'mp4':mp4,
+                                    'fading':fading}
+
+                        function = {"Landsat TM-ETM-OLI Surface Reflectance": geemap.landsat_timelapse,
+                                    "Sentinel-2 MSI Surface Reflectance": geemap.sentinel2_timelapse,
+                                    "Sentinel-1 SAR Ground Range Deteceted": geemap.sentinel1_timelapse}
 
                         try:
-                            if collection == "Landsat TM-ETM-OLI Surface Reflectance":
-                                out_gif = geemap.landsat_timelapse(
-                                    roi=roi,
-                                    out_gif=out_gif,
-                                    start_year=start_year,
-                                    end_year=end_year,
-                                    start_date=start_date,
-                                    end_date=end_date,
-                                    bands=bands,
-                                    apply_fmask=apply_fmask,
-                                    frames_per_second=speed,
-                                    dimensions=dimensions,
-                                    overlay_data=overlay_data,
-                                    overlay_color=overlay_color,
-                                    overlay_width=overlay_width,
-                                    overlay_opacity=overlay_opacity,
-                                    frequency=frequency,
-                                    date_format=None,
-                                    title=title,
-                                    title_xy=("2%", "90%"),
-                                    add_text=True,
-                                    text_xy=("2%", "2%"),
-                                    text_sequence=None,
-                                    font_type=font_type,
-                                    font_size=font_size,
-                                    font_color=font_color,
-                                    add_progress_bar=True,
-                                    progress_bar_color=progress_bar_color,
-                                    progress_bar_height=5,
-                                    loop=0,
-                                    mp4=mp4,
-                                    fading=fading,
-                                )
-                            elif collection == "Sentinel-2 MSI Surface Reflectance":
-                                out_gif = geemap.sentinel2_timelapse(
-                                    roi=roi,
-                                    out_gif=out_gif,
-                                    start_year=start_year,
-                                    end_year=end_year,
-                                    start_date=start_date,
-                                    end_date=end_date,
-                                    bands=bands,
-                                    apply_fmask=apply_fmask,
-                                    frames_per_second=speed,
-                                    dimensions=dimensions,
-                                    overlay_data=overlay_data,
-                                    overlay_color=overlay_color,
-                                    overlay_width=overlay_width,
-                                    overlay_opacity=overlay_opacity,
-                                    frequency=frequency,
-                                    date_format=None,
-                                    title=title,
-                                    title_xy=("2%", "90%"),
-                                    add_text=True,
-                                    text_xy=("2%", "2%"),
-                                    text_sequence=None,
-                                    font_type=font_type,
-                                    font_size=font_size,
-                                    font_color=font_color,
-                                    add_progress_bar=True,
-                                    progress_bar_color=progress_bar_color,
-                                    progress_bar_height=5,
-                                    loop=0,
-                                    mp4=mp4,
-                                    fading=fading,
-                                )
-                        except:
+                            out_gif = function[collection](**_kwargs)
+                                              
+                        except BaseException as e:
                             empty_text.error(
-                                "An error occurred while computing the timelapse. Your probably requested too much data. Try reducing the ROI or timespan."
+                                """An error occurred while computing the timelapse. 
+                                Your probably requested too much data. Try reducing the ROI or timespan.
+
+                                Trace:{e}"""
                             )
                             st.stop()
 
