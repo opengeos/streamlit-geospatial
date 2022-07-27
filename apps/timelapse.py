@@ -96,18 +96,18 @@ def app():
             index=1,
         )
 
-        roi_default = {"Landsat TM-ETM-OLI Surface Reflectance": list(landsat_rois.keys()),
-            "Sentinel-2 MSI Surface Reflectance": list(landsat_rois.keys()),
-            "Sentinel-1 SAR Ground Range Deteceted": list(landsat_rois.keys()),
-            "Geostationary Operational Environmental Satellites (GOES)": list(goes_rois.keys()),
-            "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km":list(modis_rois.keys()),
-            "MODIS Gap filled Land Surface Temperature Daily":list(modis_rois.keys()),
-            "MODIS Ocean Color SMI":list(ocean_rois.keys()) 
+        roi_default = {"Landsat TM-ETM-OLI Surface Reflectance": landsat_rois,
+            "Sentinel-2 MSI Surface Reflectance": landsat_rois,
+            "Sentinel-1 SAR Ground Range Deteceted": landsat_rois,
+            "Geostationary Operational Environmental Satellites (GOES)": goes_rois,
+            "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km": modis_rois,
+            "MODIS Gap filled Land Surface Temperature Daily": modis_rois,
+            "MODIS Ocean Color SMI": ocean_rois 
         }
 
         from collections import defaultdict            
-        roi_default = defaultdict(None, roi_default)
-        roi_options = ["Uploaded GeoJSON"] + roi_default[collection]
+        roi_default = defaultdict({}, roi_default)
+        roi_options = ["Uploaded GeoJSON"] + list(roi_default[collection].keys())
 
         if collection == "Any Earth Engine ImageCollection":
             keyword = st.text_input("Enter a keyword to search (e.g., MODIS):", "")
