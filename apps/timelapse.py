@@ -459,7 +459,6 @@ def app():
                     "Enter a title to show on the timelapse: ", timelapse_title
                 )
 
-                RGB = ''
                 if collection != "Sentinel-1 SAR Ground Range Deteceted":
                     RGB = st.selectbox(
                         "Select an RGB band combination:",
@@ -479,6 +478,14 @@ def app():
                         ],
                         index=9,
                     )
+                else:
+                    RGB = st.selectbox(
+                        "Select a band:",
+                        [
+                            "HH","HV","VV","VH"
+                        ],
+                        index=2,
+                    )     
 
                 frequency = st.selectbox(
                     "Select a temporal frequency:",
