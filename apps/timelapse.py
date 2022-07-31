@@ -55,7 +55,6 @@ def app():
     st.session_state["bands"] = None
     st.session_state["palette"] = None
     st.session_state["vis_params"] = None
-    st.session_state["collection"] = None
 
     with row1_col1:
         m = geemap.Map(
@@ -580,6 +579,157 @@ def app():
                         function = {"Landsat TM-ETM-OLI Surface Reflectance": timelapse.landsat_timelapse,
                                     "Sentinel-2 MSI Surface Reflectance": timelapse.sentinel2_timelapse,
                                     "Sentinel-1 SAR Ground Range Detected": timelapse.sentinel1_timelapse}
+
+                        try:
+                            out_gif = function[collection](**_kwargs)
+                                              
+                        except Exception as e:
+                            empty_text.error(
+                                """An error occurred while computing the timelapse. 
+                                You probably requested too much data. Try reducing the ROI or timespan."""
+                            )
+                            st.stop()
+
+                        if out_gif is not None and os.path.exists(out_gif):
+
+                            empty_text.text(
+                                "Right click the GIF to save it to your computer👇"
+                            )
+                            empty_image.image(out_gif)
+
+                            out_mp4 = out_gif.replace(".gif", ".mp4")
+                            if mp4 and os.path.exists(out_mp4):
+                                with empty_video:
+                                    st.text(
+                                        "Right click the MP4 to save it to your computer👇"
+                                    )
+                                    st.video(out_gif.replace(".gif", ".mp4"))
+
+                        else:
+                            empty_text.error(
+                                "Something went wrong. You probably requested too much data. Try reducing the ROI or timespan."
+                            )
+        # Only the st.form_submit_button has a callback in forms. Other widgets inside a form are not allowed to have callbacks.
+        elif collection == "Sentinel-1 SAR Ground Range Detected":
+
+            sent1_bands = ["VV","VH","HH","HV"]
+
+            presents = {"Sentinel-1 SAR Ground Range Detected": (2015, "Sentinel-1 Timelapse", 5, sent1_bands),
+            }
+
+            sensor_start_year, timelapse_title, timelapse_speed, bands = presents[collection]
+
+            video_empty.video("https://youtu.be/VVRK_-dEjR4")
+
+            # Only the st.form_submit_button has a callback in forms. Other widgets inside a form are not allowed to have callbacks.
+            with st.form("submit_sentinel1_form"):
+
+                roi = None
+                if st.session_state.get("roi") is not None:
+                    roi = st.session_state.get("roi")
+                out_gif = geemap.temp_file_path(".gif")
+
+                title = st.text_input(
+                    "Enter a title to show on the timelapse: ", timelapse_title
+                )
+
+                RGB = st.selectbox(
+                        "Select an RGB band combination:",
+                        st.session_state["bands"],
+                        index=0,
+                    )
+
+                frequency = st.selectbox(
+                    "Select a temporal frequency:",
+                    ["year", "quarter", "month"],
+                    index=0,
+                )
+
+                with st.expander("Customize timelapse"):
+
+                    speed = st.slider("Frames per second:", 1, 30, timelapse_speed)
+                    dimensions = st.slider(
+                        "Maximum dimensions (Width*Height) in pixels", 768, 2000, 768
+                    )
+                    progress_bar_color = st.color_picker(
+                        "Progress bar color:", "#0000ff"
+                    )
+                    years = st.slider(
+                        "Start and end year:",
+                        sensor_start_year,
+                        today.year,
+                        (sensor_start_year, today.year),
+                    )
+                    months = st.slider("Start and end month:", 1, 12, (1, 12))
+                    font_size = st.slider("Font size:", 10, 50, 30)
+                    font_color = st.color_picker("Font color:", "#ffffff")
+
+                    apply_fmask = ''
+                    if collection != "Sentinel-1 SAR Ground Range Detected":
+                        apply_fmask = st.checkbox(
+                            "Apply fmask (remove clouds, shadows, snow)", True
+                        )
+                    font_type = st.selectbox(
+                        "Select the font type for the title:",
+                        ["arial.ttf", "alibaba.otf"],
+                        index=0,
+                    )
+                    fading = st.slider(
+                        "Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0
+                    )
+                    mp4 = st.checkbox("Save timelapse as MP4", True)
+
+                empty_text = st.empty()
+                empty_image = st.empty()
+                empty_fire_image = st.empty()
+                empty_video = st.container()
+                submitted = st.form_submit_button("Submit")
+                if submitted:
+
+                    if sample_roi == "Uploaded GeoJSON" and data is None:
+                        empty_text.warning(
+                            "Steps to create a timelapse: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click the Submit button. Alternatively, you can select a sample ROI from the dropdown list."
+                        )
+                    else:
+
+                        empty_text.text("Computing... Please wait...")
+
+                        start_year = years[0]
+                        end_year = years[1]
+                        start_date = str(months[0]).zfill(2) + "-01"
+                        end_date = str(months[1]).zfill(2) + "-30"
+
+                        _kwargs = {'roi':roi,
+                                    'out_gif':out_gif,
+                                    'start_year':start_year,
+                                    'end_year':end_year,
+                                    'start_date':start_date,
+                                    'end_date':end_date,
+                                    'bands':RGB.split("/"),
+                                    'frames_per_second':speed,
+                                    'dimensions':dimensions,
+                                    'overlay_data':overlay_data,
+                                    'overlay_color':overlay_color,
+                                    'overlay_width':overlay_width,
+                                    'overlay_opacity':overlay_opacity,
+                                    'frequency':frequency,
+                                    'date_format':None,
+                                    'title':title,
+                                    'title_xy':("2%", "90%"),
+                                    'add_text':True,
+                                    'text_xy':("2%", "2%"),
+                                    'text_sequence':None,
+                                    'font_type':font_type,
+                                    'font_size':font_size,
+                                    'font_color':font_color,
+                                    'add_progress_bar':True,
+                                    'progress_bar_color':progress_bar_color,
+                                    'progress_bar_height':5,
+                                    'loop':0,
+                                    'mp4':mp4,
+                                    'fading':fading}
+
+                        function = {"Sentinel-1 SAR Ground Range Detected": timelapse.sentinel1_timelapse}
 
                         try:
                             out_gif = function[collection](**_kwargs)
