@@ -441,7 +441,6 @@ def app():
             presents = {"Landsat TM-ETM-OLI Surface Reflectance": (1984, "Landsat Timelapse", 5),
                         "Sentinel-2 MSI Surface Reflectance": (2015, "Sentinel-2 Timelapse", 5),
                         "Sentinel-1 SAR Ground Range Detected": (2015, "Sentinel-1 Timelapse", 5),
-
             }
 
             sensor_start_year, timelapse_title, timelapse_speed = presents[collection]
@@ -459,7 +458,7 @@ def app():
                     "Enter a title to show on the timelapse: ", timelapse_title
                 )
 
-                if collection != "Sentinel-1 SAR Ground Range Deteceted":
+                if collection != "Sentinel-1 SAR Ground Range Detected":
                     RGB = st.selectbox(
                         "Select an RGB band combination:",
                         [
@@ -586,12 +585,11 @@ def app():
                             out_gif = function[collection](**_kwargs)
                                               
                         except BaseException as e:
-                            empty_text.error(
-                                f"""An error occurred while computing the timelapse. 
+                            text = f"""An error occurred while computing the timelapse. 
                                 Your probably requested too much data. Try reducing the ROI or timespan.
 
                                 Trace:{e}"""
-                            )
+                            empty_text.error(text)
                             st.stop()
 
                         if out_gif is not None and os.path.exists(out_gif):
