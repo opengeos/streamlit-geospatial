@@ -55,6 +55,7 @@ def app():
     st.session_state["bands"] = None
     st.session_state["palette"] = None
     st.session_state["vis_params"] = None
+    st.session_state["collection"] = None
 
     with row1_col1:
         m = geemap.Map(
@@ -462,6 +463,8 @@ def app():
 
             sensor_start_year, timelapse_title, timelapse_speed, bands = presents[collection]
 
+            st.session_state["bands"] = bands
+
             video_empty.video("https://youtu.be/VVRK_-dEjR4")
 
             with st.form("submit_landsat_form"):
@@ -477,7 +480,7 @@ def app():
 
                 RGB = st.selectbox(
                         "Select an RGB band combination:",
-                        bands,
+                        st.session_state["bands"],
                         index=0,
                     )
 
