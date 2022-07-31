@@ -437,23 +437,8 @@ def app():
             "Sentinel-2 MSI Surface Reflectance",
         ]:
 
-            landsat_sent2_bands = [
-                            "Red/Green/Blue",
-                            "NIR/Red/Green",
-                            "SWIR2/SWIR1/NIR",
-                            "NIR/SWIR1/Red",
-                            "SWIR2/NIR/Red",
-                            "SWIR2/SWIR1/Red",
-                            "SWIR1/NIR/Blue",
-                            "NIR/SWIR1/Blue",
-                            "SWIR2/NIR/Green",
-                            "SWIR1/NIR/Red",
-                            "SWIR2/NIR/SWIR1",
-                            "SWIR1/NIR/SWIR2",
-                        ]
-
-            presents = {"Landsat TM-ETM-OLI Surface Reflectance": (1984, "Landsat Timelapse", 5, landsat_sent2_bands),
-                        "Sentinel-2 MSI Surface Reflectance": (2015, "Sentinel-2 Timelapse", 5, landsat_sent2_bands),
+            presents = {"Landsat TM-ETM-OLI Surface Reflectance": (1984, "Landsat Timelapse", 5),
+                        "Sentinel-2 MSI Surface Reflectance": (2015, "Sentinel-2 Timelapse", 5),
             }
 
             sensor_start_year, timelapse_title, timelapse_speed, bands = presents[collection]
@@ -475,8 +460,21 @@ def app():
 
                 RGB = st.selectbox(
                         "Select an RGB band combination:",
-                        st.session_state["bands"],
-                        index=0,
+                        [
+                            "Red/Green/Blue",
+                            "NIR/Red/Green",
+                            "SWIR2/SWIR1/NIR",
+                            "NIR/SWIR1/Red",
+                            "SWIR2/NIR/Red",
+                            "SWIR2/SWIR1/Red",
+                            "SWIR1/NIR/Blue",
+                            "NIR/SWIR1/Blue",
+                            "SWIR2/NIR/Green",
+                            "SWIR1/NIR/Red",
+                            "SWIR2/NIR/SWIR1",
+                            "SWIR1/NIR/SWIR2",
+                        ],
+                        index=9,
                     )
 
                 frequency = st.selectbox(
@@ -552,6 +550,7 @@ def app():
                                     'overlay_color':overlay_color,
                                     'overlay_width':overlay_width,
                                     'overlay_opacity':overlay_opacity,
+                                    'apply_fmask':apply_fmask,
                                     'frequency':frequency,
                                     'date_format':None,
                                     'title':title,
@@ -568,9 +567,6 @@ def app():
                                     'loop':0,
                                     'mp4':mp4,
                                     'fading':fading}
-
-                        if collection != "Sentinel-1 SAR Ground Range Detected":
-                            _kwargs = {**_kwargs, 'apply_fmask':apply_fmask}
 
                         function = {"Landsat TM-ETM-OLI Surface Reflectance": timelapse.landsat_timelapse,
                                     "Sentinel-2 MSI Surface Reflectance": timelapse.sentinel2_timelapse}
@@ -630,7 +626,7 @@ def app():
 
                 RGB = st.selectbox(
                         "Select an RGB band combination:",
-                        st.session_state["bands"],
+                        bands,
                         index=0,
                     )
 
