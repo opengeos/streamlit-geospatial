@@ -1,6 +1,6 @@
 --find-links=https://girder.github.io/large_image_wheels GDAL
 # cartopy
-geemap
+geemap>=0.16
 geopandas
 jupyter-server-proxy
 keplergl
