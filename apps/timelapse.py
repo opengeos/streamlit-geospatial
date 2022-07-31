@@ -553,7 +553,6 @@ def app():
                                     'start_date':start_date,
                                     'end_date':end_date,
                                     'bands':RGB.split("/"),
-                                    'apply_fmask':apply_fmask,
                                     'frames_per_second':speed,
                                     'dimensions':dimensions,
                                     'overlay_data':overlay_data,
@@ -576,6 +575,9 @@ def app():
                                     'loop':0,
                                     'mp4':mp4,
                                     'fading':fading}
+
+                        if collection != "Sentinel-1 SAR Ground Range Detected":
+                            _kwargs = {**_kwargs, 'apply_fmask':apply_fmask}
 
                         function = {"Landsat TM-ETM-OLI Surface Reflectance": timelapse.landsat_timelapse,
                                     "Sentinel-2 MSI Surface Reflectance": timelapse.sentinel2_timelapse,
