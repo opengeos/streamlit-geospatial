@@ -587,7 +587,7 @@ def app():
                                               
                         except BaseException as e:
                             empty_text.error(
-                                """An error occurred while computing the timelapse. 
+                                f"""An error occurred while computing the timelapse. 
                                 Your probably requested too much data. Try reducing the ROI or timespan.
 
                                 Trace:{e}"""
