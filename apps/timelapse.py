@@ -435,7 +435,6 @@ def app():
         if collection in [
             "Landsat TM-ETM-OLI Surface Reflectance",
             "Sentinel-2 MSI Surface Reflectance",
-            "Sentinel-1 SAR Ground Range Detected",
         ]:
 
             landsat_sent2_bands = [
@@ -453,11 +452,8 @@ def app():
                             "SWIR1/NIR/SWIR2",
                         ]
 
-            sent1_bands = ["VV","VH","HH","HV"]
-
             presents = {"Landsat TM-ETM-OLI Surface Reflectance": (1984, "Landsat Timelapse", 5, landsat_sent2_bands),
                         "Sentinel-2 MSI Surface Reflectance": (2015, "Sentinel-2 Timelapse", 5, landsat_sent2_bands),
-                        "Sentinel-1 SAR Ground Range Detected": (2015, "Sentinel-1 Timelapse", 5, sent1_bands),
             }
 
             sensor_start_year, timelapse_title, timelapse_speed, bands = presents[collection]
@@ -577,8 +573,7 @@ def app():
                             _kwargs = {**_kwargs, 'apply_fmask':apply_fmask}
 
                         function = {"Landsat TM-ETM-OLI Surface Reflectance": timelapse.landsat_timelapse,
-                                    "Sentinel-2 MSI Surface Reflectance": timelapse.sentinel2_timelapse,
-                                    "Sentinel-1 SAR Ground Range Detected": timelapse.sentinel1_timelapse}
+                                    "Sentinel-2 MSI Surface Reflectance": timelapse.sentinel2_timelapse}
 
                         try:
                             out_gif = function[collection](**_kwargs)
