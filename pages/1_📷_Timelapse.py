@@ -1073,12 +1073,12 @@ def app():
                         empty_text.text("Computing... Please wait...")
 
                         geemap.modis_ndvi_timelapse(
+                            roi,
                             out_gif,
                             satellite,
                             band,
                             start_date,
                             end_date,
-                            roi,
                             768,
                             speed,
                             overlay_data=overlay_data,
