@@ -86,6 +86,15 @@ def search_data():
         if keyword:
             ee_assets = geemap.search_ee_data(keyword)
             asset_titles = [x["title"] for x in ee_assets]
+            asset_types = [x["type"] for x in ee_assets]
+
+            translate = {
+                "image_collection": "ee.ImageCollection('",
+                "image": "ee.Image('",
+                "table": "ee.FeatureCollection('",
+                "table_collection": "ee.FeatureCollection('",
+            }
+
             dataset = st.selectbox("Select a dataset", asset_titles)
             if len(ee_assets) > 0:
                 st.session_state["ee_assets"] = ee_assets
@@ -103,7 +112,7 @@ def search_data():
                 ee_id = ee_assets[index]["id"]
                 uid = ee_assets[index]["uid"]
                 st.markdown(f"""**Earth Engine Snippet:** `{ee_id}`""")
-
+                ee_asset = f"{translate[asset_types[index]]}{ee_id}')"
                 vis_params = st.text_input(
                     "Enter visualization parameters as a dictionary", {}
                 )
@@ -120,7 +129,7 @@ def search_data():
                             st.error(
                                 "Visualization parameters must be a dictionary")
                         try:
-                            Map.addLayer(eval(ee_id), vis, layer_name)
+                            Map.addLayer(eval(ee_asset), vis, layer_name)
                         except Exception as e:
                             st.error(f"Error adding layer: {e}")
                     except Exception as e:
