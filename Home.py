@@ -19,6 +19,15 @@ st.sidebar.info(
     """
 )
 
+st.sidebar.title("Support")
+st.sidebar.info(
+    """
+    If you want to reward my work, I'd love a cup of coffee from you. Thanks!
+    [buymeacoffee.com/giswqs](http://buymeacoffee.com/giswqs)
+    """
+)
+
+
 st.title("Streamlit for Geospatial Applications")
 
 st.markdown(
