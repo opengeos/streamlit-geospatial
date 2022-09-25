@@ -1,3 +1,4 @@
+import sys
 from sys import modules
 import ee
 import os
@@ -10,6 +11,10 @@ import geemap.colormaps as cm
 import geemap.foliumap as geemap
 from datetime import date
 from shapely.geometry import Polygon
+
+sys.path.append(os.path.join("..", "apps"))
+
+from apps.chips import generate_and_download_chips
 
 st.set_page_config(layout="wide")
 warnings.filterwarnings("ignore")
@@ -241,8 +246,8 @@ def app():
 
     st.markdown(
         """
-        An interactive web app for creating [Landsat](https://developers.google.com/earth-engine/datasets/catalog/landsat)/other imagery chips for any location around the globe. 
-        The app was built using [streamlit](https://streamlit.io), [geemap](https://geemap.org), and [Google Earth Engine](https://earthengine.google.com). For more info, check out this streamlit [blog post](https://blog.streamlit.io/creating-satellite-timelapse-with-streamlit-and-earth-engine). 
+        An interactive web app for creating [Landsat](https://developers.google.com/earth-engine/datasets/catalog/landsat)/other imagery chips for any location around the globe.
+        The app was built using [streamlit](https://streamlit.io), [geemap](https://geemap.org), and [Google Earth Engine](https://earthengine.google.com). For more info, check out this streamlit [blog post](https://blog.streamlit.io/creating-satellite-timelapse-with-streamlit-and-earth-engine).
     """
     )
 
@@ -754,7 +759,8 @@ def app():
 
                         try:
                             if collection == "Landsat TM-ETM-OLI Surface Reflectance":
-                                out_gif = geemap.landsat_timelapse(
+                                print("we here")
+                                generate_and_download_chips(
                                     roi=roi,
                                     out_gif=out_gif,
                                     start_year=start_year,
@@ -772,7 +778,7 @@ def app():
                                     overlay_opacity=overlay_opacity,
                                     frequency=frequency,
                                     date_format=None,
-                                    title=title,
+                                    title="TEST",
                                     title_xy=("2%", "90%"),
                                     add_text=True,
                                     text_xy=("2%", "2%"),
@@ -788,7 +794,7 @@ def app():
                                     fading=fading,
                                 )
                             elif collection == "Sentinel-2 MSI Surface Reflectance":
-                                out_gif = geemap.sentinel2_timelapse(
+                                generate_and_download_chips(
                                     roi=roi,
                                     out_gif=out_gif,
                                     start_year=start_year,
@@ -821,7 +827,8 @@ def app():
                                     mp4=mp4,
                                     fading=fading,
                                 )
-                        except:
+                        except Exception as e:
+                            print(e)
                             empty_text.error(
                                 "An error occurred while computing the timelapse. Your probably requested too much data. Try reducing the ROI or timespan."
                             )
@@ -938,7 +945,7 @@ def app():
                     else:
                         empty_text.text("Computing... Please wait...")
 
-                        geemap.goes_timelapse(
+                        generate_and_download_chips(
                             out_gif,
                             start_date=start,
                             end_date=end,
@@ -984,7 +991,7 @@ def app():
                                 empty_fire_text.text(
                                     "Delineating Fire Hotspot... Please wait..."
                                 )
-                                geemap.goes_fire_timelapse(
+                                generate_and_download_chips(
                                     out_fire_gif,
                                     start_date=start,
                                     end_date=end,
@@ -1067,7 +1074,7 @@ def app():
 
                         empty_text.text("Computing... Please wait...")
 
-                        geemap.modis_ndvi_timelapse(
+                        generate_and_download_chips(
                             roi,
                             out_gif,
                             satellite,
@@ -1179,7 +1186,7 @@ def app():
 
                         empty_text.text("Computing... Please wait...")
                         try:
-                            geemap.create_timelapse(
+                            generate_and_download_chips(
                                 st.session_state.get("ee_asset_id"),
                                 start_date=start_date.strftime("%Y-%m-%d"),
                                 end_date=end_date.strftime("%Y-%m-%d"),
@@ -1311,7 +1318,7 @@ def app():
                                 collection
                                 == "MODIS Gap filled Land Surface Temperature Daily"
                             ):
-                                out_gif = geemap.create_timelapse(
+                                generate_and_download_chips(
                                     st.session_state.get("ee_asset_id"),
                                     start_date=start_date.strftime("%Y-%m-%d"),
                                     end_date=end_date.strftime("%Y-%m-%d"),
@@ -1354,7 +1361,7 @@ def app():
                                     vis_params = eval(vis_params)
                                 else:
                                     vis_params = None
-                                out_gif = geemap.modis_ocean_color_timelapse(
+                                generate_and_download_chips(
                                     st.session_state.get("ee_asset_id"),
                                     start_date=start_date.strftime("%Y-%m-%d"),
                                     end_date=end_date.strftime("%Y-%m-%d"),
@@ -1475,7 +1482,7 @@ def app():
 
                         empty_text.text("Computing... Please wait...")
                         try:
-                            geemap.naip_timelapse(
+                            generate_and_download_chips(
                                 roi,
                                 years[0],
                                 years[1],
