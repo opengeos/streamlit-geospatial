@@ -6,6 +6,9 @@ import csv
 
 from datetime import datetime, timedelta
 
+from PIL import Image, ImageOps
+import shutil
+
 END_DATE = datetime.now()
 START_DATE = END_DATE - timedelta(days=365)
 
@@ -132,7 +135,18 @@ def generate_and_download_chips(roi, bands, dimensions, title, title_xy,
             'gamma': 1.4,
         }
 
+    os.system("rm -rf ./downloads/*.jpg")
+
     geemap.get_image_collection_thumbnails(
         images_collection, OUT_DIR, vis_params, dimensions=500, format="jpg"
         # names = names_collection
     )
+
+    shutil.make_archive('images', 'zip', OUT_DIR)
+
+    for img_filename in filter(lambda file: ".jpg" in file, map(lambda f: os.path.join(OUT_DIR, f), os.listdir(OUT_DIR))):
+        img = Image.open(img_filename)
+        img_with_border = ImageOps.expand(img, border=10, fill='white')
+        img_with_border.save(img_filename)
+
+    return list(filter(lambda file: ".jpg" in file, map(lambda f: os.path.join(OUT_DIR, f), os.listdir(OUT_DIR))))

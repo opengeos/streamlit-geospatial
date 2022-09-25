@@ -519,6 +519,8 @@ def app():
             index=0,
         )
 
+    downloads = st.empty()
+
     with row1_col1:
 
         with st.expander(
@@ -685,7 +687,7 @@ def app():
                                 elif bands == ['NIR', 'Red', 'Green']:
                                     bands = ['B5', 'B4', 'B3']
 
-                                generate_and_download_chips(
+                                downloads = generate_and_download_chips(
                                     roi=roi,
                                     bands=bands,
                                     # dimensions=dimensions,
@@ -699,6 +701,7 @@ def app():
                                     imageCollectionAssetId="LANDSAT/LC08/C01/T1_SR",
                                     latest = (frequency == "latest")
                                 )
+
                             elif collection == "Sentinel-2 MSI Surface Reflectance":
 
                                 if bands == ['SWIR1', 'NIR', 'SWIR2']:
@@ -708,7 +711,7 @@ def app():
                                 elif bands == ['NIR', 'Red', 'Green']:
                                     bands = ['B8', 'B4', 'B3']
 
-                                generate_and_download_chips(
+                                downloads = generate_and_download_chips(
                                     roi=roi,
                                     bands=bands,
                                     # dimensions=dimensions,
@@ -772,7 +775,7 @@ def app():
                     else:
                         empty_text.text("Computing... Please wait...")
 
-                        generate_and_download_chips(
+                        downloads = generate_and_download_chips(
                             roi=roi,
                             bands=bands,
                             # dimensions=dimensions,
@@ -807,7 +810,7 @@ def app():
 
                         empty_text.text("Computing... Please wait...")
 
-                        generate_and_download_chips(
+                        downloads = generate_and_download_chips(
                             roi=roi,
                             bands=bands,
                             # dimensions=dimensions,
@@ -840,7 +843,7 @@ def app():
 
                         empty_text.text("Computing... Please wait...")
                         try:
-                            generate_and_download_chips(
+                            downloads = generate_and_download_chips(
                                 roi=roi,
                                 bands=bands,
                                 # dimensions=dimensions,
@@ -887,7 +890,7 @@ def app():
                                 collection
                                 == "MODIS Gap filled Land Surface Temperature Daily"
                             ):
-                                generate_and_download_chips(
+                                downloads = generate_and_download_chips(
                                     roi=roi,
                                     bands=bands,
                                     # dimensions=dimensions,
@@ -907,7 +910,7 @@ def app():
                                     vis_params = eval(vis_params)
                                 else:
                                     vis_params = None
-                                generate_and_download_chips(
+                                downloads = generate_and_download_chips(
                                     roi=roi,
                                     bands=bands,
                                     # dimensions=dimensions,
@@ -952,7 +955,7 @@ def app():
 
                         empty_text.text("Computing... Please wait...")
                         try:
-                            generate_and_download_chips(
+                            downloads = generate_and_download_chips(
                                 roi=roi,
                                 bands=None,
                                 # dimensions=dimensions,
@@ -972,6 +975,18 @@ def app():
                                 "Something went wrong. After all, this app is only a day old!"
                             )
 
+    with row1_col1:
+
+        st.image(downloads, width=250, use_column_width='never')
+
+    with row1_col1:
+        with open('./images.zip', 'rb') as zip_file:
+            st.download_button(
+                    label="Download Chips",
+                    data=zip_file,
+                    file_name="images.zip",
+                    mime="application/zip"
+                  )
 try:
     app()
 except Exception as e:
