@@ -4,6 +4,7 @@ import ee
 import os
 import warnings
 import datetime
+import pandas as pd
 import geopandas as gpd
 import folium
 import streamlit as st
@@ -229,11 +230,20 @@ def uploaded_file_to_gdf(data):
     with open(file_path, "wb") as file:
         file.write(data.getbuffer())
 
-    if file_path.lower().endswith(".kml"):
-        gpd.io.file.fiona.drvsupport.supported_drivers["KML"] = "rw"
-        gdf = gpd.read_file(file_path, driver="KML")
-    else:
-        gdf = gpd.read_file(file_path)
+    try:
+        if file_path.lower().endswith(".kml"):
+            gpd.io.file.fiona.drvsupport.supported_drivers["KML"] = "rw"
+            gdf = gpd.read_file(file_path, driver="KML")
+        elif file_path.lower().endswith(".csv"):
+            df = pd.read_csv(file_path)
+            gdf = gpd.GeoDataFrame(
+                df, geometry=gpd.points_from_xy(df.lon, df.lat)
+            )
+            gdf.crs = 'epsg:4326'
+        else:
+            gdf = gpd.read_file(file_path)
+    except Exception as e:
+        print(e)
 
     return gdf
 
@@ -291,16 +301,16 @@ def app():
         collection = st.selectbox(
             "Select a satellite image collection: ",
             [
-                "Any Earth Engine ImageCollection",
-                "Landsat TM-ETM-OLI Surface Reflectance",
+                # "Any Earth Engine ImageCollection",
                 "Sentinel-2 MSI Surface Reflectance",
-                "Geostationary Operational Environmental Satellites (GOES)",
-                "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km",
-                "MODIS Gap filled Land Surface Temperature Daily",
-                "MODIS Ocean Color SMI",
+                "Landsat TM-ETM-OLI Surface Reflectance",
+                # "Geostationary Operational Environmental Satellites (GOES)",
+                # "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km",
+                # "MODIS Gap filled Land Surface Temperature Daily",
+                # "MODIS Ocean Color SMI",
                 "USDA National Agriculture Imagery Program (NAIP)",
             ],
-            index=1,
+            index=0,
         )
 
         if collection in [
@@ -631,23 +641,23 @@ def app():
                     [
                         "Red/Green/Blue",
                         "NIR/Red/Green",
-                        "SWIR2/SWIR1/NIR",
-                        "NIR/SWIR1/Red",
-                        "SWIR2/NIR/Red",
-                        "SWIR2/SWIR1/Red",
-                        "SWIR1/NIR/Blue",
-                        "NIR/SWIR1/Blue",
-                        "SWIR2/NIR/Green",
-                        "SWIR1/NIR/Red",
-                        "SWIR2/NIR/SWIR1",
+                        # "SWIR2/SWIR1/NIR",
+                        # "NIR/SWIR1/Red",
+                        # "SWIR2/NIR/Red",
+                        # "SWIR2/SWIR1/Red",
+                        # "SWIR1/NIR/Blue",
+                        # "NIR/SWIR1/Blue",
+                        # "SWIR2/NIR/Green",
+                        # "SWIR1/NIR/Red",
+                        # "SWIR2/NIR/SWIR1",
                         "SWIR1/NIR/SWIR2",
                     ],
                     index=0,
                 )
 
                 frequency = st.selectbox(
-                    "Select a Date or Date Range (in the case that there are no images at a given location on the date you specified the image closest in date to your specified date will be used instead):",
-                    ["latest"],
+                    "Select date option (date range picker coming soon!)",
+                    ["least cloud cover (last 1 year)", "latest"],
                     index=0,
                 )
 
@@ -665,10 +675,16 @@ def app():
                         # start_date = str(months[0]).zfill(2) + "-01"
                         # end_date = str(months[1]).zfill(2) + "-30"
                         bands = RGB.split("/")
-
                         try:
                             if collection == "Landsat TM-ETM-OLI Surface Reflectance":
-                                print("we here")
+
+                                if bands == ['SWIR1', 'NIR', 'SWIR2']:
+                                    bands = ['B6', 'B5', 'B7']
+                                elif bands == ['Red', 'Green', 'Blue']:
+                                    bands = ['B4', 'B3', 'B2']
+                                elif bands == ['NIR', 'Red', 'Green']:
+                                    bands = ['B5', 'B4', 'B3']
+
                                 generate_and_download_chips(
                                     roi=roi,
                                     bands=bands,
@@ -678,9 +694,20 @@ def app():
                                     title_xy=("2%", "90%"),
                                     add_text=True,
                                     text_xy=("2%", "2%"),
-                                    imageCollectionAsset="imageCollectionAsset"
+                                    # imageCollectionAssetId="LANDSAT/LC09/C02/T2_TOA",
+                                    # imageCollectionAssetId="LANDSAT/LC08/C02/T1_L2",
+                                    imageCollectionAssetId="LANDSAT/LC08/C01/T1_SR",
+                                    latest = (frequency == "latest")
                                 )
                             elif collection == "Sentinel-2 MSI Surface Reflectance":
+
+                                if bands == ['SWIR1', 'NIR', 'SWIR2']:
+                                    bands = ['B11', 'B8', 'B12']
+                                elif bands == ['Red', 'Green', 'Blue']:
+                                    bands = ['B4', 'B3', 'B2']
+                                elif bands == ['NIR', 'Red', 'Green']:
+                                    bands = ['B8', 'B4', 'B3']
+
                                 generate_and_download_chips(
                                     roi=roi,
                                     bands=bands,
@@ -690,12 +717,13 @@ def app():
                                     title_xy=("2%", "90%"),
                                     add_text=True,
                                     text_xy=("2%", "2%"),
-                                    imageCollectionAsset=imageCollectionAsset
+                                    imageCollectionAssetId="COPERNICUS/S2",
+                                    latest = (frequency == "latest")
                                 )
                         except Exception as e:
                             print(e)
                             empty_text.error(
-                                "An error occurred while generating the chips. Your probably requested too much data. Try reducing the ROI."
+                                "Something went wrong. After all, this app is only a day old!"
                             )
                             st.stop()
 
@@ -753,7 +781,8 @@ def app():
                             title_xy=("2%", "90%"),
                             add_text=True,
                             text_xy=("2%", "2%"),
-                            imageCollectionAsset=imageCollectionAsset
+                            imageCollectionAssetId=imageCollectionAssetId,
+                            latest = (frequency == "latest")
                         )
 
         elif collection == "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km":
@@ -787,7 +816,8 @@ def app():
                             title_xy=("2%", "90%"),
                             add_text=True,
                             text_xy=("2%", "2%"),
-                            imageCollectionAsset=imageCollectionAsset
+                            imageCollectionAssetId=imageCollectionAssetId,
+                            latest = (frequency == "latest")
                         )
 
         elif collection == "Any Earth Engine ImageCollection":
@@ -819,12 +849,14 @@ def app():
                                 title_xy=("2%", "90%"),
                                 add_text=True,
                                 text_xy=("2%", "2%"),
-                                imageCollectionAsset=imageCollectionAsset,
+                                imageCollectionAssetId=imageCollectionAssetId,
+                                latest = (frequency == "latest"),
                                 crs="EPSG:3857"
                             )
-                        except:
+                        except Exception as e:
+                            print(e)
                             empty_text.error(
-                                "An error occurred while computing the timelapse. You probably requested too much data. Try reducing the ROI or timespan."
+                                "Something went wrong. After all, this app is only a day old!"
                             )
 
         elif collection in [
@@ -864,7 +896,8 @@ def app():
                                     title_xy=("2%", "90%"),
                                     add_text=True,
                                     text_xy=("2%", "2%"),
-                                    imageCollectionAsset=imageCollectionAsset,
+                                    imageCollectionAssetId=imageCollectionAssetId,
+                                    latest = (frequency == "latest"),
                                     crs="EPSG:3857"
                                 )
                             elif collection == "MODIS Ocean Color SMI":
@@ -883,15 +916,23 @@ def app():
                                     title_xy=("2%", "90%"),
                                     add_text=True,
                                     text_xy=("2%", "2%"),
-                                    imageCollectionAsset=imageCollectionAsset,
+                                    imageCollectionAssetId=imageCollectionAssetId,
+                                    latest = (frequency == "latest"),
                                     crs="EPSG:3857"
                                 )
-                        except:
+                        except Exception as e:
+                            print(e)
                             empty_text.error(
-                                "Something went wrong. You probably requested too much data. Try reducing the ROI or timespan."
+                                "Something went wrong. After all, this app is only a day old!"
                             )
 
         elif collection == "USDA National Agriculture Imagery Program (NAIP)":
+
+            frequency = st.selectbox(
+                "Select date option (date range picker coming soon!)",
+                ["latest"],
+                index=0,
+            )
 
             with st.form("submit_naip_form"):
 
@@ -913,19 +954,22 @@ def app():
                         try:
                             generate_and_download_chips(
                                 roi=roi,
-                                bands=bands,
+                                bands=None,
                                 # dimensions=dimensions,
                                 dimensions=768,
                                 title="TEST",
                                 title_xy=("2%", "90%"),
                                 add_text=True,
                                 text_xy=("2%", "2%"),
-                                imageCollectionAsset=imageCollectionAsset,
+                                imageCollectionAssetId="USDA/NAIP/DOQQ",
+                                # latest = (frequency == "latest"),
+                                latest = True,
                                 crs="EPSG:3857"
                             )
-                        except:
+                        except Exception as e:
+                            print(e)
                             empty_text.error(
-                                "Something went wrong. You either requested too much data or the ROI is outside the U.S."
+                                "Something went wrong. After all, this app is only a day old!"
                             )
 
 try:
