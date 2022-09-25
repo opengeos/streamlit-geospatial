@@ -37,13 +37,9 @@ def latLongToBbox(feature):
                     # 'name': feature.get('name')
                     });
 
-def generate_and_download_chips(
-    roi, out_gif, start_year, end_year, start_date, end_date, bands,
-    apply_fmask, frames_per_second, dimensions, overlay_data, overlay_color,
-    overlay_width, overlay_opacity, frequency, date_format, title, title_xy,
-    add_text, text_xy, text_sequence, font_type, font_size, font_color,
-    add_progress_bar, progress_bar_color, progress_bar_height, loop, mp4,
-    fading):
+def generate_and_download_chips(roi, bands, dimensions, title, title_xy,
+                                add_text, text_xy, imageCollectionAsset,
+                                crs="epsg:4326"):
 
     ee.Initialize()
 
@@ -82,4 +78,3 @@ def generate_and_download_chips(
         images_collection, OUT_DIR, VIS_PARAMS, dimensions=500, format="jpg",
         names = names_collection
     )
-    print("5")

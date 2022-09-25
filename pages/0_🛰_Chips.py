@@ -36,7 +36,7 @@ st.sidebar.info(
 st.sidebar.title("Contact")
 st.sidebar.info(
     """
-    Ishaan Jhavari: <https://ishaanjhaveri.com>
+    Ishaan Jhaveri: <https://ishaanjhaveri.com>
     [GitHub](http://github.com/iaj8) | [Twitter](https://twitter.com/ishaan_jhavs) | [LinkedIn](https://www.linkedin.com/in/iajhaveri)
 
     Yoni Nachmany: <https://www.yoninachmany.com>
@@ -248,7 +248,7 @@ def app():
         """
         An interactive web app for creating [Landsat](https://developers.google.com/earth-engine/datasets/catalog/landsat)/other imagery chips for any location around the globe.
         The app was built using [streamlit](https://streamlit.io), [geemap](https://geemap.org), and [Google Earth Engine](https://earthengine.google.com). For more info, check out this streamlit [blog post](https://blog.streamlit.io/creating-satellite-timelapse-with-streamlit-and-earth-engine).
-    """
+        """
     )
 
     row1_col1, row1_col2 = st.columns([2, 1])
@@ -509,55 +509,6 @@ def app():
             index=0,
         )
 
-        add_outline = st.checkbox(
-            "Overlay an administrative boundary on chips", False
-        )
-
-        if add_outline:
-
-            with st.expander("Customize administrative boundary", True):
-
-                overlay_options = {
-                    "User-defined": None,
-                    "Continents": "continents",
-                    "Countries": "countries",
-                    "US States": "us_states",
-                    "China": "china",
-                }
-
-                overlay = st.selectbox(
-                    "Select an administrative boundary:",
-                    list(overlay_options.keys()),
-                    index=2,
-                )
-
-                overlay_data = overlay_options[overlay]
-
-                if overlay_data is None:
-                    overlay_data = st.text_input(
-                        "Enter an HTTP URL to a GeoJSON file or an ee.FeatureCollection asset id:",
-                        "https://raw.githubusercontent.com/giswqs/geemap/master/examples/data/countries.geojson",
-                    )
-
-                overlay_color = st.color_picker(
-                    "Select a color for the administrative boundary:", "#000000"
-                )
-                overlay_width = st.slider(
-                    "Select a line width for the administrative boundary:", 1, 20, 1
-                )
-                overlay_opacity = st.slider(
-                    "Select an opacity for the administrative boundary:",
-                    0.0,
-                    1.0,
-                    1.0,
-                    0.05,
-                )
-        else:
-            overlay_data = None
-            overlay_color = "black"
-            overlay_width = 1
-            overlay_opacity = 1
-
     with row1_col1:
 
         with st.expander(
@@ -567,7 +518,7 @@ def app():
 
         data = st.file_uploader(
             "Upload a GeoJSON or KML file or a zipped shapefile with points for chip locations. Customize chip parameters and then click the Submit button 😇👇",
-            type=["geojson", "kml", "zip"],
+            type=["geojson", "kml", "zip", "csv"],
         )
 
         crs = "epsg:4326"
@@ -659,17 +610,13 @@ def app():
 
             if collection == "Landsat TM-ETM-OLI Surface Reflectance":
                 sensor_start_year = 1984
-                timelapse_title = "Landsat Timelapse"
-                timelapse_speed = 5
             elif collection == "Sentinel-2 MSI Surface Reflectance":
                 sensor_start_year = 2015
-                timelapse_title = "Sentinel-2 Timelapse"
-                timelapse_speed = 5
             # TODO: update link
-            video_empty.video("https://youtu.be/VVRK_-dEjR4")
 
             with st.form("submit_landsat_form"):
 
+                empty_text = st.empty()
                 roi = None
                 if st.session_state.get("roi") is not None:
                     roi = st.session_state.get("roi")
@@ -698,63 +645,25 @@ def app():
                     index=0,
                 )
 
-                # TODO: redefine time parameters?
                 frequency = st.selectbox(
-                    "Select a temporal frequency:",
-                    ["year", "quarter", "month"],
+                    "Select a Date or Date Range (in the case that there are no images at a given location on the date you specified the image closest in date to your specified date will be used instead):",
+                    ["latest"],
                     index=0,
                 )
 
-                with st.expander("Customize chips"):
-
-                    speed = st.slider("Frames per second:", 1, 30, timelapse_speed)
-                    dimensions = st.slider(
-                        "Maximum dimensions (Width*Height) in pixels", 768, 2000, 768
-                    )
-                    progress_bar_color = st.color_picker(
-                        "Progress bar color:", "#0000ff"
-                    )
-                    years = st.slider(
-                        "Start and end year:",
-                        sensor_start_year,
-                        today.year,
-                        (sensor_start_year, today.year),
-                    )
-                    months = st.slider("Start and end month:", 1, 12, (1, 12))
-                    font_size = st.slider("Font size:", 10, 50, 30)
-                    font_color = st.color_picker("Font color:", "#ffffff")
-                    apply_fmask = st.checkbox(
-                        "Apply fmask (remove clouds, shadows, snow)", True
-                    )
-                    font_type = st.selectbox(
-                        "Select the font type for the title:",
-                        ["arial.ttf", "alibaba.otf"],
-                        index=0,
-                    )
-                    fading = st.slider(
-                        "Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0
-                    )
-                    mp4 = st.checkbox("Save timelapse as MP4", True)
-
-                empty_text = st.empty()
-                empty_image = st.empty()
-                empty_fire_image = st.empty()
-                empty_video = st.container()
                 submitted = st.form_submit_button("Submit")
                 if submitted:
-
                     if sample_roi == "Uploaded GeoJSON" and data is None:
                         empty_text.warning(
                             "Steps to create a timelapse: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click the Submit button. Alternatively, you can select a sample ROI from the dropdown list."
                         )
                     else:
-
                         empty_text.text("Computing... Please wait...")
 
-                        start_year = years[0]
-                        end_year = years[1]
-                        start_date = str(months[0]).zfill(2) + "-01"
-                        end_date = str(months[1]).zfill(2) + "-30"
+                        # start_year = years[0]
+                        # end_year = years[1]
+                        # start_date = str(months[0]).zfill(2) + "-01"
+                        # end_date = str(months[1]).zfill(2) + "-30"
                         bands = RGB.split("/")
 
                         try:
@@ -762,179 +671,69 @@ def app():
                                 print("we here")
                                 generate_and_download_chips(
                                     roi=roi,
-                                    out_gif=out_gif,
-                                    start_year=start_year,
-                                    end_year=end_year,
-                                    start_date=start_date,
-                                    end_date=end_date,
                                     bands=bands,
-                                    apply_fmask=apply_fmask,
-                                    frames_per_second=speed,
                                     # dimensions=dimensions,
                                     dimensions=768,
-                                    overlay_data=overlay_data,
-                                    overlay_color=overlay_color,
-                                    overlay_width=overlay_width,
-                                    overlay_opacity=overlay_opacity,
-                                    frequency=frequency,
-                                    date_format=None,
                                     title="TEST",
                                     title_xy=("2%", "90%"),
                                     add_text=True,
                                     text_xy=("2%", "2%"),
-                                    text_sequence=None,
-                                    font_type=font_type,
-                                    font_size=font_size,
-                                    font_color=font_color,
-                                    add_progress_bar=True,
-                                    progress_bar_color=progress_bar_color,
-                                    progress_bar_height=5,
-                                    loop=0,
-                                    mp4=mp4,
-                                    fading=fading,
+                                    imageCollectionAsset="imageCollectionAsset"
                                 )
                             elif collection == "Sentinel-2 MSI Surface Reflectance":
                                 generate_and_download_chips(
                                     roi=roi,
-                                    out_gif=out_gif,
-                                    start_year=start_year,
-                                    end_year=end_year,
-                                    start_date=start_date,
-                                    end_date=end_date,
                                     bands=bands,
-                                    apply_fmask=apply_fmask,
-                                    frames_per_second=speed,
-                                    dimensions=768,
                                     # dimensions=dimensions,
-                                    overlay_data=overlay_data,
-                                    overlay_color=overlay_color,
-                                    overlay_width=overlay_width,
-                                    overlay_opacity=overlay_opacity,
-                                    frequency=frequency,
-                                    date_format=None,
-                                    title=title,
+                                    dimensions=768,
+                                    title="TEST",
                                     title_xy=("2%", "90%"),
                                     add_text=True,
                                     text_xy=("2%", "2%"),
-                                    text_sequence=None,
-                                    font_type=font_type,
-                                    font_size=font_size,
-                                    font_color=font_color,
-                                    add_progress_bar=True,
-                                    progress_bar_color=progress_bar_color,
-                                    progress_bar_height=5,
-                                    loop=0,
-                                    mp4=mp4,
-                                    fading=fading,
+                                    imageCollectionAsset=imageCollectionAsset
                                 )
                         except Exception as e:
                             print(e)
                             empty_text.error(
-                                "An error occurred while computing the timelapse. Your probably requested too much data. Try reducing the ROI or timespan."
+                                "An error occurred while generating the chips. Your probably requested too much data. Try reducing the ROI."
                             )
                             st.stop()
 
-                        if out_gif is not None and os.path.exists(out_gif):
-
-                            empty_text.text(
-                                "Right click the GIF to save it to your computer👇"
-                            )
-                            empty_image.image(out_gif)
-
-                            out_mp4 = out_gif.replace(".gif", ".mp4")
-                            if mp4 and os.path.exists(out_mp4):
-                                with empty_video:
-                                    st.text(
-                                        "Right click the MP4 to save it to your computer👇"
-                                    )
-                                    st.video(out_gif.replace(".gif", ".mp4"))
-
-                        else:
-                            empty_text.error(
-                                "Something went wrong. You probably requested too much data. Try reducing the ROI or timespan."
-                            )
 
         elif collection == "Geostationary Operational Environmental Satellites (GOES)":
 
-            video_empty.video("https://youtu.be/16fA2QORG4A")
-
             with st.form("submit_goes_form"):
 
+                empty_text = st.empty()
                 roi = None
                 if st.session_state.get("roi") is not None:
                     roi = st.session_state.get("roi")
-                out_gif = geemap.temp_file_path(".gif")
 
                 satellite = st.selectbox("Select a satellite:", ["GOES-17", "GOES-16"])
-                earliest_date = datetime.date(2017, 7, 10)
-                latest_date = datetime.date.today()
+                # earliest_date = datetime.date(2017, 7, 10)
+                # latest_date = datetime.date.today()
 
-                if sample_roi == "Uploaded GeoJSON":
-                    roi_start_date = today - datetime.timedelta(days=2)
-                    roi_end_date = today - datetime.timedelta(days=1)
-                    roi_start_time = datetime.time(14, 00)
-                    roi_end_time = datetime.time(1, 00)
-                else:
-                    roi_start = goes_rois[sample_roi]["start_time"]
-                    roi_end = goes_rois[sample_roi]["end_time"]
-                    roi_start_date = datetime.datetime.strptime(
-                        roi_start[:10], "%Y-%m-%d"
-                    )
-                    roi_end_date = datetime.datetime.strptime(roi_end[:10], "%Y-%m-%d")
-                    roi_start_time = datetime.time(
-                        int(roi_start[11:13]), int(roi_start[14:16])
-                    )
-                    roi_end_time = datetime.time(
-                        int(roi_end[11:13]), int(roi_end[14:16])
-                    )
+                # if sample_roi == "Uploaded GeoJSON":
+                #     roi_start_date = today - datetime.timedelta(days=2)
+                #     roi_end_date = today - datetime.timedelta(days=1)
+                #     roi_start_time = datetime.time(14, 00)
+                #     roi_end_time = datetime.time(1, 00)
+                # else:
+                #     roi_start = goes_rois[sample_roi]["start_time"]
+                #     roi_end = goes_rois[sample_roi]["end_time"]
+                #     roi_start_date = datetime.datetime.strptime(
+                #         roi_start[:10], "%Y-%m-%d"
+                #     )
+                #     roi_end_date = datetime.datetime.strptime(roi_end[:10], "%Y-%m-%d")
+                #     roi_start_time = datetime.time(
+                #         int(roi_start[11:13]), int(roi_start[14:16])
+                #     )
+                #     roi_end_time = datetime.time(
+                #         int(roi_end[11:13]), int(roi_end[14:16])
+                #     )
 
                 start_date = st.date_input("Select the start date:", roi_start_date)
                 end_date = st.date_input("Select the end date:", roi_end_date)
-
-                with st.expander("Customize timelapse"):
-
-                    add_fire = st.checkbox("Add Fire/Hotspot Characterization", False)
-
-                    scan_type = st.selectbox(
-                        "Select a scan type:", ["Full Disk", "CONUS", "Mesoscale"]
-                    )
-
-                    start_time = st.time_input(
-                        "Select the start time of the start date:", roi_start_time
-                    )
-
-                    end_time = st.time_input(
-                        "Select the end time of the end date:", roi_end_time
-                    )
-
-                    start = (
-                        start_date.strftime("%Y-%m-%d")
-                        + "T"
-                        + start_time.strftime("%H:%M:%S")
-                    )
-                    end = (
-                        end_date.strftime("%Y-%m-%d")
-                        + "T"
-                        + end_time.strftime("%H:%M:%S")
-                    )
-
-                    speed = st.slider("Frames per second:", 1, 30, 5)
-                    add_progress_bar = st.checkbox("Add a progress bar", True)
-                    progress_bar_color = st.color_picker(
-                        "Progress bar color:", "#0000ff"
-                    )
-                    font_size = st.slider("Font size:", 10, 50, 20)
-                    font_color = st.color_picker("Font color:", "#ffffff")
-                    fading = st.slider(
-                        "Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0
-                    )
-                    mp4 = st.checkbox("Save timelapse as MP4", True)
-
-                empty_text = st.empty()
-                empty_image = st.empty()
-                empty_video = st.container()
-                empty_fire_text = st.empty()
-                empty_fire_image = st.empty()
 
                 submitted = st.form_submit_button("Submit")
                 if submitted:
@@ -946,123 +745,28 @@ def app():
                         empty_text.text("Computing... Please wait...")
 
                         generate_and_download_chips(
-                            out_gif,
-                            start_date=start,
-                            end_date=end,
-                            data=satellite,
-                            scan=scan_type.replace(" ", "_").lower(),
-                            region=roi,
+                            roi=roi,
+                            bands=bands,
+                            # dimensions=dimensions,
                             dimensions=768,
-                            framesPerSecond=speed,
-                            date_format="YYYY-MM-dd HH:mm",
-                            xy=("3%", "3%"),
-                            text_sequence=None,
-                            font_type="arial.ttf",
-                            font_size=font_size,
-                            font_color=font_color,
-                            add_progress_bar=add_progress_bar,
-                            progress_bar_color=progress_bar_color,
-                            progress_bar_height=5,
-                            loop=0,
-                            overlay_data=overlay_data,
-                            overlay_color=overlay_color,
-                            overlay_width=overlay_width,
-                            overlay_opacity=overlay_opacity,
-                            mp4=mp4,
-                            fading=fading,
+                            title="TEST",
+                            title_xy=("2%", "90%"),
+                            add_text=True,
+                            text_xy=("2%", "2%"),
+                            imageCollectionAsset=imageCollectionAsset
                         )
 
-                        if out_gif is not None and os.path.exists(out_gif):
-                            empty_text.text(
-                                "Right click the GIF to save it to your computer👇"
-                            )
-                            empty_image.image(out_gif)
-
-                            out_mp4 = out_gif.replace(".gif", ".mp4")
-                            if mp4 and os.path.exists(out_mp4):
-                                with empty_video:
-                                    st.text(
-                                        "Right click the MP4 to save it to your computer👇"
-                                    )
-                                    st.video(out_gif.replace(".gif", ".mp4"))
-
-                            if add_fire:
-                                out_fire_gif = geemap.temp_file_path(".gif")
-                                empty_fire_text.text(
-                                    "Delineating Fire Hotspot... Please wait..."
-                                )
-                                generate_and_download_chips(
-                                    out_fire_gif,
-                                    start_date=start,
-                                    end_date=end,
-                                    data=satellite,
-                                    scan=scan_type.replace(" ", "_").lower(),
-                                    region=roi,
-                                    dimensions=768,
-                                    framesPerSecond=speed,
-                                    date_format="YYYY-MM-dd HH:mm",
-                                    xy=("3%", "3%"),
-                                    text_sequence=None,
-                                    font_type="arial.ttf",
-                                    font_size=font_size,
-                                    font_color=font_color,
-                                    add_progress_bar=add_progress_bar,
-                                    progress_bar_color=progress_bar_color,
-                                    progress_bar_height=5,
-                                    loop=0,
-                                )
-                                if os.path.exists(out_fire_gif):
-                                    empty_fire_image.image(out_fire_gif)
-                        else:
-                            empty_text.text(
-                                "Something went wrong, either the ROI is too big or there are no data available for the specified date range. Please try a smaller ROI or different date range."
-                            )
-
         elif collection == "MODIS Vegetation Indices (NDVI/EVI) 16-Day Global 1km":
-
-            video_empty.video("https://youtu.be/16fA2QORG4A")
 
             satellite = st.selectbox("Select a satellite:", ["Terra", "Aqua"])
             band = st.selectbox("Select a band:", ["NDVI", "EVI"])
 
             with st.form("submit_modis_form"):
 
+                empty_text = st.empty()
                 roi = None
                 if st.session_state.get("roi") is not None:
                     roi = st.session_state.get("roi")
-                out_gif = geemap.temp_file_path(".gif")
-
-                with st.expander("Customize timelapse"):
-
-                    start = st.date_input(
-                        "Select a start date:", datetime.date(2000, 2, 8)
-                    )
-                    end = st.date_input("Select an end date:", datetime.date.today())
-
-                    start_date = start.strftime("%Y-%m-%d")
-                    end_date = end.strftime("%Y-%m-%d")
-
-                    speed = st.slider("Frames per second:", 1, 30, 5)
-                    add_progress_bar = st.checkbox("Add a progress bar", True)
-                    progress_bar_color = st.color_picker(
-                        "Progress bar color:", "#0000ff"
-                    )
-                    font_size = st.slider("Font size:", 10, 50, 20)
-                    font_color = st.color_picker("Font color:", "#ffffff")
-
-                    font_type = st.selectbox(
-                        "Select the font type for the title:",
-                        ["arial.ttf", "alibaba.otf"],
-                        index=0,
-                    )
-                    fading = st.slider(
-                        "Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0
-                    )
-                    mp4 = st.checkbox("Save timelapse as MP4", True)
-
-                empty_text = st.empty()
-                empty_image = st.empty()
-                empty_video = st.container()
 
                 submitted = st.form_submit_button("Submit")
                 if submitted:
@@ -1075,105 +779,25 @@ def app():
                         empty_text.text("Computing... Please wait...")
 
                         generate_and_download_chips(
-                            roi,
-                            out_gif,
-                            satellite,
-                            band,
-                            start_date,
-                            end_date,
-                            768,
-                            speed,
-                            overlay_data=overlay_data,
-                            overlay_color=overlay_color,
-                            overlay_width=overlay_width,
-                            overlay_opacity=overlay_opacity,
-                            mp4=mp4,
-                            fading=fading,
+                            roi=roi,
+                            bands=bands,
+                            # dimensions=dimensions,
+                            dimensions=768,
+                            title="TEST",
+                            title_xy=("2%", "90%"),
+                            add_text=True,
+                            text_xy=("2%", "2%"),
+                            imageCollectionAsset=imageCollectionAsset
                         )
-
-                        geemap.reduce_gif_size(out_gif)
-
-                        empty_text.text(
-                            "Right click the GIF to save it to your computer👇"
-                        )
-                        empty_image.image(out_gif)
-
-                        out_mp4 = out_gif.replace(".gif", ".mp4")
-                        if mp4 and os.path.exists(out_mp4):
-                            with empty_video:
-                                st.text(
-                                    "Right click the MP4 to save it to your computer👇"
-                                )
-                                st.video(out_gif.replace(".gif", ".mp4"))
 
         elif collection == "Any Earth Engine ImageCollection":
 
             with st.form("submit_ts_form"):
-                with st.expander("Customize timelapse"):
-
-                    title = st.text_input(
-                        "Enter a title to show on the timelapse: ", "Timelapse"
-                    )
-                    start_date = st.date_input(
-                        "Select the start date:", datetime.date(2020, 1, 1)
-                    )
-                    end_date = st.date_input(
-                        "Select the end date:", datetime.date.today()
-                    )
-                    frequency = st.selectbox(
-                        "Select a temporal frequency:",
-                        ["year", "quarter", "month", "day", "hour", "minute", "second"],
-                        index=0,
-                    )
-                    reducer = st.selectbox(
-                        "Select a reducer for aggregating data:",
-                        ["median", "mean", "min", "max", "sum", "variance", "stdDev"],
-                        index=0,
-                    )
-                    data_format = st.selectbox(
-                        "Select a date format to show on the timelapse:",
-                        [
-                            "YYYY-MM-dd",
-                            "YYYY",
-                            "YYMM-MM",
-                            "YYYY-MM-dd HH:mm",
-                            "YYYY-MM-dd HH:mm:ss",
-                            "HH:mm",
-                            "HH:mm:ss",
-                            "w",
-                            "M",
-                            "d",
-                            "D",
-                        ],
-                        index=0,
-                    )
-
-                    speed = st.slider("Frames per second:", 1, 30, 5)
-                    add_progress_bar = st.checkbox("Add a progress bar", True)
-                    progress_bar_color = st.color_picker(
-                        "Progress bar color:", "#0000ff"
-                    )
-                    font_size = st.slider("Font size:", 10, 50, 30)
-                    font_color = st.color_picker("Font color:", "#ffffff")
-                    font_type = st.selectbox(
-                        "Select the font type for the title:",
-                        ["arial.ttf", "alibaba.otf"],
-                        index=0,
-                    )
-                    fading = st.slider(
-                        "Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0
-                    )
-                    mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
-                empty_image = st.empty()
-                empty_video = st.container()
-                empty_fire_image = st.empty()
-
                 roi = None
                 if st.session_state.get("roi") is not None:
                     roi = st.session_state.get("roi")
-                out_gif = geemap.temp_file_path(".gif")
 
                 submitted = st.form_submit_button("Submit")
                 if submitted:
@@ -1187,56 +811,21 @@ def app():
                         empty_text.text("Computing... Please wait...")
                         try:
                             generate_and_download_chips(
-                                st.session_state.get("ee_asset_id"),
-                                start_date=start_date.strftime("%Y-%m-%d"),
-                                end_date=end_date.strftime("%Y-%m-%d"),
-                                region=roi,
-                                frequency=frequency,
-                                reducer=reducer,
-                                date_format=data_format,
-                                out_gif=out_gif,
-                                bands=st.session_state.get("bands"),
-                                palette=st.session_state.get("palette"),
-                                vis_params=st.session_state.get("vis_params"),
+                                roi=roi,
+                                bands=bands,
+                                # dimensions=dimensions,
                                 dimensions=768,
-                                frames_per_second=speed,
-                                crs="EPSG:3857",
-                                overlay_data=overlay_data,
-                                overlay_color=overlay_color,
-                                overlay_width=overlay_width,
-                                overlay_opacity=overlay_opacity,
-                                title=title,
+                                title="TEST",
                                 title_xy=("2%", "90%"),
                                 add_text=True,
                                 text_xy=("2%", "2%"),
-                                text_sequence=None,
-                                font_type=font_type,
-                                font_size=font_size,
-                                font_color=font_color,
-                                add_progress_bar=add_progress_bar,
-                                progress_bar_color=progress_bar_color,
-                                progress_bar_height=5,
-                                loop=0,
-                                mp4=mp4,
-                                fading=fading,
+                                imageCollectionAsset=imageCollectionAsset,
+                                crs="EPSG:3857"
                             )
                         except:
                             empty_text.error(
                                 "An error occurred while computing the timelapse. You probably requested too much data. Try reducing the ROI or timespan."
                             )
-
-                        empty_text.text(
-                            "Right click the GIF to save it to your computer👇"
-                        )
-                        empty_image.image(out_gif)
-
-                        out_mp4 = out_gif.replace(".gif", ".mp4")
-                        if mp4 and os.path.exists(out_mp4):
-                            with empty_video:
-                                st.text(
-                                    "Right click the MP4 to save it to your computer👇"
-                                )
-                                st.video(out_gif.replace(".gif", ".mp4"))
 
         elif collection in [
             "MODIS Gap filled Land Surface Temperature Daily",
@@ -1244,60 +833,8 @@ def app():
         ]:
 
             with st.form("submit_ts_form"):
-                with st.expander("Customize timelapse"):
-
-                    title = st.text_input(
-                        "Enter a title to show on the timelapse: ",
-                        "Surface Temperature",
-                    )
-                    start_date = st.date_input(
-                        "Select the start date:", datetime.date(2018, 1, 1)
-                    )
-                    end_date = st.date_input(
-                        "Select the end date:", datetime.date(2020, 12, 31)
-                    )
-                    frequency = st.selectbox(
-                        "Select a temporal frequency:",
-                        ["year", "quarter", "month", "week", "day"],
-                        index=2,
-                    )
-                    reducer = st.selectbox(
-                        "Select a reducer for aggregating data:",
-                        ["median", "mean", "min", "max", "sum", "variance", "stdDev"],
-                        index=0,
-                    )
-
-                    vis_params = st.text_area(
-                        "Enter visualization parameters",
-                        "",
-                        help="Enter a string in the format of a dictionary, such as '{'min': 23, 'max': 32}'",
-                    )
-
-                    speed = st.slider("Frames per second:", 1, 30, 5)
-                    add_progress_bar = st.checkbox("Add a progress bar", True)
-                    progress_bar_color = st.color_picker(
-                        "Progress bar color:", "#0000ff"
-                    )
-                    font_size = st.slider("Font size:", 10, 50, 30)
-                    font_color = st.color_picker("Font color:", "#ffffff")
-                    font_type = st.selectbox(
-                        "Select the font type for the title:",
-                        ["arial.ttf", "alibaba.otf"],
-                        index=0,
-                    )
-                    add_colorbar = st.checkbox("Add a colorbar", True)
-                    colorbar_label = st.text_input(
-                        "Enter the colorbar label:", "Surface Temperature (°C)"
-                    )
-                    fading = st.slider(
-                        "Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0
-                    )
-                    mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
-                empty_image = st.empty()
-                empty_video = st.container()
-
                 roi = None
                 if st.session_state.get("roi") is not None:
                     roi = st.session_state.get("roi")
@@ -1319,40 +856,16 @@ def app():
                                 == "MODIS Gap filled Land Surface Temperature Daily"
                             ):
                                 generate_and_download_chips(
-                                    st.session_state.get("ee_asset_id"),
-                                    start_date=start_date.strftime("%Y-%m-%d"),
-                                    end_date=end_date.strftime("%Y-%m-%d"),
-                                    region=roi,
-                                    bands=None,
-                                    frequency=frequency,
-                                    reducer=reducer,
-                                    date_format=None,
-                                    out_gif=out_gif,
-                                    palette=st.session_state.get("palette"),
-                                    vis_params=None,
+                                    roi=roi,
+                                    bands=bands,
+                                    # dimensions=dimensions,
                                     dimensions=768,
-                                    frames_per_second=speed,
-                                    crs="EPSG:3857",
-                                    overlay_data=overlay_data,
-                                    overlay_color=overlay_color,
-                                    overlay_width=overlay_width,
-                                    overlay_opacity=overlay_opacity,
-                                    title=title,
+                                    title="TEST",
                                     title_xy=("2%", "90%"),
                                     add_text=True,
                                     text_xy=("2%", "2%"),
-                                    text_sequence=None,
-                                    font_type=font_type,
-                                    font_size=font_size,
-                                    font_color=font_color,
-                                    add_progress_bar=add_progress_bar,
-                                    progress_bar_color=progress_bar_color,
-                                    progress_bar_height=5,
-                                    add_colorbar=add_colorbar,
-                                    colorbar_label=colorbar_label,
-                                    loop=0,
-                                    mp4=mp4,
-                                    fading=fading,
+                                    imageCollectionAsset=imageCollectionAsset,
+                                    crs="EPSG:3857"
                                 )
                             elif collection == "MODIS Ocean Color SMI":
                                 if vis_params.startswith("{") and vis_params.endswith(
@@ -1362,114 +875,30 @@ def app():
                                 else:
                                     vis_params = None
                                 generate_and_download_chips(
-                                    st.session_state.get("ee_asset_id"),
-                                    start_date=start_date.strftime("%Y-%m-%d"),
-                                    end_date=end_date.strftime("%Y-%m-%d"),
-                                    region=roi,
-                                    bands=st.session_state["band"],
-                                    frequency=frequency,
-                                    reducer=reducer,
-                                    date_format=None,
-                                    out_gif=out_gif,
-                                    palette=st.session_state.get("palette"),
-                                    vis_params=vis_params,
+                                    roi=roi,
+                                    bands=bands,
+                                    # dimensions=dimensions,
                                     dimensions=768,
-                                    frames_per_second=speed,
-                                    crs="EPSG:3857",
-                                    overlay_data=overlay_data,
-                                    overlay_color=overlay_color,
-                                    overlay_width=overlay_width,
-                                    overlay_opacity=overlay_opacity,
-                                    title=title,
+                                    title="TEST",
                                     title_xy=("2%", "90%"),
                                     add_text=True,
                                     text_xy=("2%", "2%"),
-                                    text_sequence=None,
-                                    font_type=font_type,
-                                    font_size=font_size,
-                                    font_color=font_color,
-                                    add_progress_bar=add_progress_bar,
-                                    progress_bar_color=progress_bar_color,
-                                    progress_bar_height=5,
-                                    add_colorbar=add_colorbar,
-                                    colorbar_label=colorbar_label,
-                                    loop=0,
-                                    mp4=mp4,
-                                    fading=fading,
+                                    imageCollectionAsset=imageCollectionAsset,
+                                    crs="EPSG:3857"
                                 )
                         except:
                             empty_text.error(
                                 "Something went wrong. You probably requested too much data. Try reducing the ROI or timespan."
                             )
 
-                        if out_gif is not None and os.path.exists(out_gif):
-
-                            geemap.reduce_gif_size(out_gif)
-
-                            empty_text.text(
-                                "Right click the GIF to save it to your computer👇"
-                            )
-                            empty_image.image(out_gif)
-
-                            out_mp4 = out_gif.replace(".gif", ".mp4")
-                            if mp4 and os.path.exists(out_mp4):
-                                with empty_video:
-                                    st.text(
-                                        "Right click the MP4 to save it to your computer👇"
-                                    )
-                                    st.video(out_gif.replace(".gif", ".mp4"))
-
-                        else:
-                            st.error(
-                                "Something went wrong. You probably requested too much data. Try reducing the ROI or timespan."
-                            )
-
         elif collection == "USDA National Agriculture Imagery Program (NAIP)":
 
             with st.form("submit_naip_form"):
-                with st.expander("Customize timelapse"):
-
-                    title = st.text_input(
-                        "Enter a title to show on the timelapse: ", "NAIP Timelapse"
-                    )
-
-                    years = st.slider(
-                        "Start and end year:",
-                        2003,
-                        today.year,
-                        (2003, today.year),
-                    )
-
-                    bands = st.selectbox(
-                        "Select a band combination:", ["N/R/G", "R/G/B"], index=0
-                    )
-
-                    speed = st.slider("Frames per second:", 1, 30, 3)
-                    add_progress_bar = st.checkbox("Add a progress bar", True)
-                    progress_bar_color = st.color_picker(
-                        "Progress bar color:", "#0000ff"
-                    )
-                    font_size = st.slider("Font size:", 10, 50, 30)
-                    font_color = st.color_picker("Font color:", "#ffffff")
-                    font_type = st.selectbox(
-                        "Select the font type for the title:",
-                        ["arial.ttf", "alibaba.otf"],
-                        index=0,
-                    )
-                    fading = st.slider(
-                        "Fading duration (seconds) for each frame:", 0.0, 3.0, 0.0
-                    )
-                    mp4 = st.checkbox("Save timelapse as MP4", True)
 
                 empty_text = st.empty()
-                empty_image = st.empty()
-                empty_video = st.container()
-                empty_fire_image = st.empty()
-
                 roi = None
                 if st.session_state.get("roi") is not None:
                     roi = st.session_state.get("roi")
-                out_gif = geemap.temp_file_path(".gif")
 
                 submitted = st.form_submit_button("Submit")
                 if submitted:
@@ -1483,60 +912,21 @@ def app():
                         empty_text.text("Computing... Please wait...")
                         try:
                             generate_and_download_chips(
-                                roi,
-                                years[0],
-                                years[1],
-                                out_gif,
-                                bands=bands.split("/"),
-                                palette=st.session_state.get("palette"),
-                                vis_params=None,
+                                roi=roi,
+                                bands=bands,
+                                # dimensions=dimensions,
                                 dimensions=768,
-                                frames_per_second=speed,
-                                crs="EPSG:3857",
-                                overlay_data=overlay_data,
-                                overlay_color=overlay_color,
-                                overlay_width=overlay_width,
-                                overlay_opacity=overlay_opacity,
-                                title=title,
+                                title="TEST",
                                 title_xy=("2%", "90%"),
                                 add_text=True,
                                 text_xy=("2%", "2%"),
-                                text_sequence=None,
-                                font_type=font_type,
-                                font_size=font_size,
-                                font_color=font_color,
-                                add_progress_bar=add_progress_bar,
-                                progress_bar_color=progress_bar_color,
-                                progress_bar_height=5,
-                                loop=0,
-                                mp4=mp4,
-                                fading=fading,
+                                imageCollectionAsset=imageCollectionAsset,
+                                crs="EPSG:3857"
                             )
                         except:
                             empty_text.error(
                                 "Something went wrong. You either requested too much data or the ROI is outside the U.S."
                             )
-
-                        if out_gif is not None and os.path.exists(out_gif):
-
-                            empty_text.text(
-                                "Right click the GIF to save it to your computer👇"
-                            )
-                            empty_image.image(out_gif)
-
-                            out_mp4 = out_gif.replace(".gif", ".mp4")
-                            if mp4 and os.path.exists(out_mp4):
-                                with empty_video:
-                                    st.text(
-                                        "Right click the MP4 to save it to your computer👇"
-                                    )
-                                    st.video(out_gif.replace(".gif", ".mp4"))
-
-                        else:
-                            st.error(
-                                "Something went wrong. You either requested too much data or the ROI is outside the U.S."
-                            )
-
 
 try:
     app()
