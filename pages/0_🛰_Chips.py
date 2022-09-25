@@ -23,19 +23,23 @@ def ee_authenticate(token_name="EARTHENGINE_TOKEN"):
 st.sidebar.title("About")
 st.sidebar.info(
     """
-    Web App URL: <https://geospatial.streamlitapp.com>
-    GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
+    Web App URL: <https://yoninachmany-streamlit-geospatial-streamlit-app-1qn4j9.streamlitapp.com/Chips>
+    GitHub repository: <https://github.com/yoninachmany/streamlit-geospatial>
     """
 )
 
 st.sidebar.title("Contact")
 st.sidebar.info(
     """
-    Qiusheng Wu: <https://wetlands.io>
-    [GitHub](https://github.com/giswqs) | [Twitter](https://twitter.com/giswqs) | [YouTube](https://www.youtube.com/c/QiushengWu) | [LinkedIn](https://www.linkedin.com/in/qiushengwu)
+    Ishaan Jhavari: <https://ishaanjhaveri.com>
+    [GitHub](http://github.com/iaj8) | [Twitter](https://twitter.com/ishaan_jhavs) | [LinkedIn](https://www.linkedin.com/in/iajhaveri)
+
+    Yoni Nachmany: <https://www.yoninachmany.com>
+    [GitHub](https://github.com/YoniNachmany) | [Twitter](https://twitter.com/YoniNachmany) | [LinkedIn](https://www.linkedin.com/in/YoniNachmany/)
     """
 )
 
+# TODO: change these ROIs from bounding boxes to points?
 goes_rois = {
     "Creek Fire, CA (2020-09-05)": {
         "region": Polygon(
@@ -237,7 +241,7 @@ def app():
 
     st.markdown(
         """
-        An interactive web app for creating [Landsat](https://developers.google.com/earth-engine/datasets/catalog/landsat)/[GOES](https://jstnbraaten.medium.com/goes-in-earth-engine-53fbc8783c16) chips for any location around the globe. 
+        An interactive web app for creating [Landsat](https://developers.google.com/earth-engine/datasets/catalog/landsat)/other imagery chips for any location around the globe. 
         The app was built using [streamlit](https://streamlit.io), [geemap](https://geemap.org), and [Google Earth Engine](https://earthengine.google.com). For more info, check out this streamlit [blog post](https://blog.streamlit.io/creating-satellite-timelapse-with-streamlit-and-earth-engine). 
     """
     )
@@ -278,6 +282,7 @@ def app():
                 m.set_center(lng, lat, 12)
                 st.session_state["zoom_level"] = 12
 
+        # TODO: delete any collections? MODIS?
         collection = st.selectbox(
             "Select a satellite image collection: ",
             [
@@ -500,7 +505,7 @@ def app():
         )
 
         add_outline = st.checkbox(
-            "Overlay an administrative boundary on timelapse", False
+            "Overlay an administrative boundary on chips", False
         )
 
         if add_outline:
@@ -551,12 +556,12 @@ def app():
     with row1_col1:
 
         with st.expander(
-            "Steps: Draw a rectangle on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click the Submit button. Expand this tab to see a demo 👉"
+            "Steps: Draw a set of points on the map -> Export it as a GeoJSON -> Upload it back to the app -> Click the Submit button. Expand this tab to see a demo 👉"
         ):
             video_empty = st.empty()
 
         data = st.file_uploader(
-            "Upload a GeoJSON file to use as an ROI. Customize timelapse parameters and then click the Submit button 😇👇",
+            "Upload a GeoJSON or KML file or a zipped shapefile with points for chip locations. Customize chip parameters and then click the Submit button 😇👇",
             type=["geojson", "kml", "zip"],
         )
 
@@ -655,6 +660,7 @@ def app():
                 sensor_start_year = 2015
                 timelapse_title = "Sentinel-2 Timelapse"
                 timelapse_speed = 5
+            # TODO: update link
             video_empty.video("https://youtu.be/VVRK_-dEjR4")
 
             with st.form("submit_landsat_form"):
@@ -662,11 +668,12 @@ def app():
                 roi = None
                 if st.session_state.get("roi") is not None:
                     roi = st.session_state.get("roi")
+                # TOOD: define output names
                 out_gif = geemap.temp_file_path(".gif")
 
-                title = st.text_input(
-                    "Enter a title to show on the timelapse: ", timelapse_title
-                )
+                # title = st.text_input(
+                #     "Enter a title to show on the timelapse: ", timelapse_title
+                # )
                 RGB = st.selectbox(
                     "Select an RGB band combination:",
                     [
@@ -683,16 +690,17 @@ def app():
                         "SWIR2/NIR/SWIR1",
                         "SWIR1/NIR/SWIR2",
                     ],
-                    index=9,
+                    index=0,
                 )
 
+                # TODO: redefine time parameters?
                 frequency = st.selectbox(
                     "Select a temporal frequency:",
                     ["year", "quarter", "month"],
                     index=0,
                 )
 
-                with st.expander("Customize timelapse"):
+                with st.expander("Customize chips"):
 
                     speed = st.slider("Frames per second:", 1, 30, timelapse_speed)
                     dimensions = st.slider(
