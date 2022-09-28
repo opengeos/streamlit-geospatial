@@ -215,7 +215,8 @@ def uploaded_file_to_gdf(data):
 
     _, file_extension = os.path.splitext(data.name)
     file_id = str(uuid.uuid4())
-    file_path = os.path.join(tempfile.gettempdir(), f"{file_id}{file_extension}")
+    file_path = os.path.join(tempfile.gettempdir(),
+                             f"{file_id}{file_extension}")
 
     with open(file_path, "wb") as file:
         file.write(data.getbuffer())
@@ -313,7 +314,8 @@ def app():
             roi_options = ["Uploaded GeoJSON"]
 
         if collection == "Any Earth Engine ImageCollection":
-            keyword = st.text_input("Enter a keyword to search (e.g., MODIS):", "")
+            keyword = st.text_input(
+                "Enter a keyword to search (e.g., MODIS):", "")
             if keyword:
 
                 assets = geemap.search_ee_data(keyword)
@@ -335,14 +337,16 @@ def app():
                 if dataset is not None:
                     with st.expander("Show dataset details", False):
                         index = asset_titles.index(dataset)
-                        html = geemap.ee_data_html(st.session_state["ee_assets"][index])
+                        html = geemap.ee_data_html(
+                            st.session_state["ee_assets"][index])
                         st.markdown(html, True)
             # elif collection == "MODIS Gap filled Land Surface Temperature Daily":
             #     ee_id = ""
             else:
                 ee_id = ""
 
-            asset_id = st.text_input("Enter an ee.ImageCollection asset ID:", ee_id)
+            asset_id = st.text_input(
+                "Enter an ee.ImageCollection asset ID:", ee_id)
 
             if asset_id:
                 with st.expander("Customize band combination and color palette", True):
@@ -376,7 +380,8 @@ def app():
                             palette_values,
                         )
                         st.write(
-                            cm.plot_colormap(cmap=palette_options, return_fig=True)
+                            cm.plot_colormap(
+                                cmap=palette_options, return_fig=True)
                         )
                         st.session_state["palette"] = eval(palette)
 
@@ -412,7 +417,8 @@ def app():
                 )
 
             MODIS_options = ["Daytime (1:30 pm)", "Nighttime (1:30 am)"]
-            MODIS_option = st.selectbox("Select a MODIS dataset:", MODIS_options)
+            MODIS_option = st.selectbox(
+                "Select a MODIS dataset:", MODIS_options)
             if MODIS_option == "Daytime (1:30 pm)":
                 st.session_state[
                     "ee_asset_id"
@@ -694,7 +700,8 @@ def app():
 
                 with st.expander("Customize timelapse"):
 
-                    speed = st.slider("Frames per second:", 1, 30, timelapse_speed)
+                    speed = st.slider("Frames per second:",
+                                      1, 30, timelapse_speed)
                     dimensions = st.slider(
                         "Maximum dimensions (Width*Height) in pixels", 768, 2000, 768
                     )
@@ -850,7 +857,8 @@ def app():
                     roi = st.session_state.get("roi")
                 out_gif = geemap.temp_file_path(".gif")
 
-                satellite = st.selectbox("Select a satellite:", ["GOES-17", "GOES-16"])
+                satellite = st.selectbox("Select a satellite:", [
+                                         "GOES-17", "GOES-16"])
                 earliest_date = datetime.date(2017, 7, 10)
                 latest_date = datetime.date.today()
 
@@ -865,7 +873,8 @@ def app():
                     roi_start_date = datetime.datetime.strptime(
                         roi_start[:10], "%Y-%m-%d"
                     )
-                    roi_end_date = datetime.datetime.strptime(roi_end[:10], "%Y-%m-%d")
+                    roi_end_date = datetime.datetime.strptime(
+                        roi_end[:10], "%Y-%m-%d")
                     roi_start_time = datetime.time(
                         int(roi_start[11:13]), int(roi_start[14:16])
                     )
@@ -873,15 +882,18 @@ def app():
                         int(roi_end[11:13]), int(roi_end[14:16])
                     )
 
-                start_date = st.date_input("Select the start date:", roi_start_date)
+                start_date = st.date_input(
+                    "Select the start date:", roi_start_date)
                 end_date = st.date_input("Select the end date:", roi_end_date)
 
                 with st.expander("Customize timelapse"):
 
-                    add_fire = st.checkbox("Add Fire/Hotspot Characterization", False)
+                    add_fire = st.checkbox(
+                        "Add Fire/Hotspot Characterization", False)
 
                     scan_type = st.selectbox(
-                        "Select a scan type:", ["Full Disk", "CONUS", "Mesoscale"]
+                        "Select a scan type:", [
+                            "Full Disk", "CONUS", "Mesoscale"]
                     )
 
                     start_time = st.time_input(
@@ -931,12 +943,12 @@ def app():
                         empty_text.text("Computing... Please wait...")
 
                         geemap.goes_timelapse(
+                            roi,
                             out_gif,
                             start_date=start,
                             end_date=end,
                             data=satellite,
                             scan=scan_type.replace(" ", "_").lower(),
-                            region=roi,
                             dimensions=768,
                             framesPerSecond=speed,
                             date_format="YYYY-MM-dd HH:mm",
@@ -1022,7 +1034,8 @@ def app():
                     start = st.date_input(
                         "Select a start date:", datetime.date(2000, 2, 8)
                     )
-                    end = st.date_input("Select an end date:", datetime.date.today())
+                    end = st.date_input(
+                        "Select an end date:", datetime.date.today())
 
                     start_date = start.strftime("%Y-%m-%d")
                     end_date = end.strftime("%Y-%m-%d")
@@ -1107,12 +1120,14 @@ def app():
                     )
                     frequency = st.selectbox(
                         "Select a temporal frequency:",
-                        ["year", "quarter", "month", "day", "hour", "minute", "second"],
+                        ["year", "quarter", "month", "day",
+                            "hour", "minute", "second"],
                         index=0,
                     )
                     reducer = st.selectbox(
                         "Select a reducer for aggregating data:",
-                        ["median", "mean", "min", "max", "sum", "variance", "stdDev"],
+                        ["median", "mean", "min", "max",
+                            "sum", "variance", "stdDev"],
                         index=0,
                     )
                     data_format = st.selectbox(
@@ -1248,7 +1263,8 @@ def app():
                     )
                     reducer = st.selectbox(
                         "Select a reducer for aggregating data:",
-                        ["median", "mean", "min", "max", "sum", "variance", "stdDev"],
+                        ["median", "mean", "min", "max",
+                            "sum", "variance", "stdDev"],
                         index=0,
                     )
 
