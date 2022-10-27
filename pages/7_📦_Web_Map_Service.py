@@ -83,7 +83,7 @@ def app():
                 legend_dict = ast.literal_eval(legend_text)
                 m.add_legend(legend_dict=legend_dict)
 
-            m.to_streamlit(width, height)
+            m.to_streamlit(height=height)
 
 
 app()

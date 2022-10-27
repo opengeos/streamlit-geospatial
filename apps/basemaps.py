@@ -27,9 +27,12 @@ def app():
         if keyword:
             options = leafmap.search_xyz_services(keyword=keyword)
             if checkbox:
-                options = options + leafmap.search_qms(keyword=keyword)
+                qms = leafmap.search_qms(keyword=keyword)
+                if qms is not None:
+                    options = options + qms
 
-            tiles = empty.multiselect("Select XYZ tiles to add to the map:", options)
+            tiles = empty.multiselect(
+                "Select XYZ tiles to add to the map:", options)
 
         with row1_col1:
             m = leafmap.Map()
