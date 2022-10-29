@@ -1,4 +1,3 @@
-from sys import modules
 import ee
 import os
 import warnings
