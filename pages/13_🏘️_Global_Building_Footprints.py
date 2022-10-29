@@ -1,7 +1,6 @@
 import ee
 import geemap.foliumap as geemap
 import geopandas as gpd
-from nbdime import load_jupyter_server_extension
 import streamlit as st
 
 st.set_page_config(layout="wide")
