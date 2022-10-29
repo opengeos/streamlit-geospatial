@@ -89,8 +89,16 @@ with col2:
 
     style = {'fillColor': '00000000', 'color': color}
 
-    Map.addLayer(fc.style(**style), {}, layer_name)
-    Map.centerObject(fc.first(), zoom=12)
+    split = st.checkbox("Split-panel map")
+
+    if split:
+        left = geemap.ee_tile_layer(fc.style(**style), {}, 'Left')
+        right = left
+        Map.split_map(left, right)
+    else:
+        Map.addLayer(fc.style(**style), {}, layer_name)
+
+    Map.centerObject(fc.first(), zoom=16)
 
     with st.expander("Data Sources"):
         st.info(
