@@ -1,6 +1,7 @@
 import ee
 import os
 import datetime
+import fiona
 import geopandas as gpd
 import folium
 import streamlit as st
@@ -24,7 +25,7 @@ def uploaded_file_to_gdf(data):
         file.write(data.getbuffer())
 
     if file_path.lower().endswith(".kml"):
-        gpd.io.file.fiona.drvsupport.supported_drivers["KML"] = "rw"
+        fiona.drvsupport.supported_drivers["KML"] = "rw"
         gdf = gpd.read_file(file_path, driver="KML")
     else:
         gdf = gpd.read_file(file_path)

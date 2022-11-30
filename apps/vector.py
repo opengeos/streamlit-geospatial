@@ -1,4 +1,5 @@
 import os
+import fiona
 import geopandas as gpd
 import streamlit as st
 
@@ -63,7 +64,7 @@ def app():
 
             with row1_col1:
                 if file_path.lower().endswith(".kml"):
-                    gpd.io.file.fiona.drvsupport.supported_drivers["KML"] = "rw"
+                    fiona.drvsupport.supported_drivers["KML"] = "rw"
                     gdf = gpd.read_file(file_path, driver="KML")
                 else:
                     gdf = gpd.read_file(file_path)
