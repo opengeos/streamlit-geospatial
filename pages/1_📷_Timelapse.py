@@ -207,7 +207,7 @@ ocean_rois = {
 }
 
 
-@st.cache
+@st.cache(allow_output_mutation=True)
 def uploaded_file_to_gdf(data):
     import tempfile
     import os
