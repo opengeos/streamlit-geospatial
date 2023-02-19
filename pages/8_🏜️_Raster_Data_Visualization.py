@@ -5,11 +5,10 @@ import streamlit as st
 
 st.set_page_config(layout="wide")
 
-st.sidebar.title("About")
 st.sidebar.info(
     """
-    Web App URL: <https://geospatial.streamlitapp.com>
-    GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
+    - Web App URL: <https://streamlit.geemap.org>
+    - GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
     """
 )
 
@@ -22,7 +21,7 @@ st.sidebar.info(
 )
 
 
-@st.cache
+@st.cache_data
 def load_cog_list():
     print(os.getcwd())
     in_txt = os.path.join(os.getcwd(), "data/cog_files.txt")
@@ -30,7 +29,7 @@ def load_cog_list():
         return [line.strip() for line in f.readlines()[1:]]
 
 
-@st.cache
+@st.cache_data
 def get_palettes():
     return list(cm.palettes.keys())
     # palettes = dir(palettable.matplotlib)[:-16]

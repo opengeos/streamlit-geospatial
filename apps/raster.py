@@ -4,7 +4,7 @@ import streamlit as st
 import palettable
 
 
-@st.cache
+@st.cache_data
 def load_cog_list():
     print(os.getcwd())
     in_txt = os.path.join(os.getcwd(), "data/cog_files.txt")
@@ -12,7 +12,7 @@ def load_cog_list():
         return [line.strip() for line in f.readlines()[1:]]
 
 
-@st.cache
+@st.cache_data
 def get_palettes():
     palettes = dir(palettable.matplotlib)[:-16]
     return ["matplotlib." + p for p in palettes]

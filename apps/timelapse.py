@@ -11,7 +11,7 @@ from datetime import date
 from .rois import *
 
 
-@st.cache
+@st.cache_data
 def uploaded_file_to_gdf(data):
     import tempfile
     import os

@@ -80,7 +80,7 @@ def get_data_columns(df, category, frequency="monthly"):
         return cols[1:]
 
 
-@st.cache
+@st.cache_data
 def get_inventory_data(url):
     df = pd.read_csv(url)
     url = url.lower()
@@ -124,7 +124,7 @@ def get_periods(df):
     return [str(d) for d in list(set(df["month_date_yyyymm"].tolist()))]
 
 
-@st.cache
+@st.cache_data
 def get_geom_data(category):
 
     prefix = (

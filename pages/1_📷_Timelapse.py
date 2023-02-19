@@ -15,16 +15,15 @@ st.set_page_config(layout="wide")
 warnings.filterwarnings("ignore")
 
 
-@st.cache(persist=True)
+@st.cache_data
 def ee_authenticate(token_name="EARTHENGINE_TOKEN"):
     geemap.ee_initialize(token_name=token_name)
 
 
-st.sidebar.title("About")
 st.sidebar.info(
     """
-    Web App URL: <https://geospatial.streamlitapp.com>
-    GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
+    - Web App URL: <https://streamlit.geemap.org>
+    - GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
     """
 )
 
@@ -207,7 +206,7 @@ ocean_rois = {
 }
 
 
-@st.cache(allow_output_mutation=True)
+@st.cache_data
 def uploaded_file_to_gdf(data):
     import tempfile
     import os

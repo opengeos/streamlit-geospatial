@@ -3,7 +3,7 @@ import streamlit as st
 import leafmap.foliumap as leafmap
 
 
-@st.cache
+@st.cache_data
 def get_layers(url):
     options = leafmap.get_wms_layers(url)
     return options

@@ -2,7 +2,7 @@ import streamlit as st
 import tropycal.tracks as tracks
 
 
-@st.cache
+@st.cache_data
 def read_data(basin='north_atlantic', source='hurdat', include_btk=False):
     return tracks.TrackDataset(basin=basin, source=source, include_btk=include_btk)
 

@@ -3,11 +3,10 @@ import leafmap.foliumap as leafmap
 
 st.set_page_config(layout="wide")
 
-st.sidebar.title("About")
 st.sidebar.info(
     """
-    Web App URL: <https://geospatial.streamlitapp.com>
-    GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
+    - Web App URL: <https://streamlit.geemap.org>
+    - GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
     """
 )
 
