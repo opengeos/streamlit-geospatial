@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <title>Streamlit Embed</title>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+<!--begin first part of fixing Iframe scrollbar HERE -->
+    <style>
+    .container {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      padding-top: 115%; /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
+    }
+    .responsive-iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      width: 100%;
+      height: 90%;
+    }
+    </style>
+<!--end first part of fixing Iframe scrollbar HERE -->
+    
+
+  </head>
+  <body>
+
+<!--begin second part of fixing Iframe scrollbar HERE -->
+  <div class="container">
+    <iframe
+      class="responsive-iframe"
+    	src="https://giswqs-streamlit.hf.space"
+    	frameborder="0"
+    ></iframe>
+  </div>
+<!--end second part of fixing Iframe scrollbar HERE -->
+
+<!--begin attempt to prevent Redirect of HTML Static Page HERE -->
+  <script>
+    Array
+      .from(document.getElementsByTagName("meta"))
+      .filter(elem => elem.getAttributeNames().includes("http-equiv") && elem.getAttribute("http-equiv") === "refresh")[0] // it might return undefined so put it in try catch
+      .setAttribute("content", "");
+  </script>
+<!--end attempt to prevent Redirect of HTML Static Page HERE -->
+
+  </body>
+</html>
