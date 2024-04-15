@@ -70,7 +70,6 @@ def lulc_mrb_floodplain():
 
 
 def global_mangrove_watch():
-    """https://samapriya.github.io/awesome-gee-community-datasets/projects/mangrove/"""
     Map = geemap.Map()
     gmw2007 = ee.FeatureCollection("projects/sat-io/open-datasets/GMW/GMW_2007_v2")
     gmw2008 = ee.FeatureCollection("projects/sat-io/open-datasets/GMW/GMW_2008_v2")
