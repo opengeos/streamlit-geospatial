@@ -12,21 +12,6 @@ from leafmap.common import hex_to_rgb
 
 st.set_page_config(layout="wide")
 
-st.sidebar.info(
-    """
-    - Web App URL: <https://streamlit.geemap.org>
-    - GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
-    """
-)
-
-st.sidebar.title("Contact")
-st.sidebar.info(
-    """
-    Qiusheng Wu: <https://wetlands.io>
-    [GitHub](https://github.com/giswqs) | [Twitter](https://twitter.com/giswqs) | [YouTube](https://www.youtube.com/c/QiushengWu) | [LinkedIn](https://www.linkedin.com/in/qiushengwu)
-    """
-)
-
 STREAMLIT_STATIC_PATH = pathlib.Path(st.__path__[0]) / "static"
 # We create a downloads directory within the streamlit static asset directory
 # and we write output files to it
@@ -380,7 +365,6 @@ def app():
     min_value = gdf[selected_col].min()
     max_value = gdf[selected_col].max()
     color = "color"
-    # color_exp = f"[({selected_col}-{min_value})/({max_value}-{min_value})*255, 0, 0]"
     color_exp = f"[R, G, B]"
 
     geojson = pdk.Layer(
