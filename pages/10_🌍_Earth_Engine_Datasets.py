@@ -80,8 +80,7 @@ def search_data():
 
     dataset = None
     with col2:
-        keyword = st.text_input(
-            "Enter a keyword to search (e.g., elevation)", "")
+        keyword = st.text_input("Enter a keyword to search (e.g., elevation)", "")
         if keyword:
             ee_assets = geemap.search_ee_data(keyword)
             asset_titles = [x["title"] for x in ee_assets]
@@ -103,8 +102,7 @@ def search_data():
                 with st.expander("Show dataset details", True):
                     index = asset_titles.index(dataset)
 
-                    html = geemap.ee_data_html(
-                        st.session_state["ee_assets"][index])
+                    html = geemap.ee_data_html(st.session_state["ee_assets"][index])
                     html = html.replace("\n", "")
                     st.markdown(html, True)
 
@@ -125,8 +123,7 @@ def search_data():
                             vis_params = "{}"
                         vis = eval(vis_params)
                         if not isinstance(vis, dict):
-                            st.error(
-                                "Visualization parameters must be a dictionary")
+                            st.error("Visualization parameters must be a dictionary")
                         try:
                             Map.addLayer(eval(ee_asset), vis, layer_name)
                         except Exception as e:
@@ -144,8 +141,7 @@ def search_data():
 def app():
     st.title("Earth Engine Data Catalog")
 
-    apps = ["Search Earth Engine Data Catalog",
-            "National Land Cover Database (NLCD)"]
+    apps = ["Search Earth Engine Data Catalog", "National Land Cover Database (NLCD)"]
 
     selected_app = st.selectbox("Select an app", apps)
 

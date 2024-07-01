@@ -225,7 +225,7 @@ def app():
     st.title("U.S. Real Estate Data and Market Trends")
     st.markdown(
         """**Introduction:** This interactive dashboard is designed for visualizing U.S. real estate data and market trends at multiple levels (i.e., national,
-         state, county, and metro). The data sources include [Real Estate Data](https://www.realtor.com/research/data) from realtor.com and 
+         state, county, and metro). The data sources include [Real Estate Data](https://www.realtor.com/research/data) from realtor.com and
          [Cartographic Boundary Files](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html) from U.S. Census Bureau.
          Several open-source packages are used to process the data and generate the visualizations, e.g., [streamlit](https://streamlit.io),
           [geopandas](https://geopandas.org), [leafmap](https://leafmap.org), and [pydeck](https://deckgl.readthedocs.io).
