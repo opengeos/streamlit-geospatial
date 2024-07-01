@@ -23,7 +23,7 @@ def app():
     st.title("Search Basemaps")
     st.markdown(
         """
-    This app is a demonstration of searching and loading basemaps from [xyzservices](https://github.com/geopandas/xyzservices) and [Quick Map Services (QMS)](https://github.com/nextgis/quickmapservices). Selecting from 1000+ basemaps with a few clicks.  
+    This app is a demonstration of searching and loading basemaps from [xyzservices](https://github.com/geopandas/xyzservices) and [Quick Map Services (QMS)](https://github.com/nextgis/quickmapservices). Selecting from 1000+ basemaps with a few clicks.
     """
     )
 
@@ -48,8 +48,7 @@ def app():
                 if qms is not None:
                     options = options + qms
 
-            tiles = empty.multiselect(
-                "Select XYZ tiles to add to the map:", options)
+            tiles = empty.multiselect("Select XYZ tiles to add to the map:", options)
 
         with row1_col1:
             m = leafmap.Map()

@@ -236,8 +236,8 @@ def app():
 
     st.markdown(
         """
-        An interactive web app for creating [Landsat](https://developers.google.com/earth-engine/datasets/catalog/landsat)/[GOES](https://jstnbraaten.medium.com/goes-in-earth-engine-53fbc8783c16) timelapse for any location around the globe. 
-        The app was built using [streamlit](https://streamlit.io), [geemap](https://geemap.org), and [Google Earth Engine](https://earthengine.google.com). For more info, check out my streamlit [blog post](https://blog.streamlit.io/creating-satellite-timelapse-with-streamlit-and-earth-engine). 
+        An interactive web app for creating [Landsat](https://developers.google.com/earth-engine/datasets/catalog/landsat)/[GOES](https://jstnbraaten.medium.com/goes-in-earth-engine-53fbc8783c16) timelapse for any location around the globe.
+        The app was built using [streamlit](https://streamlit.io), [geemap](https://geemap.org), and [Google Earth Engine](https://earthengine.google.com). For more info, check out my streamlit [blog post](https://blog.streamlit.io/creating-satellite-timelapse-with-streamlit-and-earth-engine).
     """
     )
 
@@ -413,13 +413,13 @@ def app():
             MODIS_options = ["Daytime (1:30 pm)", "Nighttime (1:30 am)"]
             MODIS_option = st.selectbox("Select a MODIS dataset:", MODIS_options)
             if MODIS_option == "Daytime (1:30 pm)":
-                st.session_state[
-                    "ee_asset_id"
-                ] = "projects/sat-io/open-datasets/gap-filled-lst/gf_day_1km"
+                st.session_state["ee_asset_id"] = (
+                    "projects/sat-io/open-datasets/gap-filled-lst/gf_day_1km"
+                )
             else:
-                st.session_state[
-                    "ee_asset_id"
-                ] = "projects/sat-io/open-datasets/gap-filled-lst/gf_night_1km"
+                st.session_state["ee_asset_id"] = (
+                    "projects/sat-io/open-datasets/gap-filled-lst/gf_night_1km"
+                )
 
             palette_options = st.selectbox(
                 "Color palette",
