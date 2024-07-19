@@ -1,3 +1,4 @@
+import json
 import os
 import leafmap.foliumap as leafmap
 import leafmap.colormaps as cm
@@ -45,6 +46,14 @@ An interactive web app for visualizing local raster datasets and Cloud Optimized
 """
 )
 
+
+def is_trusted_url(url):
+    if url.startswith("https://opendata.digitalglobe.com/events/california-fire-2020/"):
+        return True
+    else:
+        return False
+
+
 row1_col1, row1_col2 = st.columns([2, 1])
 
 with row1_col1:
@@ -59,7 +68,7 @@ with row1_col2:
         cog,
     )
 
-    if url:
+    if is_trusted_url(url):
         try:
             options = leafmap.cog_bands(url)
         except Exception as e:
@@ -74,6 +83,8 @@ with row1_col2:
             pass
         else:
             st.error("Please select one or three bands")
+    else:
+        st.error("Please enter a trusted URL")
 
     add_params = st.checkbox("Add visualization parameters")
     if add_params:
@@ -83,7 +94,7 @@ with row1_col2:
 
     if len(vis_params) > 0:
         try:
-            vis_params = eval(vis_params)
+            vis_params = json.loads(vis_params.replace("'", '"'))
         except Exception as e:
             st.error(
                 f"Invalid visualization parameters. It should be a dictionary. Error: {e}"

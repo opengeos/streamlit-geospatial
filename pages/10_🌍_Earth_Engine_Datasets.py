@@ -1,4 +1,5 @@
 import ee
+import json
 import streamlit as st
 import geemap.foliumap as geemap
 
@@ -110,6 +111,14 @@ def search_data():
                 uid = ee_assets[index]["uid"]
                 st.markdown(f"""**Earth Engine Snippet:** `{ee_id}`""")
                 ee_asset = f"{translate[asset_types[index]]}{ee_id}')"
+
+                if ee_asset.startswith("ee.ImageCollection"):
+                    ee_asset = ee.ImageCollection(ee_id)
+                elif ee_asset.startswith("ee.Image"):
+                    ee_asset = ee.Image(ee_id)
+                elif ee_asset.startswith("ee.FeatureCollection"):
+                    ee_asset = ee.FeatureCollection(ee_id)
+
                 vis_params = st.text_input(
                     "Enter visualization parameters as a dictionary", {}
                 )
@@ -121,11 +130,11 @@ def search_data():
                         if vis_params.strip() == "":
                             # st.error("Please enter visualization parameters")
                             vis_params = "{}"
-                        vis = eval(vis_params)
+                        vis = json.loads(vis_params.replace("'", '"'))
                         if not isinstance(vis, dict):
                             st.error("Visualization parameters must be a dictionary")
                         try:
-                            Map.addLayer(eval(ee_asset), vis, layer_name)
+                            Map.addLayer(ee_asset, vis, layer_name)
                         except Exception as e:
                             st.error(f"Error adding layer: {e}")
                     except Exception as e:

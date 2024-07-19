@@ -1,4 +1,5 @@
 import ee
+import json
 import os
 import warnings
 import datetime
@@ -377,7 +378,9 @@ def app():
                         st.write(
                             cm.plot_colormap(cmap=palette_options, return_fig=True)
                         )
-                        st.session_state["palette"] = eval(palette)
+                        st.session_state["palette"] = json.loads(
+                            palette.replace("'", '"')
+                        )
 
                     if bands:
                         vis_params = st.text_area(
@@ -392,7 +395,9 @@ def app():
                             "{}",
                         )
                     try:
-                        st.session_state["vis_params"] = eval(vis_params)
+                        st.session_state["vis_params"] = json.loads(
+                            vis_params.replace("'", '"')
+                        )
                         st.session_state["vis_params"]["palette"] = st.session_state[
                             "palette"
                         ]
@@ -432,7 +437,7 @@ def app():
                 palette_values,
             )
             st.write(cm.plot_colormap(cmap=palette_options, return_fig=True))
-            st.session_state["palette"] = eval(palette)
+            st.session_state["palette"] = json.loads(palette.replace("'", '"'))
         elif collection == "MODIS Ocean Color SMI":
             with st.expander("Show dataset details", False):
                 st.markdown(
@@ -490,7 +495,7 @@ def app():
                 palette_values,
             )
             st.write(cm.plot_colormap(cmap=palette_options, return_fig=True))
-            st.session_state["palette"] = eval(palette)
+            st.session_state["palette"] = json.loads(palette.replace("'", '"'))
 
         sample_roi = st.selectbox(
             "Select a sample ROI or upload a GeoJSON file:",
@@ -1342,7 +1347,9 @@ def app():
                                 if vis_params.startswith("{") and vis_params.endswith(
                                     "}"
                                 ):
-                                    vis_params = eval(vis_params)
+                                    vis_params = json.loads(
+                                        vis_params.replace("'", '"')
+                                    )
                                 else:
                                     vis_params = None
                                 out_gif = geemap.modis_ocean_color_timelapse(

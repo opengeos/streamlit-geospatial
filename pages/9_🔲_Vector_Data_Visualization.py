@@ -21,6 +21,17 @@ st.sidebar.info(
 )
 
 
+# Define a whitelist of trusted URLs
+trusted_urls = [
+    "https://github.com/giswqs/streamlit-geospatial/raw/master/data/us_states.geojson",
+    # Add more trusted URLs here
+]
+
+
+def is_trusted_url(url):
+    return url in trusted_urls
+
+
 def save_uploaded_file(file_content, file_name):
     """
     Save the uploaded file to a temporary directory
@@ -71,7 +82,7 @@ def app():
 
         container = st.container()
 
-        if data or url:
+        if data or is_trusted_url(url):
             if data:
                 file_path = save_uploaded_file(data, data.name)
                 layer_name = os.path.splitext(data.name)[0]

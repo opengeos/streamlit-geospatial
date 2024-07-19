@@ -1,4 +1,5 @@
 import ast
+import json
 import streamlit as st
 import leafmap.foliumap as leafmap
 
@@ -19,11 +20,21 @@ st.sidebar.info(
     """
 )
 
+# Define a whitelist of trusted URLs
+trusted_urls = [
+    "https://services.terrascope.be/wms/v2",
+    # Add more trusted URLs here
+]
+
 
 @st.cache_data
 def get_layers(url):
     options = leafmap.get_wms_layers(url)
     return options
+
+
+def is_trusted_url(url):
+    return url in trusted_urls
 
 
 def app():
@@ -50,7 +61,14 @@ def app():
         empty = st.empty()
 
         if url:
-            options = get_layers(url)
+
+            if is_trusted_url(url):
+                options = get_layers(url)
+                # Process options as needed
+            else:
+                st.error(
+                    "The entered URL is not trusted. Please enter a valid WMS URL."
+                )
 
             default = None
             if url == esa_landcover:
@@ -79,7 +97,7 @@ def app():
                         url, layers=layer, name=layer, attribution=" ", transparent=True
                     )
             if add_legend and legend_text:
-                legend_dict = ast.literal_eval(legend_text)
+                legend_dict = json.loads(legend_text.replace("'", '"'))
                 m.add_legend(legend_dict=legend_dict)
 
             m.to_streamlit(height=height)
