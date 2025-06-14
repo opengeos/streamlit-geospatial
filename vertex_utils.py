@@ -3,9 +3,12 @@ from google.cloud.aiplatform.gapic.types import Prediction
 from google.cloud.exceptions import GoogleCloudError
 import config
 
-def get_vertex_endpoint(project_id: str = config.VERTEX_AI_PROJECT_ID,
-                        location: str = config.VERTEX_AI_LOCATION,
-                        endpoint_id: str = config.VERTEX_AI_ENDPOINT_ID) -> aiplatform.Endpoint | None:
+
+def get_vertex_endpoint(
+    project_id: str = config.VERTEX_AI_PROJECT_ID,
+    location: str = config.VERTEX_AI_LOCATION,
+    endpoint_id: str = config.VERTEX_AI_ENDPOINT_ID,
+) -> aiplatform.Endpoint | None:
     """
     Initializes connection to Vertex AI and gets a specific endpoint.
 
@@ -27,8 +30,11 @@ def get_vertex_endpoint(project_id: str = config.VERTEX_AI_PROJECT_ID,
         print(f"Error initializing Vertex AI or getting endpoint: {e}")
         return None
     except Exception as e:
-        print(f"An unexpected error occurred with Vertex AI endpoint '{endpoint_id}': {e}")
+        print(
+            f"An unexpected error occurred with Vertex AI endpoint '{endpoint_id}': {e}"
+        )
         return None
+
 
 def get_prediction(endpoint: aiplatform.Endpoint, instance_data: dict) -> dict | None:
     """

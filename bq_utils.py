@@ -3,6 +3,7 @@ from google.cloud import bigquery
 from google.cloud.exceptions import GoogleCloudError
 import config
 
+
 def get_bigquery_client(project_id=config.BQ_PROJECT_ID):
     """
     Initializes and returns a google.cloud.bigquery.Client.
@@ -21,10 +22,18 @@ def get_bigquery_client(project_id=config.BQ_PROJECT_ID):
         print(f"BigQuery authentication failed for project '{project_id}': {e}")
         return None
     except Exception as e:
-        print(f"An unexpected error occurred during BigQuery client initialization for project '{project_id}': {e}")
+        print(
+            f"An unexpected error occurred during BigQuery client initialization for project '{project_id}': {e}"
+        )
         return None
 
-def fetch_locations_data(client, project_id=config.BQ_PROJECT_ID, dataset_id=config.BQ_DATASET_ID, table_id=config.BQ_LOCATIONS_TABLE_ID):
+
+def fetch_locations_data(
+    client,
+    project_id=config.BQ_PROJECT_ID,
+    dataset_id=config.BQ_DATASET_ID,
+    table_id=config.BQ_LOCATIONS_TABLE_ID,
+):
     """
     Fetches location data from a BigQuery table.
 
@@ -54,7 +63,16 @@ def fetch_locations_data(client, project_id=config.BQ_PROJECT_ID, dataset_id=con
         print(f"An unexpected error occurred during data fetching: {e}")
         return None
 
-def fetch_historical_metrics(client, location_id, start_date, end_date, project_id=config.BQ_PROJECT_ID, dataset_id=config.BQ_DATASET_ID, table_id=config.BQ_PIPELINE_METRICS_TABLE_ID):
+
+def fetch_historical_metrics(
+    client,
+    location_id,
+    start_date,
+    end_date,
+    project_id=config.BQ_PROJECT_ID,
+    dataset_id=config.BQ_DATASET_ID,
+    table_id=config.BQ_PIPELINE_METRICS_TABLE_ID,
+):
     """
     Fetches historical metrics for a specific location and date range from BigQuery.
 
@@ -89,16 +107,20 @@ def fetch_historical_metrics(client, location_id, start_date, end_date, project_
     job_config = bigquery.QueryJobConfig(
         query_parameters=[
             bigquery.ScalarQueryParameter("location_id", "STRING", location_id),
-            bigquery.ScalarQueryParameter("start_date", "DATE", start_date.strftime("%Y-%m-%d")),
-            bigquery.ScalarQueryParameter("end_date", "DATE", end_date.strftime("%Y-%m-%d")),
+            bigquery.ScalarQueryParameter(
+                "start_date", "DATE", start_date.strftime("%Y-%m-%d")
+            ),
+            bigquery.ScalarQueryParameter(
+                "end_date", "DATE", end_date.strftime("%Y-%m-%d")
+            ),
         ]
     )
 
     try:
         query_job = client.query(query, job_config=job_config)
         df = query_job.to_dataframe()
-        if 'timestamp' in df.columns:
-            df['timestamp'] = pd.to_datetime(df['timestamp'])
+        if "timestamp" in df.columns:
+            df["timestamp"] = pd.to_datetime(df["timestamp"])
         else:
             print("Warning: 'timestamp' column not found in metrics data.")
         return df

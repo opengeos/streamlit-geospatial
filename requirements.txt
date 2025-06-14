@@ -1,11 +1,11 @@
-google-cloud-bigquery
-google-cloud-aiplatform
-pandas
 db-dtypes
-streamlit
-leafmap
 folium
 geopandas
+google-cloud-aiplatform
+google-cloud-bigquery
+leafmap
 numpy
+pandas
 pytest
 pytest-mock
+streamlit
