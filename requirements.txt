@@ -1,5 +1,3 @@
---find-links=https://girder.github.io/large_image_wheels GDAL
-# cartopy
 folium==0.13.0
 geemap[extra]
 geopandas
@@ -16,6 +14,5 @@ streamlit-bokeh-events
 streamlit-folium
 streamlit-keplergl
 tropycal
-# git+https://github.com/giswqs/leafmap
-# git+https://github.com/giswqs/geemap
+
 
