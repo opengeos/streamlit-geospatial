@@ -10,19 +10,21 @@ def ee_authenticate(token_name="EARTHENGINE_TOKEN"):
     geemap.ee_initialize(token_name=token_name)
 
 
-st.sidebar.info(
-    """
+st.sidebar.info("""
     - Web App URL: <https://streamlit.gishub.org>
+<<<<<<< HEAD
     - GitHub repository: <https://github.com/opengeos/streamlit-geospatial>
     """
 )
+=======
+    - GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
+    """)
+>>>>>>> origin/master
 
 st.sidebar.title("Contact")
-st.sidebar.info(
-    """
+st.sidebar.info("""
     Qiusheng Wu at [wetlands.io](https://wetlands.io) | [GitHub](https://github.com/giswqs) | [Twitter](https://twitter.com/giswqs) | [YouTube](https://youtube.com/@giswqs) | [LinkedIn](https://www.linkedin.com/in/giswqs)
-    """
-)
+    """)
 
 st.title("Global Building Footprints")
 
@@ -104,11 +106,9 @@ with col2:
     Map.centerObject(fc.first(), zoom=16)
 
     with st.expander("Data Sources"):
-        st.info(
-            """
+        st.info("""
             [Microsoft Building Footprints](https://gee-community-catalog.org/projects/msbuildings/)
-            """
-        )
+            """)
 
 
 with col1:

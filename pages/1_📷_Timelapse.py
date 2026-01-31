@@ -21,19 +21,21 @@ def ee_authenticate(token_name="EARTHENGINE_TOKEN"):
     geemap.ee_initialize(token_name=token_name)
 
 
-st.sidebar.info(
-    """
+st.sidebar.info("""
     - Web App URL: <https://streamlit.gishub.org>
+<<<<<<< HEAD
     - GitHub repository: <https://github.com/opengeos/streamlit-geospatial>
     """
 )
+=======
+    - GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
+    """)
+>>>>>>> origin/master
 
 st.sidebar.title("Contact")
-st.sidebar.info(
-    """
+st.sidebar.info("""
     Qiusheng Wu at [wetlands.io](https://wetlands.io) | [GitHub](https://github.com/giswqs) | [Twitter](https://twitter.com/giswqs) | [YouTube](https://youtube.com/@giswqs) | [LinkedIn](https://www.linkedin.com/in/giswqs)
-    """
-)
+    """)
 
 goes_rois = {
     "Creek Fire, CA (2020-09-05)": {
@@ -234,12 +236,10 @@ def app():
 
     st.title("Create Satellite Timelapse")
 
-    st.markdown(
-        """
+    st.markdown("""
         An interactive web app for creating [Landsat](https://developers.google.com/earth-engine/datasets/catalog/landsat)/[GOES](https://jstnbraaten.medium.com/goes-in-earth-engine-53fbc8783c16) timelapse for any location around the globe.
         The app was built using [streamlit](https://streamlit.io), [geemap](https://geemap.org), and [Google Earth Engine](https://earthengine.google.com). For more info, check out my streamlit [blog post](https://blog.streamlit.io/creating-satellite-timelapse-with-streamlit-and-earth-engine).
-    """
-    )
+    """)
 
     row1_col1, row1_col2 = st.columns([2, 1])
 
@@ -408,11 +408,9 @@ def app():
 
         elif collection == "MODIS Gap filled Land Surface Temperature Daily":
             with st.expander("Show dataset details", False):
-                st.markdown(
-                    """
+                st.markdown("""
                 See the [Awesome GEE Community Datasets](https://samapriya.github.io/awesome-gee-community-datasets/projects/daily_lst/).
-                """
-                )
+                """)
 
             MODIS_options = ["Daytime (1:30 pm)", "Nighttime (1:30 am)"]
             MODIS_option = st.selectbox("Select a MODIS dataset:", MODIS_options)
@@ -439,11 +437,9 @@ def app():
             st.session_state["palette"] = json.loads(palette.replace("'", '"'))
         elif collection == "MODIS Ocean Color SMI":
             with st.expander("Show dataset details", False):
-                st.markdown(
-                    """
+                st.markdown("""
                 See the [Earth Engine Data Catalog](https://developers.google.com/earth-engine/datasets/catalog/NASA_OCEANDATA_MODIS-Aqua_L3SMI).
-                """
-                )
+                """)
 
             MODIS_options = ["Aqua", "Terra"]
             MODIS_option = st.selectbox("Select a satellite:", MODIS_options)

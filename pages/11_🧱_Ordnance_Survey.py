@@ -6,19 +6,21 @@ import folium.plugins as plugins
 
 st.set_page_config(layout="wide")
 
-st.sidebar.info(
-    """
+st.sidebar.info("""
     - Web App URL: <https://streamlit.gishub.org>
+<<<<<<< HEAD
     - GitHub repository: <https://github.com/opengeos/streamlit-geospatial>
     """
 )
+=======
+    - GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
+    """)
+>>>>>>> origin/master
 
 st.sidebar.title("Contact")
-st.sidebar.info(
-    """
+st.sidebar.info("""
     Qiusheng Wu at [wetlands.io](https://wetlands.io) | [GitHub](https://github.com/giswqs) | [Twitter](https://twitter.com/giswqs) | [YouTube](https://youtube.com/@giswqs) | [LinkedIn](https://www.linkedin.com/in/giswqs)
-    """
-)
+    """)
 
 st.title("National Library of Scotland XYZ Layers")
 df = pd.read_csv("data/scotland_xyz.tsv", sep="\t")
