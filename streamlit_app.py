@@ -3,28 +3,22 @@ import leafmap.foliumap as leafmap
 
 st.set_page_config(layout="wide")
 
-st.sidebar.info(
-    """
+st.sidebar.info("""
     - Web App URL: <https://streamlit.gishub.org>
     - GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
-    """
-)
+    """)
 
 st.sidebar.title("Contact")
-st.sidebar.info(
-    """
+st.sidebar.info("""
     Qiusheng Wu at [wetlands.io](https://wetlands.io) | [GitHub](https://github.com/giswqs) | [Twitter](https://twitter.com/giswqs) | [YouTube](https://youtube.com/@giswqs) | [LinkedIn](https://www.linkedin.com/in/giswqs)
-    """
-)
+    """)
 
 # Customize page title
 st.title("Streamlit for Geospatial Applications")
 
-st.markdown(
-    """
+st.markdown("""
     This multipage app template demonstrates various interactive web apps created using [streamlit](https://streamlit.io) and [leafmap](https://leafmap.org). It is an open-source project and you are very welcome to contribute to the [GitHub repository](https://github.com/giswqs/streamlit-multipage-template).
-    """
-)
+    """)
 
 st.header("Instructions")
 
