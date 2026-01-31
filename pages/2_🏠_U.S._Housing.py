@@ -15,7 +15,7 @@ st.set_page_config(layout="wide")
 st.sidebar.info(
     """
     - Web App URL: <https://streamlit.gishub.org>
-    - GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
+    - GitHub repository: <https://github.com/opengeos/streamlit-geospatial>
     """
 )
 
@@ -143,7 +143,7 @@ def get_periods(df):
 def get_geom_data(category):
 
     prefix = (
-        "https://raw.githubusercontent.com/giswqs/streamlit-geospatial/master/data/"
+        "https://raw.githubusercontent.com/opengeos/streamlit-geospatial/master/data/"
     )
     links = {
         "national": prefix + "us_nation.geojson",
@@ -323,7 +323,7 @@ def app():
                 **{label}**: {desc}
                 """
                 st.markdown(markdown)
-            except:
+            except Exception:
                 st.warning("No description available for selected attribute")
 
     row2_col1, row2_col2, row2_col3, row2_col4, row2_col5, row2_col6 = st.columns(

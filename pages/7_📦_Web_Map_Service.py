@@ -1,4 +1,3 @@
-import ast
 import json
 import streamlit as st
 import leafmap.foliumap as leafmap
@@ -8,7 +7,7 @@ st.set_page_config(layout="wide")
 st.sidebar.info(
     """
     - Web App URL: <https://streamlit.gishub.org>
-    - GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
+    - GitHub repository: <https://github.com/opengeos/streamlit-geospatial>
     """
 )
 

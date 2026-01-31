@@ -8,7 +8,7 @@ st.set_page_config(layout="wide")
 st.sidebar.info(
     """
     - Web App URL: <https://streamlit.gishub.org>
-    - GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
+    - GitHub repository: <https://github.com/opengeos/streamlit-geospatial>
     """
 )
 
@@ -22,7 +22,7 @@ st.sidebar.info(
 
 # Define a whitelist of trusted URLs
 trusted_urls = [
-    "https://github.com/giswqs/streamlit-geospatial/raw/master/data/us_states.geojson",
+    "https://github.com/opengeos/streamlit-geospatial/raw/master/data/us_states.geojson",
     # Add more trusted URLs here
 ]
 
@@ -72,7 +72,7 @@ def app():
 
         url = st.text_input(
             "Enter a URL to a vector dataset",
-            "https://github.com/giswqs/streamlit-geospatial/raw/master/data/us_states.geojson",
+            "https://github.com/opengeos/streamlit-geospatial/raw/master/data/us_states.geojson",
         )
 
         data = st.file_uploader(

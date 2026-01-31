@@ -24,7 +24,7 @@ def ee_authenticate(token_name="EARTHENGINE_TOKEN"):
 st.sidebar.info(
     """
     - Web App URL: <https://streamlit.gishub.org>
-    - GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
+    - GitHub repository: <https://github.com/opengeos/streamlit-geospatial>
     """
 )
 
@@ -348,7 +348,7 @@ def app():
                     try:
                         col = ee.ImageCollection.load(asset_id)
                         st.session_state["ee_asset_id"] = asset_id
-                    except:
+                    except Exception:
                         st.error("Invalid Earth Engine asset ID.")
                         st.session_state["ee_asset_id"] = None
                         return
@@ -529,7 +529,7 @@ def app():
                 if overlay_data is None:
                     overlay_data = st.text_input(
                         "Enter an HTTP URL to a GeoJSON file or an ee.FeatureCollection asset id:",
-                        "https://raw.githubusercontent.com/giswqs/geemap/master/examples/data/countries.geojson",
+                        "https://raw.githubusercontent.com/gee-community/geemap/master/examples/data/countries.geojson",
                     )
 
                 overlay_color = st.color_picker(
@@ -816,7 +816,7 @@ def app():
                                     mp4=mp4,
                                     fading=fading,
                                 )
-                        except:
+                        except Exception:
                             empty_text.error(
                                 "An error occurred while computing the timelapse. Your probably requested too much data. Try reducing the ROI or timespan."
                             )
@@ -1208,7 +1208,7 @@ def app():
                                 mp4=mp4,
                                 fading=fading,
                             )
-                        except:
+                        except Exception:
                             empty_text.error(
                                 "An error occurred while computing the timelapse. You probably requested too much data. Try reducing the ROI or timespan."
                             )
@@ -1387,7 +1387,7 @@ def app():
                                     mp4=mp4,
                                     fading=fading,
                                 )
-                        except:
+                        except Exception:
                             empty_text.error(
                                 "Something went wrong. You probably requested too much data. Try reducing the ROI or timespan."
                             )
@@ -1502,7 +1502,7 @@ def app():
                                 mp4=mp4,
                                 fading=fading,
                             )
-                        except:
+                        except Exception:
                             empty_text.error(
                                 "Something went wrong. You either requested too much data or the ROI is outside the U.S."
                             )
