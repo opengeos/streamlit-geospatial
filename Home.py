@@ -4,49 +4,39 @@ import leafmap.foliumap as leafmap
 st.set_page_config(layout="wide")
 
 st.sidebar.title("About")
-st.sidebar.info(
-    """
+st.sidebar.info("""
     - Web App URL: <https://streamlit.gishub.org>
     - GitHub repository: <https://github.com/opengeos/streamlit-geospatial>
-    """
-)
+    """)
 
 st.sidebar.title("Contact")
-st.sidebar.info(
-    """
+st.sidebar.info("""
     Qiusheng Wu at [wetlands.io](https://wetlands.io) | [GitHub](https://github.com/giswqs) | [Twitter](https://twitter.com/giswqs) | [YouTube](https://youtube.com/@giswqs) | [LinkedIn](https://www.linkedin.com/in/giswqs)
-    """
-)
+    """)
 
 st.sidebar.title("Support")
-st.sidebar.info(
-    """
+st.sidebar.info("""
     If you want to reward my work, I'd love a cup of coffee from you. Thanks!
     [buymeacoffee.com/giswqs](http://buymeacoffee.com/giswqs)
-    """
-)
+    """)
 
 
 st.title("Streamlit for Geospatial Applications")
 
-st.markdown(
-    """
+st.markdown("""
     This multi-page web app demonstrates various interactive web apps created using [streamlit](https://streamlit.io) and open-source mapping libraries,
     such as [leafmap](https://leafmap.org), [geemap](https://geemap.org), [pydeck](https://deckgl.readthedocs.io), and [kepler.gl](https://docs.kepler.gl/docs/keplergl-jupyter).
     This is an open-source project and you are very welcome to contribute your comments, questions, resources, and apps as [issues](https://github.com/opengeos/streamlit-geospatial/issues) or
     [pull requests](https://github.com/opengeos/streamlit-geospatial/pulls) to the [GitHub repository](https://github.com/opengeos/streamlit-geospatial).
 
-    """
-)
+    """)
 
 st.info("Click on the left sidebar menu to navigate to the different apps.")
 
 st.subheader("Timelapse of Satellite Imagery")
-st.markdown(
-    """
+st.markdown("""
     The following timelapse animations were created using the Timelapse web app. Click `Timelapse` on the left sidebar menu to create your own timelapse for any location around the globe.
-"""
-)
+""")
 
 row1_col1, row1_col2 = st.columns(2)
 with row1_col1:
