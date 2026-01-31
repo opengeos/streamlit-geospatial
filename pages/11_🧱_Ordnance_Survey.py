@@ -9,8 +9,7 @@ st.set_page_config(layout="wide")
 st.sidebar.info("""
     - Web App URL: <https://streamlit.gishub.org>
     - GitHub repository: <https://github.com/opengeos/streamlit-geospatial>
-    """
-)
+    """)
 
 st.sidebar.title("Contact")
 st.sidebar.info("""

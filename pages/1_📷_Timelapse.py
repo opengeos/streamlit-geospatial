@@ -24,8 +24,7 @@ def ee_authenticate(token_name="EARTHENGINE_TOKEN"):
 st.sidebar.info("""
     - Web App URL: <https://streamlit.gishub.org>
     - GitHub repository: <https://github.com/opengeos/streamlit-geospatial>
-    """
-)
+    """)
 
 st.sidebar.title("Contact")
 st.sidebar.info("""
