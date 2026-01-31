@@ -37,7 +37,9 @@ def read_data(url):
 countries = (
     "https://github.com/gee-community/geemap/raw/master/examples/data/countries.geojson"
 )
-states = "https://github.com/gee-community/geemap/raw/master/examples/data/us_states.json"
+states = (
+    "https://github.com/gee-community/geemap/raw/master/examples/data/us_states.json"
+)
 
 countries_gdf = read_data(countries)
 states_gdf = read_data(states)
