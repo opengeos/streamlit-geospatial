@@ -12,7 +12,7 @@ def ee_authenticate(token_name="EARTHENGINE_TOKEN"):
 
 st.sidebar.info("""
     - Web App URL: <https://streamlit.gishub.org>
-    - GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
+    - GitHub repository: <https://github.com/opengeos/streamlit-geospatial>
     """)
 
 st.sidebar.title("Contact")
@@ -31,9 +31,11 @@ def read_data(url):
 
 
 countries = (
-    "https://github.com/giswqs/geemap/raw/master/examples/data/countries.geojson"
+    "https://github.com/gee-community/geemap/raw/master/examples/data/countries.geojson"
 )
-states = "https://github.com/giswqs/geemap/raw/master/examples/data/us_states.json"
+states = (
+    "https://github.com/gee-community/geemap/raw/master/examples/data/us_states.json"
+)
 
 countries_gdf = read_data(countries)
 states_gdf = read_data(states)
@@ -69,7 +71,7 @@ with col2:
             fc = ee.FeatureCollection(
                 f"projects/sat-io/open-datasets/MSBuildings/US/{state}"
             )
-        except:
+        except Exception:
             st.error("No data available for the selected state.")
 
     else:
@@ -77,7 +79,7 @@ with col2:
             fc = ee.FeatureCollection(
                 f"projects/sat-io/open-datasets/MSBuildings/{country}"
             )
-        except:
+        except Exception:
             st.error("No data available for the selected country.")
 
         layer_name = country
