@@ -220,25 +220,25 @@ def assign_colors_to_gdf(gdf, selected_col, palette, n_colors):
     """Assign RGB colors to GeoDataFrame based on attribute values - cached to prevent recomputation"""
     colors = cm.get_palette(palette, n_colors)
     colors = [hex_to_rgb(c) for c in colors]
-    
+
     gdf = gdf.copy()  # Work on a copy
     gdf = gdf.sort_values(by=selected_col, ascending=True)
-    
+
     # Vectorized color assignment
     indices = (gdf.reset_index(drop=True).index / (len(gdf) / len(colors))).astype(int)
     indices = indices.clip(upper=len(colors) - 1)
-    
+
     gdf["R"] = [colors[i][0] for i in indices]
     gdf["G"] = [colors[i][1] for i in indices]
     gdf["B"] = [colors[i][2] for i in indices]
-    
+
     return gdf
 
 
 def app():
-    
+
     # Initialize session state to prevent unnecessary reruns
-    if 'data_loaded' not in st.session_state:
+    if "data_loaded" not in st.session_state:
         st.session_state.data_loaded = False
 
     st.title("U.S. Real Estate Data and Market Trends")
@@ -258,16 +258,14 @@ def app():
         [0.6, 0.8, 0.6, 1.4, 2]
     )
     with row1_col1:
-        frequency = st.selectbox("Monthly/weekly data", ["Monthly", "Weekly"], key="frequency")
+        frequency = st.selectbox(
+            "Monthly/weekly data", ["Monthly", "Weekly"], key="frequency"
+        )
     with row1_col2:
         types = ["Current month data", "Historical data"]
         if frequency == "Weekly":
             types.remove("Current month data")
-        cur_hist = st.selectbox(
-            "Current/historical data",
-            types,
-            key="cur_hist"
-        )
+        cur_hist = st.selectbox("Current/historical data", types, key="cur_hist")
     with row1_col3:
         if frequency == "Monthly":
             scale = st.selectbox(
@@ -282,7 +280,9 @@ def app():
         inventory_df = get_inventory_data(data_links["weekly"][scale.lower()])
         weeks = get_weeks(inventory_df)
         with row1_col1:
-            selected_date = st.date_input("Select a date", value=weeks[-1], key="selected_date")
+            selected_date = st.date_input(
+                "Select a date", value=weeks[-1], key="selected_date"
+            )
             saturday = get_saturday(selected_date)
             selected_period = saturday.strftime("%-m/%-d/%Y")
             if saturday not in weeks:
@@ -314,7 +314,7 @@ def app():
                         end_year,
                         value=start_year,
                         step=1,
-                        key="year"
+                        key="year",
                     )
                     selected_month = st.slider(
                         "Month",
@@ -322,7 +322,7 @@ def app():
                         max_value=12,
                         value=int(periods[0][-2:]),
                         step=1,
-                        key="month"
+                        key="month",
                     )
                 selected_period = str(selected_year) + str(selected_month).zfill(2)
                 if selected_period not in periods:
@@ -354,9 +354,13 @@ def app():
 
     palettes = cm.list_colormaps()
     with row2_col1:
-        palette = st.selectbox("Color palette", palettes, index=palettes.index("Blues"), key="palette")
+        palette = st.selectbox(
+            "Color palette", palettes, index=palettes.index("Blues"), key="palette"
+        )
     with row2_col2:
-        n_colors = st.slider("Number of colors", min_value=2, max_value=20, value=8, key="n_colors")
+        n_colors = st.slider(
+            "Number of colors", min_value=2, max_value=20, value=8, key="n_colors"
+        )
     with row2_col3:
         show_nodata = st.checkbox("Show nodata areas", value=True, key="show_nodata")
     with row2_col4:
@@ -364,7 +368,12 @@ def app():
     with row2_col5:
         if show_3d:
             elev_scale = st.slider(
-                "Elevation scale", min_value=1, max_value=1000000, value=1, step=10, key="elev_scale"
+                "Elevation scale",
+                min_value=1,
+                max_value=1000000,
+                value=1,
+                step=10,
+                key="elev_scale",
             )
             with row2_col6:
                 st.info("Press Ctrl and move the left mouse button.")
@@ -375,7 +384,7 @@ def app():
     gdf = join_attributes(gdf, inventory_df, scale.lower())
     gdf_null = select_null(gdf, selected_col)
     gdf = select_non_null(gdf, selected_col)
-    
+
     # Use cached color assignment function to avoid recomputation
     gdf = assign_colors_to_gdf(gdf, selected_col, palette, n_colors)
 
