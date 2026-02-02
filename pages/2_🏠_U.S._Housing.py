@@ -220,7 +220,7 @@ def assign_colors_to_gdf(_gdf, selected_col, palette, n_colors):
     """Assign RGB colors to GeoDataFrame based on attribute values - cached to prevent recomputation"""
     colors = cm.get_palette(palette, n_colors)
     colors = [hex_to_rgb(c) for c in colors]
-    
+
     gdf = _gdf.copy()  # Work on a copy
     gdf = gdf.sort_values(by=selected_col, ascending=True)
 
