@@ -223,15 +223,15 @@ def assign_colors_to_gdf(_gdf, selected_col, palette, n_colors):
 
     gdf = _gdf.copy()  # Work on a copy
     gdf = gdf.sort_values(by=selected_col, ascending=True)
-
+    
     # Vectorized color assignment
-    indices = (gdf.reset_index(drop=True).index / (len(gdf) / len(colors))).astype(int)
-    indices = indices.clip(upper=len(colors) - 1)
-
+    indices = (gdf.reset_index(drop=True).index / (len(gdf) / len(colors))).astype(int).to_numpy()
+    indices = indices.clip(max=len(colors) - 1)
+    
     gdf["R"] = [colors[i][0] for i in indices]
     gdf["G"] = [colors[i][1] for i in indices]
     gdf["B"] = [colors[i][2] for i in indices]
-
+    
     return gdf
 
 
