@@ -48,7 +48,7 @@ data_links = {
     "monthly_historical": {
         "national": link_prefix + "Core/RDC_Inventory_Core_Metrics_Country_History.csv",
         "state": link_prefix + "Core/RDC_Inventory_Core_Metrics_State_History.csv",
-        "metro": link_prefix + "Core/RDC_Inventory_Core_Metrics_Metro.csv",
+        "metro": link_prefix + "Core/RDC_Inventory_Core_Metrics_Metro_History.csv",
         "county": link_prefix + "Core/RDC_Inventory_Core_Metrics_County_History.csv",
         "zip": link_prefix + "Core/RDC_Inventory_Core_Metrics_Zip_History.csv",
     },
