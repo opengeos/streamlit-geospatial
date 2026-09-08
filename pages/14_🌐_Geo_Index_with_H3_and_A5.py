@@ -2,7 +2,6 @@ import streamlit_hexviz as shv
 import pandas as pd
 import streamlit as st
 
-
 st.write("## Earthquakes")
 st.subheader("Example for geo index and heatmaps with H3 and A5")
 

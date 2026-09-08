@@ -1,4 +1,5 @@
 --find-links=https://girder.github.io/large_image_wheels GDAL
+fiona
 folium
 geemap[extra]
 geopandas
@@ -9,6 +10,5 @@ plotly
 pyarrow
 streamlit
 streamlit-folium
-streamlit-keplergl
-fiona
 streamlit-hexviz[a5]
+streamlit-keplergl
