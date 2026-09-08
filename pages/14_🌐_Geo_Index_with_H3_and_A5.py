@@ -38,7 +38,7 @@ elif geospatial_grid == "H3 flexible":
         use_sidebar_controls=True,
         key="h3_flex",
     )
-    st.info("use left side navigation for chaning settings")
+    st.info("use left side navigation for changing settings")
 elif geospatial_grid == "A5 resolution 4":
     shv.a5_map(
         df=data,
@@ -59,7 +59,7 @@ elif geospatial_grid == "A5 flexible":
         use_sidebar_controls=True,
         key="a5_flex",
     )
-    st.info("use left side navigation for chaning settings")
+    st.info("use left side navigation for changing settings")
 
 st.write("Data sample")
 st.dataframe(data.head(20))
@@ -109,7 +109,7 @@ with st.expander("See code"):
             use_sidebar_controls=True,
             key="h3_flex",
         )
-        st.info("use left side navigation for chaning settings")
+        st.info("use left side navigation for changing settings")
     elif geospatial_grid == "A5 resolution 4":
         shv.a5_map(
             df=data,
@@ -130,7 +130,7 @@ with st.expander("See code"):
             use_sidebar_controls=True,
             key="a5_flex",
         )
-    st.info("use left side navigation for chaning settings")
+    st.info("use left side navigation for changing settings")
 
 
     st.dataframe(data.head(20))
