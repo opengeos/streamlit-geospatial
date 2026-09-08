@@ -1,3 +1,4 @@
+--find-links=https://girder.github.io/large_image_wheels GDAL
 folium
 geemap[extra]
 geopandas
