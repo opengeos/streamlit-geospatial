@@ -65,7 +65,7 @@ st.dataframe(data.head(20))
 
 with st.expander("See code"):
     st.code(
-        """ pip install streamlit-hexviz[a5]
+        """ pip install "streamlit-hexviz[a5]"
             """,
         language="bash",
     )
@@ -129,7 +129,7 @@ with st.expander("See code"):
             use_sidebar_controls=True,
             key="a5_flex",
         )
-    st.info("use left side navigation for changing settings")
+        st.info("use left side navigation for changing settings")
 
 
     st.dataframe(data.head(20))
